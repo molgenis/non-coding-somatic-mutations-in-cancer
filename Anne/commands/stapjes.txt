@@ -1,0 +1,62 @@
+# download files
+met bash schrip -> downloadFiles.sh
+'''
+#!/usr/bin/bash
+
+#sets working directory
+cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
+
+# array of files it should download
+array=( EGAF00000151604 EGAF00000151605 EGAF00000151606 )
+# array with file output names
+array2=( ./SS6004094.bam ./SS6004099.bam ./SS6004104.bam )
+
+for i in "${!array[@]}"
+do
+    while [ ! -f "${array2[i]}" ]
+    do
+        pyega3 -cf ~/ega_credentials.json fetch "${array[i]}" --saveto "${array2[i]}"
+    done
+done
+'''
+# chr download
+#https://hgdownload.soe.ucsc.edu/goldenPath/hg19/chromosomes/
+wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/*'
+
+# sort
+samtools sort SS6005044.bam -o SS6005044.sorted.bam
+# index
+samtools index sample.sorted.bam
+# filteren op chr22
+samtools view -h SS6005044.sorted.bam chr22 > SS6005044.chr22.sam
+samtools view -bS SS6005044.chr22.sam > SS6005044.chr22.bam
+# Bekijk grote header van bam file
+samtools view -H SS6005044.bam
+
+# Verander >1 -> >chr1
+sed -e 's/>\([0-9XY]\)/>chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
+# Verwijder chrM
+awk '/^>/ {P=index($0,"chrM")==0} {if(P) print} ' NEW_genome.fa > without_chrM_genome.fa
+# Bekijk headers
+grep -e ">" without_chrM_genome.fa
+# Maak dict file
+gatk CreateSequenceDictionary -R without_chrM_genome.fa
+# Maak index file
+samtools faidx without_chrM_genome.fa
+
+# Mutect2
+gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/reference/human-hg19/without_chrM_genome.fa -I SS6005044.chr22.bam -O unfiltered_SS6005044.chr22.vcf
+
+
+
+
+gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/reference/human-hg19/chr22.fa -I SS6005044.chr22.bam -O unfiltered_SS6005044_chr22.vcf
+
+
+
+
+
+
+java -jar picard.jar ValidateSamFile I=SS6005044.chr22.bam MODE=SUMMARY
+
+wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/*'

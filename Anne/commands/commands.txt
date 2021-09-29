@@ -1,0 +1,93 @@
+algemeen:
+ls -lah
+ls -lah ~/.conda
+rm -r /groups/umcg-wijmenga/tmp01/users/umcg-aewijk/.conda/envs/pyega3_env
+
+paths:
+/home/umcg-aewijk/
+/groups/umcg-wijmenga/tmp01/users/umcg-aewijk
+
+symlinking:
+mv .conda /groups/umcg-wijmenga/tmp01/users/umcg-aewijk/
+ln -s /groups/umcg-wijmenga/tmp01/users/umcg-aewijk/.conda ~/.conda
+
+screen:
+screen -S ega
+ctrl+a d
+screen -ls
+screen -r screennaam
+
+
+downloaden bestanden:
+conda create -n ega python=3.7
+conda activate ega 			OF 			source activate ega
+pip install pyega3
+cp /groups/umcg-wijmenga/tmp01/users/umcg-aewijk/ega_credentials.json ~/
+cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
+screen -S ega
+pyega3 -cf ~/ega_credentials.json files EGAD00001000292
+Voor het echt downloaden:
+pyega3 -cf ~/ega_credentials.json fetch EGAF00000151604 --saveto ./SS6004094.bam
+pyega3 -cf ~/ega_credentials.json fetch EGAF00000151605 --saveto ./SS6004099.bam
+pyega3 -cf ~/ega_credentials.json fetch EGAF00000151606 --saveto ./SS6004104.bam
+
+bash
+touch test.sh
+nano test.sh
+chmod +x test.sh
+
+Samtools:
+# sort
+samtools sort SS6005044.bam -o SS6005044.sorted.bam
+# index
+samtools index sample.sorted.bam
+# filteren op 1 chromosoom
+# https://carleshf87.wordpress.com/2013/10/28/extracting-reads-for-a-single-chromosome-from-bamsam-file-with-samtools/
+samtools view -h SS6005044.sorted.bam chr22 > SS6005044.chr22.sam
+samtools view -bS SS6005044.chr22.sam > SS6005044.chr22.bam
+
+
+samtools view -H  SS6005044.bam |grep '^@SQ'>chromosomes.txt
+samtools view -H SS6005044.bam
+
+
+
+gatk Mutect2
+# https://gatk.broadinstitute.org/hc/en-us/articles/360035531652-FASTA-Reference-genome-format
+gatk CreateSequenceDictionary -R NEW_genome.fa
+samtools faidx NEW_genome.fa
+#https://gatk.broadinstitute.org/hc/en-us/articles/360035531132--How-to-Call-somatic-mutations-using-GATK4-Mutect2
+gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/reference/human-hg19/NEW_genome.fa -I SS6005044.chr22.bam -O unfiltered_SS6005044.chr22.vcf
+
+gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/reference/human-hg19/without_chrM_genome.fa -I SS6005044.chr22.bam -O unfiltered_SS6005044.chr22.vcf
+
+# ERROR: https://gatk.broadinstitute.org/hc/en-us/articles/360035891131-Errors-about-input-files-having-missing-or-incompatible-contigs
+# oplossing https://www.biostars.org/p/146171/
+https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37
+# Remove chrM
+awk '/^>/ {P=index($0,"chrM")==0} {if(P) print} ' NEW_genome.fa > without_chrM_genome.fa
+grep -e ">" without_chrM_genome.fa
+
+
+sed 's/>/>chr/g' cp_genome.fa > cp_genome_chage.fa
+sed 's/>chrMT/>chrM/g' cp_genome.fa > cp_genome_chage.fa
+OF
+# http://seqanswers.com/forums/showthread.php?t=22504
+sed -e 's/>\([0-9XY]\)/>chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
+# checken
+grep -e ">" my.fasta
+
+
+
+
+
+
+cat chr1.fa > chrall.fa
+cat chr2.fa >> chrall.fa
+cat chr3.fa >> chrall.fa
+11:56
+etc.
+maar dan liever in een mooi loopje
+cat ~/file0{1..3} ~/file{A..C} > merged-file
+for i in file0{1..3} file{A..C}; do cat ~/"$i"; done > merged-file
+cat * > merged-file
