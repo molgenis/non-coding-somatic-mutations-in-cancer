@@ -1,0 +1,24 @@
+https://paleogenomics-course.readthedocs.io/en/latest/4_ReadsMapping_v2.html
+
+ml BWA/0.7.17-GCCcore-7.3.0
+bwa index -a is /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa
+samtools faidxbwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa SS6005044.chr22.fastq -n 0.1 -l 1000 > SS6005044.chr22.sai
+
+bam > fastq
+fastq > fastq.gz
+gzip SS6005044.chr22.fastq
+bwa index -a is /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+
+gatk CreateSequenceDictionary -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+samtools faidx /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044.chr22.fastq.gz -n 0.1 -l 1000 > SS6005044.chr22.sai
+
+bwa samse /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044.chr22.sai SS6005044.chr22.fastq.gz -f SS6005044.chr22.sam
+samtools view -Sb SS6005044.chr22.sam > SS6005044.chr22.bam
+
+samtools view SS6005044.chr22.bam | less -S
+samtools view -H SS6005044.chr22.bam
+samtools sort SS6005044.chr22.bam -o SS6005044.chr22.sort.bam
+samtools index SS6005044.chr22.sort.bam
+
+

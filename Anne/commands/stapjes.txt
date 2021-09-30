@@ -32,6 +32,9 @@ samtools view -h SS6005044.sorted.bam chr22 > SS6005044.chr22.sam
 samtools view -bS SS6005044.chr22.sam > SS6005044.chr22.bam
 # Bekijk grote header van bam file
 samtools view -H SS6005044.bam
+# depth
+samtools depth SS6005044.bam
+
 
 # Verander >1 -> >chr1
 sed -e 's/>\([0-9XY]\)/>chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
@@ -52,11 +55,12 @@ gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/refe
 
 gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/reference/human-hg19/chr22.fa -I SS6005044.chr22.bam -O unfiltered_SS6005044_chr22.vcf
 
-
-
-
-
-
 java -jar picard.jar ValidateSamFile I=SS6005044.chr22.bam MODE=SUMMARY
 
 wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/*'
+
+
+
+#BAM -> FASTQ
+samtools fastq SS6005044.chr22.bam > SS6005044.chr22.fastq
+
