@@ -1,0 +1,485 @@
+###################################
+# Algemeen
+###################################
+* paths
+    Calculon
+    cd /groups/umcg-wijmenga/tmp04/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
+    gear
+    cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
+
+    /home/umcg-aewijk/
+    /groups/umcg-wijmenga/tmp01/users/umcg-aewijk
+
+    fasta van het genoom (hg19)
+    /groups/umcg-wijmenga/tmp01/users/umcg-hbrugge/refdata-cellranger-hg19-3.0.0/fasta/
+    /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/reference/human-hg19
+    snp file van het genoom
+    /groups/umcg-wijmenga/tmp01/projects/1M_cells_scRNAseq/ongoing/Cardiology/genotype/dbSNP/human_9606_b151_GRCh37p13/All_20180423.vcf.gz
+
+
+* aanroepen packages
+    module key samtools
+    ml ....
+    '''
+    ml Anaconda3/5.3.0
+    ml SAMtools/1.9-foss-2018b
+    ml GATK/4.1.4.1-Java-8-LTS
+    ml BCFtools/1.11-GCCcore-7.3.0
+    ml BWA/0.7.17-GCCcore-7.3.0
+    ml Bowtie2/2.3.4.2-foss-2018b
+    ml picard/2.20.5-Java-11-LTS
+    '''
+
+* interactieve sessie
+    srun --cpus-per-task=1 --mem=4gb --nodes=1 --qos=priority --time=05:00:00 --pty bash -i
+    or
+    srun --cpus-per-task=1 --mem=4gb --nodes=1 --qos=regular --time=05:00:00 --pty bash -i
+
+* conda
+    source activate internship
+    conda create -n stage  python=3.7
+    source activate stage  
+
+* tmux 
+    tmux new -s BAM
+
+* screen
+    screen -S ega
+    ctrl+a d
+    screen -ls
+    screen -r screennaam
+
+* symlinking
+    mv .conda /groups/umcg-wijmenga/tmp01/users/umcg-aewijk/
+    ln -s /groups/umcg-wijmenga/tmp01/users/umcg-aewijk/.conda ~/.conda
+    ls -lah
+
+* bash
+    touch test.sh
+    nano test.sh
+    chmod +x test.sh
+    sed -i -e 's/\r$//' test.sh
+
+
+faidx --regex "^.+\|.+\|.+\|[[1-9][0-2]?|[XY]]" input.fa > output.fa
+ls -lah
+ls -lah ~/.conda
+rm -r /groups/umcg-wijmenga/tmp01/users/umcg-aewijk/.conda/envs/pyega3_env
+samtools view -H  SS6005044.bam |grep '^@SQ'>chromosomes.txt
+samtools view -H SS6005044.bam
+
+###################################
+#
+###################################
+
+* Download files
+    * Van dataset: EGAD00001000292
+        Download dit doormiddel van een bash script
+            '''
+            #!/usr/bin/bash
+
+            #sets working directory
+            cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
+
+            # array of files it should download
+            array=( EGAF00000151604 EGAF00000151605 EGAF00000151606 )
+            # array with file output names
+            array2=( ./SS6004094.bam ./SS6004099.bam ./SS6004104.bam )
+
+            for i in "${!array[@]}"
+            do
+                while [ ! -f "${array2[i]}" ]
+                do
+                    pyega3 -cf ~/ega_credentials.json fetch "${array[i]}" --saveto "${array2[i]}"
+                done
+            done
+            '''
+    * download chromosoom data
+        https://hgdownload.soe.ucsc.edu/goldenPath/hg19/chromosomes/
+        wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/*'
+        download chromosoom data zodat we weten waar we deze data vandaan hebben
+        sh script: unzip, plakt de bestanden aan elkaar van elk chromosoom
+        '''
+        #!/usr/bin/bash
+
+        download_unzip_merge_files () {
+            # download files: https://hgdownload.soe.ucsc.edu/goldenPath/hg19/chromosomes/
+            cd ./zipFile/
+            wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/hg19/chromosomes/*'
+            # Loop over files
+            for filename in $(ls | egrep -i 'chr[0-9,X,Y,M]{1,2}.fa.gz' )
+            do 
+                #printf "%s\n" "$filename"
+                # unzip files
+                gunzip -c "$filename" > /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/"${filename%.*}"
+                # merge files
+                cat /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/"${filename%.*}" >> /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa  
+            done
+            
+            cd ..
+            ml SAMtools/1.9-foss-2018b
+            ml GATK/4.1.4.1-Java-8-LTS
+            # dict file
+            gatk CreateSequenceDictionary -R chrall.fa
+            # index file
+            samtools faidx chrall.fa
+        }
+
+
+        FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa
+        # Control if file excist
+        if [ ! -f "$FILE" ]; then
+            download_unzip_merge_files
+        else 
+            read -p "Do you want to do the download and the rest again?" yn
+            case $yn in
+                [Yy]* ) 
+                    rm "$FILE"
+                    rm /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.dict
+                    rm /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa.fai
+                    rm /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/*
+                    rm /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/zipFile/*
+                    printf "DELETE SUCCESSFUL"
+                    printf "DOWNLOAD START"
+                    download_unzip_merge_files
+                    printf "DOWNLOAD END";;
+                [Nn]* ) 
+                    printf "%s\n" "$FILE";;
+                * ) 
+                    echo "Please answer y (=yes) or n (=no).";;
+            esac
+        fi
+        '''
+
+
+* sorteren, indexen en filteren van bam files
+    * sorteren
+        samtools sort SS6005044.bam -o SS6005044.sorted.bam
+    * indexen
+        samtools index SS6005044.sorted.bam
+    * filteren op chr22
+      https://carleshf87.wordpress.com/2013/10/28/extracting-reads-for-a-single-chromosome-from-bamsam-file-with-samtools/
+        ? samtools view -b in.bam chr1 > in_chr1.bam
+        samtools view -h SS6005044.sorted.bam chr22 > SS6005044_2.chr22.sam
+        samtools view -bS SS6005044_2.chr22.sam > SS6005044_2.chr22.bam
+    * Bekijk grote header van bam file
+        samtools view -H SS6005044.bam
+
+* depth (nico)
+    samtools depth SS6005044.bam
+
+* Bewerken van reference genoom file
+    * verander >1 naar >chr1
+        sed -e 's/>\([0-9XY]\)/>chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
+    * verwijder chrM
+        awk '/^>/ {P=index($0,"chrM")==0} {if(P) print} ' NEW_genome.fa > without_chrM_genome.fa
+    * veranderen >1 naar >chr1 en >MT naar >chrM
+        # http://seqanswers.com/forums/showthread.php?t=22504
+        sed -e 's/##contig=<ID=\([0-9XY]\)/##contig=<ID=chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
+    
+    sed 's/>/>chr/g' cp_genome.fa > cp_genome_chage.fa
+    sed 's/>chrMT/>chrM/g' cp_genome.fa > cp_genome_chage.fa
+    OF
+    # http://seqanswers.com/forums/showthread.php?t=22504
+    sed -e 's/##contig=<ID=\([0-9XY]\)/##contig=<ID=chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
+    # checken
+    grep -e ">" my.fasta
+
+    * bekijk headers
+        grep -e ">" without_chrM_genome.fa
+    * maak dict file
+        gatk CreateSequenceDictionary -R without_chrM_genome.fa
+    * maak index file
+        samtools faidx without_chrM_genome.fa
+
+* Bewerken vcf file
+    * header
+        bcftools view --header-only somatic-b37_Mutect2-WGS-panel-b37.vcf | sed 's/##contig=<ID=\([0-9XY]\)/##contig=<ID=chr\1/' | sed 's/##contig=<ID=MT/##contig=<ID=chrM/' > new_somatic-b37_Mutect2-WGS-panel-b37.vcf
+    * no headers
+        bcftools view --header-only somatic-b37_Mutect2-WGS-panel-b37.vcf | sed 's/##contig=<ID=\([0-9XY]\)/##contig=<ID=chr\1/' | sed 's/##contig=<ID=MT/##contig=<ID=chrM/' > new_somatic-b37_Mutect2-WGS-panel-b37.vcf
+    * header en no header plakken
+        cat new_somatic-b37_Mutect2-WGS-panel-b37.vcf new2_somatic-b37_Mutect2-WGS-panel-b37.vcf >> merge.vcf
+    * index
+        gatk IndexFeatureFile -I merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+
+* index and dict
+    #https://gatk.broadinstitute.org/hc/en-us/articles/360035531652-FASTA-Reference-genome-format
+    gatk CreateSequenceDictionary -R NEW_genome.fa
+    samtools faidx NEW_genome.fa
+
+* opnieuw alignen van bestanden
+  https://paleogenomics-course.readthedocs.io/en/latest/4_ReadsMapping_v2.html
+    * filteren chr22
+        samtools view -h SS6005044.sorted.bam chr22 > SS6005044.chr22.sam
+        samtools view -bS SS6005044.chr22.sam > SS6005044.chr22.bam
+    * bam omzetten naar  fastq
+        samtools fastq SS6005044.chr22.bam > SS6005044.chr22.fastq
+    * fastq zippen
+        gzip SS6005044.chr22.fastq
+    * Preparation of the reference sequence
+        bwa index -a is /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+    * Create a reference dictionary
+        java -jar ${EBROOTPICARD}/picard.jar CreateSequenceDictionary R= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa O= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.dict
+    * Index the reference sequence with Samtools
+        samtools faidx /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+    * Alignment of pre-processed reads to the reference genome with BWA aln
+        bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044.chr22.fastq.gz -n 0.1 -l 1000 > SS6005044.chr22.sai
+        bwa samse /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044.chr22.sai SS6005044.chr22.fastq.gz -f SS6005044.chr22.sam
+    * Converting sam file to bam file
+        samtools view -Sb SS6005044.chr22.sam > SS6005044.chr22.bam
+        samtools view SS6005044.chr22.bam | less -S
+        samtools view -H SS6005044.chr22.bam
+    * Sorting and indexing the bam file
+        samtools sort SS6005044.chr22.bam -o SS6005044.chr22.sort.bam
+        samtools index SS6005044.chr22.sort.bam
+    * Adding Read Group tags and indexing bam files
+        java -jar ${EBROOTPICARD}/picard.jar  AddOrReplaceReadGroups INPUT= SS6005044.chr22.sort.bam OUTPUT= SS6005044.chr22.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
+        samtools index SS6005044.chr22.RG.bam
+    * Marking and removing duplicates
+        java -jar ${EBROOTPICARD}/picard.jar  MarkDuplicates I= SS6005044.chr22.RG.bam O= SS6005044.chr22.DR.bam M=output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> logFile.log
+        samtools index SS6005044.chr22.DR.bam
+
+    '''
+    FILE="SS6005042"
+
+    samtools view -h ${FILE}.sorted.bam chr22 > ${FILE}.chr22.sam
+    samtools view -bS ${FILE}.chr22.sam > ${FILE}.chr22.bam
+    samtools fastq ${FILE}.chr22.bam > ${FILE}.chr22.fastq
+    gzip ${FILE}.chr22.fastq
+    bwa index -a is /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+    java -jar ${EBROOTPICARD}/picard.jar CreateSequenceDictionary R= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa O= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.dict
+    samtools faidx /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+    bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa ${FILE}.chr22.fastq.gz -n 0.1 -l 1000 > ${FILE}.chr22.sai
+    bwa samse /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa ${FILE}.chr22.sai ${FILE}.chr22.fastq.gz -f ${FILE}.chr22.sam
+    samtools view -Sb ${FILE}.chr22.sam > ${FILE}.chr22.bam
+    samtools view ${FILE}.chr22.bam | less -S
+    samtools view -H ${FILE}.chr22.bam
+    samtools sort ${FILE}.chr22.bam -o ${FILE}.chr22.sort.bam
+    samtools index ${FILE}.chr22.sort.bam
+    java -jar ${EBROOTPICARD}/picard.jar  AddOrReplaceReadGroups INPUT= ${FILE}.chr22.sort.bam OUTPUT= ${FILE}.chr22.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
+    samtools index ${FILE}.chr22.RG.bam
+    java -jar ${EBROOTPICARD}/picard.jar  MarkDuplicates I= ${FILE}.chr22.RG.bam O= ${FILE}.chr22.DR.bam M=output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> logFile.log
+    samtools index ${FILE}.chr22.DR.bam
+    '''
+
+
+* Sample name change
+    *  for f in *.DR.bam; do samtools view -H $f  | sed "s/SM:[^\t]*/SM:${f}/g" | samtools reheader - $f > SM_$f; echo -ne "$f\t" ; samtools view -H $f | grep '^@RG' | sed "s/.*SM:\([^\t]*\).*/\1/g" | uniq; done
+
+        for f in *.DR.bam; do echo -ne "$f\t" ; samtools view -H $f  | sed "s/SM:[^\t]*/SM:${f}/g" | samtools reheader - $f > SM_$f; done
+
+        for f in *.DR.bam; do echo -ne "$f\t" ; samtools view -H $f  | sed "s/SM:[^\t]*/SM:${f}/g" | samtools reheader - $f > SM_$f; done
+        for f in *.DR.bam; do echo -ne "$f\t" ; samtools view -H $f | grep '^@RG' | sed "s/.*SM:\([^\t]*\).*/\1/g" | uniq; done
+
+
+* Mutect2
+  https://gatk.broadinstitute.org/hc/en-us/articles/360035531132--How-to-Call-somatic-mutations-using-GATK4-Mutect2
+    * Nick
+        --native-pair-hmm-threads 40 -L Documents/SiNVICT/UCSC_COMBINED.bed
+        Deze 2 slinger ik er nog achter aan
+        De eerste is 40 threads aan gooien anders duurt het me te lang, 
+        en de 2e is regio's selecteren, want ik ben maar geinteresseerd in bepaalde regio's, maar de bam-files zijn van het hele genoom
+    * EERSTE STAP
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.bam -tumor SS6005044.chr22.DR.bam -I SM_SS6005042.chr22.DR.bam -normal SS6005042.chr22.DR.bam -O 5044_5042_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -tumor SS6005044.chr22.DR.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5042_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -tumor SS6005044.chr22.DR.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5042_somatic_name.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/somatic-b37_Mutect2-WGS-panel-b37.vcf
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -tumor SS6005044.chr22.DR.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5042_somatic_name.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -tumor SS6005044.chr22.DR.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5042_somatic_name_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -I SM_SS6005042.chr22.DR.sort.bam -O 5044_5042_somatic_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SS6005044.chr22.DR.bam -O 5044_somatic.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.bam -tumor SS6005044.chr22.DR.bam -O 5044_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -tumor SS6005044.chr22.DR.bam -O 5044_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -tumor SS6005044.chr22.DR.bam -O 5044_somatic_name_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -O 5044_somatic_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SS6005043.chr22.DR.bam -O 5043_somatic.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005043.chr22.DR.bam -tumor SS6005043.chr22.DR.bam -O 5043_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005043.chr22.DR.sort.bam -tumor SS6005043.chr22.DR.bam -O 5043_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005043.chr22.DR.sort.bam -tumor SS6005043.chr22.DR.bam -O 5043_somatic_name_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005043.chr22.DR.sort.bam -O 5043_somatic_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SS6005042.chr22.DR.bam -O 5042_somatic.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005042.chr22.DR.bam -normal SS6005042.chr22.DR.bam -O 5042_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5042_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5042_somatic_name_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005042.chr22.DR.sort.bam -O 5042_somatic_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf   
+
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -tumor SS6005044.chr22.DR.bam -I SM_SS6005043.chr22.DR.sort.bam -tumor SS6005043.chr22.DR.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5043_5042_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -I SM_SS6005043.chr22.DR.sort.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5043_5042_somatic_name.vcf.gz
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -I SM_SS6005043.chr22.DR.sort.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5043_5042_somatic_name_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+        gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -I SM_SS6005043.chr22.DR.sort.bam -I SM_SS6005042.chr22.DR.sort.bam -O 5044_5043_5042_somatic_PON.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+        * normaal
+
+        * met sample names
+            gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.bam -tumor SS6005044.chr22.DR.bam -I SM_SS6005042.chr22.DR.bam -normal SS6005042.chr22.DR.bam -O 5044_5042_somatic_name.vcf.gz
+            gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005042.chr22.DR.bam -normal SS6005042.chr22.DR.bam -O 5042_somatic_name.vcf.gz
+            gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -I SM_SS6005043.chr22.DR.sort.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5043_5042_somatic_name.vcf.gz
+        * met PON (--panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/somatic-b37_Mutect2-WGS-panel-b37.vcf)
+        https://console.cloud.google.com/storage/browser/_details/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz;tab=live_object?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22)) 
+        https://console.cloud.google.com/storage/browser/_details/gatk-best-practices/somatic-b37/Mutect2-WGS-panel-b37.vcf;tab=live_object?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22)) 
+
+            gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.bam -tumor SS6005044.chr22.DR.bam -I SM_SS6005042.chr22.DR.bam -normal SS6005042.chr22.DR.bam -O 5044_5042_somatic_name.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/somatic-b37_Mutect2-WGS-panel-b37.vcf
+            gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005042.chr22.DR.bam -normal SS6005042.chr22.DR.bam -O 5042_somatic_name.vcf.gz --panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/somatic-b37_Mutect2-WGS-panel-b37.vcf
+            gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SM_SS6005044.chr22.DR.sort.bam -I SM_SS6005043.chr22.DR.sort.bam -I SM_SS6005042.chr22.DR.sort.bam -normal SS6005042.chr22.DR.bam -O 5044_5043_5042_somatic_name.vcf.gz--panel-of-normals /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/somatic-b37_Mutect2-WGS-panel-b37.vcf
+
+    * TWEEDE STAP
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5043_5042_somatic_name.vcf.gz -O filtered_5043_5042_somatic_name.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5043_5042_somatic_name_PON.vcf.gz -O filtered_5043_5042_somatic_name_PON.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5043_somatic.vcf.gz -O filtered_5043_somatic.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5043_somatic_name.vcf.gz -O filtered_5043_somatic_name.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5043_somatic_name_PON.vcf.gz -O filtered_5043_somatic_name_PON.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_5042_somatic.vcf.gz -O filtered_5044_5042_somatic.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_5042_somatic_name.vcf.gz -O filtered_5044_5042_somatic_name.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_5042_somatic_name_PON.vcf.gz -O filtered_5044_5042_somatic_name_PON.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_5043_5042_somatic_name.vcf.gz -O filtered_5044_5043_5042_somatic_name.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_5043_5042_somatic_name_PON.vcf.gz -O filtered_5044_5043_5042_somatic_name_PON.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_somatic.vcf.gz -O filtered_5044_somatic.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_somatic_name.vcf.gz -O filtered_5044_somatic_name.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_somatic_name_PON.vcf.gz -O filtered_5044_somatic_name_PON.vcf.gz
+
+
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_somatic_PON.vcf.gz -O filtered_5044_somatic_PON.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5043_5042_somatic_PON.vcf.gz -O filtered_5043_5042_somatic_PON.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5043_somatic_PON.vcf.gz -O filtered_5043_somatic_PON.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_5042_somatic_PON.vcf.gz -O filtered_5044_5042_somatic_PON.vcf.gz
+        gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V 5044_5043_5042_somatic_PON.vcf.gz -O filtered_5044_5043_5042_somatic_PON.vcf.gz
+
+    # ERROR: https://gatk.broadinstitute.org/hc/en-us/articles/360035891131-Errors-about-input-files-having-missing-or-incompatible-contigs
+    # oplossing https://www.biostars.org/p/146171/
+    https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37
+    # Remove chrM
+    awk '/^>/ {P=index($0,"chrM")==0} {if(P) print} ' NEW_genome.fa > without_chrM_genome.fa
+    grep -e ">" without_chrM_genome.fa
+
+* bamCompare
+    https://deeptools.readthedocs.io/en/develop/content/installation.html
+    https://deeptools.readthedocs.io/en/develop/content/tools/bamCompare.html
+    * bamCompare -b1 SS6005044.chr22.DR.bam -b2 SS6005044_2.chr22.DR.bam -o AAlog2ratio.bw
+        '''
+        (stage) [umcg-aewijk@gearshift EGAD00001000292]$ bamCompare -b1 SS6005044.chr22.DR.bam -b2 SS6005044_2.chr22.DR.bam -o AAlog2ratio.bw
+
+        The following chromosome names did not match between the the bam files
+        chromosome      length
+                chrM      16571
+                chr20   63025520
+                chr8  146364022
+                chr4  191154276
+                chr11  135006516
+                chr2  243199373
+                chr14  107349540
+                chr16   90354753
+                chr17   81195210
+                chr5  180915260
+                chr3  198022430
+                chr7  159138663
+                chr6  171115067
+                chr1  249250621
+                chr13  115169878
+                chr19   59128983
+                chr12  133851895
+                chr10  135534747
+                chr21   48129895
+                chrX  155270560
+                chr18   78077248
+                chr15  102531392
+                chr9  141213431
+        bamFilesList: ['SS6005044.chr22.DR.bam', 'SS6005044_2.chr22.DR.bam']
+        binLength: 50
+        numberOfSamples: 0
+        blackListFileName: None
+        skipZeroOverZero: False
+        bed_and_bin: False
+        genomeChunkSize: None
+        defaultFragmentLength: read length
+        numberOfProcessors: 1
+        verbose: False
+        region: None
+        bedFile: None
+        minMappingQuality: None
+        ignoreDuplicates: False
+        chrsToSkip: []
+        stepSize: 50
+        center_read: False
+        samFlag_include: None
+        samFlag_exclude: None
+        minFragmentLength: 0
+        maxFragmentLength: 0
+        zerosToNans: False
+        smoothLength: None
+        save_data: False
+        out_file_for_raw_data: None
+        maxPairedFragmentLength: 1000
+
+        '''
+
+
+
+??? java -jar ${EBROOTPICARD}/picard.jar CompareSAMs SS6005044.chr22.DR.bam SS6005044_2.chr22.bam LENIENT_LOW_MQ_ALIGNMENT=true LENIENT_DUP=true O=comparison_SS6005044.chr22.DR_SS6005044_2.chr22.tsv
+
+* job script
+    sbatch test_chr22_realignment_SBATCH.sh
+    squeue -u ${USER}
+    sbatch myScript.sh
+    '''
+    #!/usr/bin/env bash
+
+    #SBATCH --job-name=testchr22alignment
+    #SBATCH --output=testchr22alignment.out
+    #SBATCH --error=testchr22alignment.err
+    #SBATCH --time=23:59:59
+    #SBATCH --cpus-per-task=8
+    #SBATCH --mem=96gb
+    #SBATCH --nodes=1
+    #SBATCH --open-mode=append
+    #SBATCH --export=NONE
+    #SBATCH --get-user-env=L
+
+    #ml SAMtools
+    #ml HTSlib
+    #ml picard
+    ml SAMtools/1.9-foss-2018b
+    ml GATK/4.1.4.1-Java-8-LTS
+    ml BWA/0.7.17-GCCcore-7.3.0
+    ml picard/2.20.5-Java-11-LTS
+
+    #whateverotherlibs
+    FILE="SS6005044"
+
+    samtools view -h ${FILE}.sorted.bam chr22 > ${FILE}.chr22.sam
+    samtools view -bS ${FILE}.chr22.sam > ${FILE}.chr22.bam
+    samtools fastq ${FILE}.chr22.bam > ${FILE}.chr22.fastq
+    gzip ${FILE}.chr22.fastq
+    bwa index -a is /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+    java -jar ${EBROOTPICARD}/picard.jar CreateSequenceDictionary R= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa O= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.dict
+    samtools faidx /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+    bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa ${FILE}.chr22.fastq.gz -n 0.1 -l 1000 > ${FILE}.chr22.sai
+    bwa samse /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa ${FILE}.chr22.sai ${FILE}.chr22.fastq.gz -f ${FILE}.chr22.sam
+    samtools view -Sb ${FILE}.chr22.sam > ${FILE}.chr22.bam
+    samtools view ${FILE}.chr22.bam | less -S
+    samtools view -H ${FILE}.chr22.bam
+    samtools sort ${FILE}.chr22.bam -o ${FILE}.chr22.sort.bam
+    samtools index ${FILE}.chr22.sort.bam
+    java -jar ${EBROOTPICARD}/picard.jar  AddOrReplaceReadGroups INPUT= ${FILE}.chr22.sort.bam OUTPUT= ${FILE}.chr22.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
+    samtools index ${FILE}.chr22.RG.bam
+    java -jar ${EBROOTPICARD}/picard.jar  MarkDuplicates I= ${FILE}.chr22.RG.bam O= ${FILE}.chr22.DR.bam M=output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> logFile.log
+    samtools index ${FILE}.chr22.DR.bam
+    gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I ${FILE}.chr22.DR.bam -O unfiltered_${FILE}.chr22.DR.vcf
+    '''
+        
+
+
+
+
+
+
+
+
+
+TODO
+* QC
+* Bam file vergelijking
+* align tegen hg38
+* volgens mij klopt er iets niet na het filteren met _name, want die vcf files zijn echt heel stuk kleiner
+* andere alignments (Andre)
+

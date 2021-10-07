@@ -73,7 +73,7 @@ sed 's/>/>chr/g' cp_genome.fa > cp_genome_chage.fa
 sed 's/>chrMT/>chrM/g' cp_genome.fa > cp_genome_chage.fa
 OF
 # http://seqanswers.com/forums/showthread.php?t=22504
-sed -e 's/>\([0-9XY]\)/>chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
+sed -e 's/##contig=<ID=\([0-9XY]\)/##contig=<ID=chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
 # checken
 grep -e ">" my.fasta
 
@@ -91,3 +91,9 @@ maar dan liever in een mooi loopje
 cat ~/file0{1..3} ~/file{A..C} > merged-file
 for i in file0{1..3} file{A..C}; do cat ~/"$i"; done > merged-file
 cat * > merged-file
+
+
+
+bcftools view --no-header somatic-b37_Mutect2-WGS-panel-b37.vcf | sed 's/^/chr/' | sed 's/^MT/chrM/' >> new2_somatic-b37_Mutect2-WGS-panel-b37.vcf
+bcftools view --header-only somatic-b37_Mutect2-WGS-panel-b37.vcf | sed 's/##contig=<ID=\([0-9XY]\)/##contig=<ID=chr\1/' | sed 's/##contig=<ID=MT/##contig=<ID=chrM/' > new_somatic-b37_Mutect2-WGS-panel-b37.vcf
+cat new_somatic-b37_Mutect2-WGS-panel-b37.vcf new2_somatic-b37_Mutect2-WGS-panel-b37.vcf >> merge.vcf
