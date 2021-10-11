@@ -47,7 +47,3 @@ else
             echo "Please answer y (=yes) or n (=no).";;
     esac
 fi
-
-
-
-

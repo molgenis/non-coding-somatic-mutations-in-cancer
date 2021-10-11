@@ -19,9 +19,9 @@ do
     #printf "%s is in %s\n" "${array[i]}" "${array2[i]}"
     while [ ! -f "${array2[i]}" ]
     do
-        #printf "%s is in %s\n" "${array[i]}" "${array2[i]}i"
+        printf "HALLOOOOOOOOOOOO %s is in %s\n" "${array[i]}" "${array2[i]}i"
         #https://github.com/EGA-archive/ega-download-client
-        pyega3 -c 10 -cf ~/ega_credentials.json fetch "${array[i]}" --saveto "${array2[i]}"
+        pyega3 -c 30 -cf ~/ega_credentials.json fetch "${array[i]}" --saveto "${array2[i]}"
         #touch "${array2[i]}"
     done
 done

@@ -467,7 +467,36 @@ samtools view -H SS6005044.bam
     gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I ${FILE}.chr22.DR.bam -O unfiltered_${FILE}.chr22.DR.vcf
     '''
         
+* Validate
+    #http://broadinstitute.github.io/picard/command-line-overview.html#ValidateSamFile
+    #https://gatk.broadinstitute.org/hc/en-us/articles/360035891231-Errors-in-SAM-or-BAM-files-can-be-diagnosed-with-ValidateSamFile
+    samtools view -H SS6005044_2.chr22.sort.bam  
+    java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044_2.chr22.sort.bam  MODE=SUMMARY
+    java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044_2.chr22.sort.bam IGNORE_WARNINGS=true MODE=VERBOSE
+    java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044_2.chr22.sort.bam IGNORE=type MODE=VERBOSE
 
+        MISSING_READ_GROUP              The header is missing read group information
+        MISMATCH_MATE_ALIGNMENT_START	Mate alignment does not match alignment start of mate
+        MISMATCH_MATE_REF_INDEX	        Mate reference index (MRNM) does not match reference index of mate
+    #http://broadinstitute.github.io/picard/command-line-overview.html#AddOrReplaceReadGroups
+    java -jar ${EBROOTPICARD}/picard.jar AddOrReplaceReadGroups I=SS6005044_2.chr22.sort.bam O=SS6005044_2_addReplace.chr22.sort.bam RGID=4 RGLB=lib1 RGPL=illumina RGPU=unit1 RGSM=20
+    java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044_2_addReplace.chr22.sort.bam IGNORE_WARNINGS=true MODE=VERBOSE
+    #http://broadinstitute.github.io/picard/command-line-overview.html#FixMateInformation
+    java -jar ${EBROOTPICARD}/picard.jar FixMateInformation I=SS6005044_2_addReplace.chr22.sort.bam O=SS6005044_2_fixed_mate.chr22.sort.bam
+    java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044_2_fixed_mate.chr22.sort.bam IGNORE_WARNINGS=true MODE=VERBOSE
+        MATE_NOT_FOUND	                Read is marked as paired, but its pair was not found
+
+
+
+
+
+
+    samtools view -H SS6005044.chr22.DR.bam
+    java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044.chr22.DR.bam  MODE=SUMMARY
+    java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044.chr22.DR.bam IGNORE_WARNINGS=true MODE=VERBOSE
+    java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044.chr22.DR.bam IGNORE=type MODE=VERBOSE
+
+        INVALID_PLATFORM_VALUE	        The read group has an invalid value set for its PL field
 
 
 
