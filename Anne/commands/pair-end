@@ -1,0 +1,110 @@
+samtools view -h SS6005044.sorted.bam chr22 > chr22/SS6005044.chr22.sam
+cd chr22
+samtools view -bS SS6005044.chr22.sam > SS6005044.chr22.bam
+samtools sort SS6005044.chr22.bam -o SS6005044_chr22.sort.bam
+samtools sort -n SS6005044.chr22.bam -o SS6005044_name_chr22.sort.bam
+
+#https://gist.github.com/darencard/72ddd9e6c08aaff5ff64ca512a04a6dd
+* reads that mapped properly as pairs
+    samtools view -u -f 1 -F 12 SS6005044_chr22.sort.bam > SS6005044_chr22_map_map.bam
+* R1 unmapped, R2 mapped
+    samtools view -u -f 4 -F 264 SS6005044_chr22.sort.bam > SS6005044_chr22_unmap_map.bam
+* R1 mapped, R2 unmapped
+    samtools view -u -f 8 -F 260 SS6005044_chr22.sort.bam > SS6005044_chr22_map_unmap.bam
+* R1 & R2 unmapped
+    samtools view -u -f 12 -F 256 SS6005044_chr22.sort.bam > SS6005044_chr22_unmap_unmap.bam
+* merge the three files
+    samtools merge -u SS6005044_chr22_unmapped.bam SS6005044_chr22_unmap_map.bam SS6005044_chr22_map_unmap.bam SS6005044_chr22_unmap_unmap.bam
+* BAM files must be resorted so that they are ordered by read ID instead of location in the reference
+    samtools sort -n SS6005044_chr22_map_map.bam -o SS6005044_chr22_mapped.sort.bam
+    samtools sort -n SS6005044_chr22_unmapped.bam -o SS6005044_chr22_unmapped.sort.bam
+* it is a good idea to check that you have the correct number of reads and no redundancy. You can summarize the original BAM file to get an idea of where you started.
+    samtools flagstat SS6005044_chr22.sort.bam
+    samtools view -c SS6005044_chr22_mapped.sort.bam
+    samtools view -c SS6005044_chr22_unmapped.sort.bam
+* extract the FASTQ reads into two paired read files
+    X bamToFastq -i SS6005044_chr22_mapped.sort.bam -fq SS6005044_chr22_mapped.1.fastq -fq2 SS6005044_chr22_mapped.2.fastq 
+    X bamToFastq -i SS6005044_chr22_unmapped.sort.bam -fq SS6005044_chr22_unmapped.1.fastq -fq2 SS6005044_chr22_unmapped.2.fastq
+    samtools fastq -@ 8 SS6005044_chr22_mapped.sort.bam -1 SS6005044_chr22_mapped.1.fastq -2 SS6005044_chr22_mapped.2.fastq -0 /dev/null -s /dev/null -n
+    samtools fastq -@ 8 SS6005044_chr22_unmapped.sort.bam -1 SS6005044_chr22_unmapped.1.fastq -2 SS6005044_chr22_unmapped.2.fastq -0 /dev/null -s /dev/null -n
+* combine both the first and paired reads together from the mapped and unmapped files
+    cat SS6005044_chr22_mapped.1.fastq SS6005044_chr22_unmapped.1.fastq > SS6005044_chr22.1.fastq
+    cat SS6005044_chr22_mapped.2.fastq SS6005044_chr22_unmapped.2.fastq > SS6005044_chr22.2.fastq
+
+
+
+    * Preparation of the reference sequence
+        bwa index -a is /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+    * Create a reference dictionary
+        java -jar ${EBROOTPICARD}/picard.jar CreateSequenceDictionary R= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa O= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.dict
+    * Index the reference sequence with Samtools
+        samtools faidx /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
+
+BWA
+http://bio-bwa.sourceforge.net/bwa.shtml
+bwa mem /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044_chr22_mapped.1.fastq SS6005044_chr22_mapped.2.fastq > aln-pe.sam
+    [main] Version: 0.7.17-r1188
+    [main] CMD: bwa mem /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044_chr22_mapped.1.fastq SS6005044_chr22_mapped.2.fastq
+    [main] Real time: 1429.475 sec; CPU: 1465.627 sec
+
+#http://lh3lh3.users.sourceforge.net/alnROC.shtml
+bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044_chr22_mapped.1.fastq > SS6005044_chr22_mapped.1.sai && bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044_chr22_mapped.2.fastq > SS6005044_chr22_mapped.2.sai && bwa sampe /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044_chr22_mapped.1.sai SS6005044_chr22_mapped.2.sai SS6005044_chr22_mapped.1.fastq SS6005044_chr22_mapped.2.fastq > SS6005044_chr22_mapped_1_2.bwa.sam
+    [bwa_sai2sam_pe_core] 7446169 sequences have been processed.
+    [main] Version: 0.7.17-r1188
+    [main] CMD: bwa sampe /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa SS6005044_chr22_mapped.1.sai SS6005044_chr22_mapped.2.sai SS6005044_chr22_mapped.1.fastq SS6005044_chr22_mapped.2.fastq
+    [main] Real time: 246.989 sec; CPU: 244.700 sec
+
+http://userweb.eng.gla.ac.uk/umer.ijaz/bioinformatics/BWA_tutorial.pdf
+
+Bowtie2
+https://www.biostars.org/p/47167/
+bowtie2-build /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa chr22
+bowtie2 -p 4 -x chr22 -1 SS6005044_chr22_mapped.1.fastq -2 SS6005044_chr22_mapped.2.fastq -S bowtie2_aln-pe.sam
+    [umcg-aewijk@gearshift chr22]$ bowtie2 -p 4 -x chr22 -1 SS6005044_chr22_mapped.1.fastq -2 SS6005044_chr22_mapped.2.fastq -S bowtie2_aln-pe.sam
+    7446169 reads; of these:
+    7446169 (100.00%) were paired; of these:
+        31725 (0.43%) aligned concordantly 0 times
+        7017125 (94.24%) aligned concordantly exactly 1 time
+        397319 (5.34%) aligned concordantly >1 times
+        ----
+        31725 pairs aligned concordantly 0 times; of these:
+        8976 (28.29%) aligned discordantly 1 time
+        ----
+        22749 pairs aligned 0 times concordantly or discordantly; of these:
+        45498 mates make up the pairs; of these:
+            30031 (66.01%) aligned 0 times
+            10236 (22.50%) aligned exactly 1 time
+            5231 (11.50%) aligned >1 times
+    99.80% overall alignment rate
+
+
+samtools view -Sb aln-pe.sam > aln-pe.bam
+samtools sort aln-pe.bam -o aln-pe.sort.bam
+samtools index aln-pe.sort.bam
+* Adding Read Group tags and indexing bam files
+java -jar ${EBROOTPICARD}/picard.jar  AddOrReplaceReadGroups INPUT= aln-pe.sort.bam OUTPUT= aln-pe.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
+samtools index aln-pe.RG.bam
+* Marking and removing duplicates
+java -jar ${EBROOTPICARD}/picard.jar  MarkDuplicates I= aln-pe.RG.bam O= aln-pe.DR.bam M=aln-pe_output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> aln-pe_logFile.log
+samtools index aln-pe.DR.bam
+
+
+samtools view -Sb SS6005044_chr22_mapped_1_2.bwa.sam > SS6005044_chr22_mapped_1_2.bwa.bam
+samtools sort SS6005044_chr22_mapped_1_2.bwa.bam -o SS6005044_chr22_mapped_1_2.bwa.sort.bam
+samtools index SS6005044_chr22_mapped_1_2.bwa.sort.bam
+* Adding Read Group tags and indexing bam files
+java -jar ${EBROOTPICARD}/picard.jar  AddOrReplaceReadGroups INPUT= SS6005044_chr22_mapped_1_2.bwa.sort.bam OUTPUT= SS6005044_chr22_mapped_1_2.bwa.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
+samtools index SS6005044_chr22_mapped_1_2.bwa.RG.bam
+* Marking and removing duplicates
+java -jar ${EBROOTPICARD}/picard.jar  MarkDuplicates I= SS6005044_chr22_mapped_1_2.bwa.RG.bam O= SS6005044_chr22_mapped_1_2.bwa.DR.bam M=SS6005044_chr22_mapped_1_2.bwa_output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> SS6005044_chr22_mapped_1_2.bwa_logFile.log
+samtools index SS6005044_chr22_mapped_1_2.bwa.DR.bam
+
+samtools view -Sb bowtie2_aln-pe.sam > bowtie2_aln-pe.bam
+samtools sort bowtie2_aln-pe.bam -o bowtie2_aln-pe.sort.bam
+samtools index bowtie2_aln-pe.sort.bam
+* Adding Read Group tags and indexing bam files
+java -jar ${EBROOTPICARD}/picard.jar  AddOrReplaceReadGroups INPUT= bowtie2_aln-pe.sort.bam OUTPUT= bowtie2_aln-pe.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
+samtools index bowtie2_aln-pe.RG.bam
+* Marking and removing duplicates
+java -jar ${EBROOTPICARD}/picard.jar  MarkDuplicates I= bowtie2_aln-pe.RG.bam O= bowtie2_aln-pe.DR.bam M=bowtie2_aln-pe_output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> bowtie2_aln-pe_logFile.log
+samtools index bowtie2_aln-pe.DR.bam

@@ -486,8 +486,10 @@ samtools view -H SS6005044.bam
     java -jar ${EBROOTPICARD}/picard.jar ValidateSamFile I=SS6005044_2_fixed_mate.chr22.sort.bam IGNORE_WARNINGS=true MODE=VERBOSE
         MATE_NOT_FOUND	                Read is marked as paired, but its pair was not found
 
-
-
+    samtools index SS6005044_2_fixed_mate.chr22.sort.bam
+    gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SS6005044_2_fixed_mate.chr22.sort.bam -O SS6005044_2_fixed_mate_chr22.sort_somatic.vcf.gz
+        A USER ERROR has occurred: Contig chr1 not present in the sequence dictionary [chr22]
+    gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa -I SS6005044_2_fixed_mate.chr22.sort.bam -O SS6005044_2_fixed_mate_chr22.sort_somatic.vcf.gz
 
 
 
@@ -500,10 +502,79 @@ samtools view -H SS6005044.bam
 
 
 
+    samtools view -c -f 1 SS6005044_2_fixed_mate.chr22.sort.bam
+    samtools view -c -f 1 SS6005044.chr22.DR.bam
 
 
+    sed -e 's/>\([0-9XY]\)/>chr\1/' -e 's/>MT/>chrM/' cp_genome.fa > NEW_genome.fa
+    sed -e 's/SN:chr\([^22]\)//g' SS6005044_2_fixed_mate.chr22.sort.bam > SS6005044_2_1_fixed_mate.chr22.sort.bam
+
+    s/SN:chr[^22]//g
+
+* Check if BAM is derived from pair-end or single-end reads?
+  #https://www.biostars.org/p/178730/
+    samtools view -c -f 1 in.bam
+
+* bam to paied-end read files
+  #https://www.metagenomics.wiki/tools/samtools/converting-bam-to-fastq
+    samtools sort -n SS6005044.bam -o SS6005044_name.sorted.bam
+    samtools fastq -@ 8 SS6005044_name.sorted.bam -1 SS6005044_name_R1.fastq.gz -2 SS6005044_name_R2.fastq.gz -0 /dev/null -s /dev/null -n
+
+    samtools bam2fq SS6005044_name.sorted.bam > SS6005044_name_2.sorted.fastq
+    cat SS6005044_name_2.sorted.fastq | grep '^@.*/1$' -A 3 --no-group-separator > SS6005044_name_2_r1.fastq
+    cat SS6005044_name_2.sorted.fastq | grep '^@.*/2$' -A 3 --no-group-separator > SS6005044_name_2_r2.fastq
 
 
+* Extracting paired FASTQ read data from a BAM mapping file
+  #https://gist.github.com/darencard/72ddd9e6c08aaff5ff64ca512a04a6dd
+    * reads that mapped properly as pairs
+        samtools view -u -f 1 -F 12 lib_002.sorted.md.bam > lib_002_map_map.bam
+    * R1 unmapped, R2 mapped
+        samtools view -u -f 4 -F 264 lib_002.sorted.md.bam > lib_002_unmap_map.bam
+    * R1 mapped, R2 unmapped
+        samtools view -u -f 8 -F 260 lib_002.sorted.md.bam > lib_002_map_unmap.bam
+    * R1 & R2 unmapped
+        samtools view -u -f 12 -F 256 lib_002.sorted.md.bam > lib_002_unmap_unmap.bam
+    * merge the three files
+        samtools merge -u lib_002_unmapped.bam lib_002_unmap_map.bam lib_002_map_unmap.bam lib_002_unmap_unmap.bam
+    * BAM files must be resorted so that they are ordered by read ID instead of location in the reference
+        samtools sort -n lib_002_map_map.bam lib_002_mapped.sort
+        samtools sort -n lib_002_unmapped.bam lib_002_unmapped.sort
+    * it is a good idea to check that you have the correct number of reads and no redundancy. You can summarize the original BAM file to get an idea of where you started.
+        samtools flagstat lib_002.sorted.md.bam
+        samtools view -c lib_002_mapped.sort.bam
+        samtools view -c lib_002_unmapped.sort.bam
+    * extract the FASTQ reads into two paired read files
+        bamToFastq -i lib_002_mapped.sort.bam -fq lib_002_mapped.1.fastq -fq2 lib_002_mapped.2.fastq 
+        bamToFastq -i lib_002_unmapped.sort.bam -fq lib_002_unmapped.1.fastq -fq2 lib_002_unmapped.2.fastq
+    * combine both the first and paired reads together from the mapped and unmapped files
+        cat lib_002_mapped.1.fastq lib_002_unmapped.1.fastq > lib_002.1.fastq
+        cat lib_002_mapped.2.fastq lib_002_unmapped.2.fastq > lib_002.2.fastq
+
+* header BAM file
+    https://www.biostars.org/p/46104/
+    samtools view -H SS6005044_2_fixed_mate.chr22.sort.bam > header.sam
+    MET DE HAND AANPASSINGEN MAKEN                                           
+    samtools reheader header_change.sam SS6005044_2_fixed_mate.chr22.sort.bam > SS6005044_2_fixed_mate.chr22.sort.reheadered.bam
+
+    gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SS6005044_2_fixed_mate.chr22.sort.reheadered.bam -O SS6005044_2_fixed_mate.chr22.sort.reheadered_somatic.vcf.gz
+    gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V SS6005044_2_fixed_mate.chr22.sort.reheadered_somatic.vcf.gz -O filtered_SS6005044_2_fixed_mate.chr22.sort.reheadered_somatic.vcf.gz
+    # FOUT
+
+    * opnieuw proberen 
+    samtools view -h SS6005044.sorted.bam chr22 > SS6005044_TEST.chr22.sam
+    samtools view -bS SS6005044_TEST.chr22.sam > SS6005044_TEST.chr22.bam
+    java -jar ${EBROOTPICARD}/picard.jar AddOrReplaceReadGroups I=SS6005044_TEST.chr22.sort.bam O=SS6005044_TEST_add.chr22.sort.bam RGID=4 RGLB=lib1 RGPL=illumina RGPU=unit1 RGSM=20
+    #http://broadinstitute.github.io/picard/command-line-overview.html#FixMateInformation
+    java -jar ${EBROOTPICARD}/picard.jar FixMateInformation I=SS6005044_TEST_add.chr22.sort.bam O=SS6005044_TEST_FIXM.chr22.sort.bam 
+
+    samtools view -H SS6005044_TEST_FIXM.chr22.sort.bam | grep @HD > new_header.txt
+    samtools view -H SS6005044_TEST_FIXM.chr22.sort.bam | grep @PG >> new_header.txt
+    samtools view -H SS6005044_TEST_FIXM.chr22.sort.bam | grep chr22  >> new_header.txt
+
+    samtools reheader new_header.txt SS6005044_TEST_FIXM.chr22.sort.bam > SS6005044_TEST_FIXM.chr22.reheadered.bam
+    gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -I SS6005044_TEST_FIXM.chr22.reheadered.bam -O SS6005044_TEST_FIXM.chr22.reheadered_somatic.vcf.gz
+    gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa -V SS6005044_TEST_FIXM.chr22.reheadered_somatic.vcf.gz -O SS6005044_TEST_FIXM.chr22.reheadered_somatic.vcf.gz
 
 TODO
 * QC
