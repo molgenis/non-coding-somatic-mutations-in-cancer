@@ -14,6 +14,12 @@ VCF_NAME=somatic-b37_Mutect2-WGS-panel-b37.vcf
 PON=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
 
 dir=5042_5044
+TUMOR=5044
+NORMAL=5042
+
+PATH_DICT_one=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/${TUMOR}/bwa_mem/
+PATH_DICT_two=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/${NORMAL}/bwa_mem/
+OUTPUT_DICT=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/${NORMAL}_${TUMOR}/bwa_mem/
 
 ml Anaconda3/5.3.0
 ml SAMtools/1.9-foss-2018b
@@ -23,14 +29,13 @@ ml BWA/0.7.17-GCCcore-7.3.0
 ml Bowtie2/2.3.4.2-foss-2018b
 ml picard/2.20.5-Java-11-LTS
 
-
-
-
+# Function that changed the sample names
 change_sample_name() {
     samtools view -H ${2}${1}.bam  | sed "s/SM:[^\t]*/SM:${1}/g" | samtools reheader - ${2}${1}.bam > ${2}SN_${1}.bam
     samtools index ${2}SN_${1}.bam
 }
 
+# bam --> VCF, for one file
 Mutect2_one_sample(){
     # standard
     printf "####standard\n"
@@ -50,6 +55,7 @@ Mutect2_one_sample(){
     gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${1}_${CHR}_somatic_PON.vcf.gz -O ${3}filtered_${1}_${CHR}_somatic_PON.vcf.gz   
 }
 
+# bam --> VCF, for two files (one tumor file and one normal file)
 Mutect2_two_samples() {
     # standard
     gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -O ${OUTPUT_DICT}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic.vcf.gz
@@ -67,13 +73,6 @@ Mutect2_two_samples() {
 
 
 cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/${dir}
-
-TUMOR=5044
-NORMAL=5042
-
-PATH_DICT_one=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/${TUMOR}/bwa_mem/
-PATH_DICT_two=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/${NORMAL}/bwa_mem/
-OUTPUT_DICT=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/${NORMAL}_${TUMOR}/bwa_mem/
 
 printf "####change_sample_name\n"
 change_sample_name aln_pe.RG ${PATH_DICT_one} #1=file
