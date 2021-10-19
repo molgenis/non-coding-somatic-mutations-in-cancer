@@ -1,22 +1,28 @@
 #!/usr/bin/bash
 
-NUMBER=5042
+NUMBER=5044
 CHROM=chr22
 
-ml Anaconda3/5.3.0
 ml SAMtools/1.9-foss-2018b
-ml GATK/4.1.4.1-Java-8-LTS
-ml BCFtools/1.11-GCCcore-7.3.0
 ml BWA/0.7.17-GCCcore-7.3.0
 ml Bowtie2/2.3.4.2-foss-2018b
 ml picard/2.20.5-Java-11-LTS
 
 echo "BEGIN"
+echo "${NUMBER}"
+
+mkdir /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/${CHROM}/${NUMBER}
 
 cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292
 samtools view -h SS600${NUMBER}.sorted.bam ${CHROM} > ${CHROM}/${NUMBER}/SS600${NUMBER}.${CHROM}.sam
 
+
 cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/${CHROM}/${NUMBER}
+mkdir /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/${CHROM}/${NUMBER}/bowtie
+mkdir /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/${CHROM}/${NUMBER}/bwa_aln
+mkdir /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/${CHROM}/${NUMBER}/bwa_mem
+mkdir /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/${CHROM}/${NUMBER}/QC
+
 samtools view -bS SS600${NUMBER}.${CHROM}.sam > SS600${NUMBER}.${CHROM}.bam
 samtools sort SS600${NUMBER}.${CHROM}.bam -o SS600${NUMBER}_${CHROM}.sort.bam
 samtools sort -n SS600${NUMBER}.${CHROM}.bam -o SS600${NUMBER}_name_${CHROM}.sort.bam
@@ -60,16 +66,13 @@ align_test() {
     samtools index ${1}.DR.bam
 }
 
-
-
-
-
-#BWA
+#BWA = Burrows-Wheeler Aligner
+#https://ucdavis-bioinformatics-training.github.io/2017-August-Variant-Analysis-Workshop/wednesday/alignment.html
 bwa mem /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa SS600${NUMBER}_${CHROM}_mapped.1.fastq SS600${NUMBER}_${CHROM}_mapped.2.fastq > bwa_mem/aln_pe.sam
 align_test bwa_mem/aln_pe
 
-bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa SS600${NUMBER}_${CHROM}_mapped.1.fastq > SS600${NUMBER}_${CHROM}_mapped.1.sai && bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa SS600${NUMBER}_${CHROM}_mapped.2.fastq > SS600${NUMBER}_${CHROM}_mapped.2.sai && bwa sampe /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa SS600${NUMBER}_${CHROM}_mapped.1.sai SS600${NUMBER}_${CHROM}_mapped.2.sai SS600${NUMBER}_${CHROM}_mapped.1.fastq SS600${NUMBER}_${CHROM}_mapped.2.fastq > bwa_aln/SS600${NUMBER}_${CHROM}_mapped_1_2.bwa.sam
-align_test bwa_aln/SS600${NUMBER}_${CHROM}2_mapped_1_2.bwa
+bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa SS600${NUMBER}_${CHROM}_mapped.1.fastq > SS600${NUMBER}_${CHROM}_mapped.1.sai && bwa aln /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa SS600${NUMBER}_${CHROM}_mapped.2.fastq > SS600${NUMBER}_${CHROM}_mapped.2.sai && bwa sampe /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa SS600${NUMBER}_${CHROM}_mapped.1.sai SS600${NUMBER}_${CHROM}_mapped.2.sai SS600${NUMBER}_${CHROM}_mapped.1.fastq SS600${NUMBER}_${CHROM}_mapped.2.fastq > bwa_aln/bwa_aln_${NUMBER}_${CHROM}_mapped_1_2.sam
+align_test bwa_aln/bwa_aln_${NUMBER}_${CHROM}_mapped_1_2
 
 #BOWTIE2
 bowtie2-build /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa ${CHROM}

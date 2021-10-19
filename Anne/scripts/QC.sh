@@ -20,7 +20,7 @@ fastqc -f fastq -o ${OUTPUT} ${FILE_1} ${FILE_2}
 # trimming pair-end
 # https://cutadapt.readthedocs.io/en/stable/guide.html#trimming-paired-end-reads
 cutadapt -o QC/cutadapt/TRIM_${FILE_1} -p QC/cutadapt/TRIM_${FILE_2} ${FILE_1} ${FILE_2} -q 20 --minimum-length 30 --pair-filter=any
-fastqc -f fastq -o ${OUTPUT} QC/cutadapt/TRIM_${FILE_1} QC/cutadapt/TRIM_${FILE_2}
+fastqc -f fastq -o ${OUTPUT}/cutadapt/ QC/cutadapt/TRIM_${FILE_1} QC/cutadapt/TRIM_${FILE_2}
 
 # BBDuk
 #https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/
@@ -35,11 +35,12 @@ fastqc -f fastq -o ${OUTPUT} QC/cutadapt/TRIM_${FILE_1} QC/cutadapt/TRIM_${FILE_
 # “qtrim=r” means it will trim the right side only; you can alternatively set “qtrim=l” for left or “qtrim=rl” for both. 
 # If quality trimming is enabled, it happens after all kmer-based operations.
 bbduk.sh -Xmx1g in1=${FILE_1} in2=${FILE_2} out1=QC/bbduk/clean_20_${FILE_1} out2=QC/bbduk/clean_20_${FILE_2} qtrim=rl trimq=20 minlen=30
-fastqc -f fastq -o ${OUTPUT} QC/bbduk/clean_20_${FILE_1} QC/bbduk/clean_20_${FILE_2}
+fastqc -f fastq -o ${OUTPUT}/bbduk/ QC/bbduk/clean_20_${FILE_1} QC/bbduk/clean_20_${FILE_2}
 # Quality filtering:
 # This will discard reads with average quality below 20. If quality-trimming is enabled, the average quality will be calculated on the trimmed read.
-bbduk.sh -Xmx1g in1=${FILE_1} in2=${FILE_2} out1=QC/bbduk/clean_qf20_${FILE_1} out2=QC/bbduk/clean_qf20__${FILE_2} maq=20 minlen=30
-fastqc -f fastq -o ${OUTPUT} QC/bbduk/clean_qf20_${FILE_1} QC/bbduk/clean_qf20__${FILE_2}
+# NIET TRIMMEN
+bbduk.sh -Xmx1g in1=${FILE_1} in2=${FILE_2} out1=QC/bbduk/clean_qf20_${FILE_1} out2=QC/bbduk/clean_qf20__${FILE_2} maq=20
+fastqc -f fastq -o ${OUTPUT}/bbduk/ QC/bbduk/clean_qf20_${FILE_1} QC/bbduk/clean_qf20__${FILE_2}
 
 
 #http://hannonlab.cshl.edu/fastx_toolkit/
