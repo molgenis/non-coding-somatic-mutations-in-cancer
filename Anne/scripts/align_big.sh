@@ -12,8 +12,8 @@
 #SBATCH --get-user-env=L
 
 NUMBER=5044
-FILE_NUM=SS600${NUMBER}_test
-GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa
+FILE_NUM=SS600${NUMBER}
+GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa
 PATH_DIR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
 
 ml SAMtools/1.9-foss-2018b
@@ -60,20 +60,29 @@ align_last_steps() {
     samtools index ${1}.DR.bam
 }
 
+# Function that changed the sample names
+change_sample_name() {
+    samtools view -H ${2}${1}.bam  | sed "s/SM:[^\t]*/SM:${1}/g" | samtools reheader - ${2}${1}.bam > ${2}SN_${1}.bam
+    samtools index ${2}SN_${1}.bam
+}
+
 #echo "BWA mem"
 #BWA = Burrows-Wheeler Aligner
 #https://ucdavis-bioinformatics-training.github.io/2017-August-Variant-Analysis-Workshop/wednesday/alignment.html
 bwa mem ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/bwa_mem/mem_${FILE_NUM}.sam
 align_last_steps ${PATH_DIR}${NUMBER}/bwa_mem/mem_${FILE_NUM}
+change_sample_name ${PATH_DIR}${NUMBER}/bwa_mem/mem_${FILE_NUM}.DR
 
 #echo "BWA aln"
 bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq > ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.sai && bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.sai && bwa sampe ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.sai ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.sai ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/bwa_aln/aln_${FILE_NUM}.sam
 align_last_steps ${PATH_DIR}${NUMBER}/bwa_aln/aln_${FILE_NUM}
+change_sample_name ${PATH_DIR}${NUMBER}/bwa_aln/aln_${FILE_NUM}.DR
 
 #BOWTIE2
 #echo "bowtie2"
 bowtie2-build ${GENOOM} ${PATH_DIR}${NUMBER}/bowtie/GENOOM
 bowtie2 -p 4 -x ${PATH_DIR}${NUMBER}/bowtie/GENOOM -1 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq -2 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq -S ${PATH_DIR}${NUMBER}/bowtie/bowtie2_${FILE_NUM}.sam
 align_last_steps ${PATH_DIR}${NUMBER}/bowtie/bowtie2_${FILE_NUM}
+change_sample_name ${PATH_DIR}${NUMBER}/bowtie/bowtie2_${FILE_NUM}.DR
 
 echo "EIND"

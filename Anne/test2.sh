@@ -1,79 +1,101 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=align_big
-#SBATCH --output=align_big.out
-#SBATCH --error=align_big.err
-#SBATCH --time=167:59:59
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=96gb
-#SBATCH --nodes=1
-#SBATCH --open-mode=append
-#SBATCH --export=NONE
-#SBATCH --get-user-env=L
+PATH_REF=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/
+REF=chr22.fa
 
-NUMBER=5044
-FILE_NUM=SS600${NUMBER}_test
-GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa
-PATH_DIR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
+#CHR_DICT=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.dict
+CHR=chr22
 
+#VCF_PON=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/
+#VCF_NAME=somatic-b37_Mutect2-WGS-panel-b37.vcf
+PON=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+GR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GermlineResource/merge_af-only-gnomad.raw.sites.vcf
+
+ml Anaconda3/5.3.0
 ml SAMtools/1.9-foss-2018b
+ml GATK/4.1.4.1-Java-8-LTS
+ml BCFtools/1.11-GCCcore-7.3.0
 ml BWA/0.7.17-GCCcore-7.3.0
 ml Bowtie2/2.3.4.2-foss-2018b
 ml picard/2.20.5-Java-11-LTS
-ml FastQC/0.11.8-Java-11-LTS
-ml cutadapt/2.6-GCCcore-7.3.0-Python-3.7.4-bare
 
-echo "BEGIN"
-#echo "${NUMBER}"
+# # Function that changed the sample names
+# change_sample_name() {
+#     samtools view -H ${2}${1}.bam  | sed "s/SM:[^\t]*/SM:${1}/g" | samtools reheader - ${2}${1}.bam > ${2}SN_${1}.bam
+#     samtools index ${2}SN_${1}.bam
+# }
 
-mkdir -p ${PATH_DIR}${NUMBER}/bowtie
-mkdir -p ${PATH_DIR}${NUMBER}/bwa_aln
-mkdir -p ${PATH_DIR}${NUMBER}/bwa_mem
-mkdir -p ${PATH_DIR}${NUMBER}/QC
+# # bam --> VCF, for one file
+# Mutect2_one_sample(){
+#     # standard
+#     #echo "####standard\n"
+#     #gatk Mutect2 -R ${PATH_REF}${REF} -I ${3}SN_${1}.bam -O ${3}unfiltered_${1}_${CHR}_somatic.vcf.gz --native-pair-hmm-threads 8
+#     #gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${1}_${CHR}_somatic.vcf.gz -O ${3}filtered_${1}_${CHR}_somatic.vcf.gz
+#     # sample name
+#     #echo "####sample name\n"
+#     #gatk Mutect2 -R ${PATH_REF}${REF} -I ${3}SN_${1}.bam -${2} ${1}.bam -O ${3}unfiltered_${1}_${CHR}_somatic_name.vcf.gz --native-pair-hmm-threads 8
+#     #gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${1}_${CHR}_somatic_name.vcf.gz -O ${3}filtered_${1}_${CHR}_somatic_name.vcf.gz
+#     # sample name and PON
+#     #echo "####sample name and PON\n"
+#     #gatk Mutect2 -R ${PATH_REF}${REF} -I ${3}SN_${1}.bam -${2} ${1}.bam -O ${3}unfiltered_${1}_${CHR}_somatic_name_PON.vcf.gz --panel-of-normals ${PON} --native-pair-hmm-threads 8
+#     #gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${1}_${CHR}_somatic_name_PON.vcf.gz -O ${3}filtered_${1}_${CHR}_somatic_name_PON.vcf.gz
+#     # PON
+#     #echo "####PON\n"
+#     #gatk Mutect2 -R ${PATH_REF}${REF} -I ${3}SN_${1}.bam -O ${3}unfiltered_${1}_${CHR}_somatic_PON.vcf.gz --panel-of-normals ${PON} --native-pair-hmm-threads 8
+#     #gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${1}_${CHR}_somatic_PON.vcf.gz -O ${3}filtered_${1}_${CHR}_somatic_PON.vcf.gz
+#      sample name and PON and GR
+#     echo "####sample name and PON and GR\n"
+#     gatk Mutect2 -R ${PATH_REF}${REF} -I ${3}SN_${1}.bam -${2} ${1}.bam -O ${3}unfiltered_${1}_${CHR}_somatic_name_PON_GR.vcf.gz --panel-of-normals ${PON} --native-pair-hmm-threads 8 --germline-resource ${GR}
+#     gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${1}_${CHR}_somatic_name_PON_GR.vcf.gz -O ${3}filtered_${1}_${CHR}_somatic_name_PON_GR.vcf.gz
+# }
+
+# # bam --> VCF, for two files (one tumor file and one normal file)
+# Mutect2_two_samples() {
+#     # standard
+#     echo "####standard\n"
+#     gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic.vcf.gz --native-pair-hmm-threads 8
+#     gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic.vcf.gz
+#     # sample name
+#     echo "####sample name\n"
+#     gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -tumor ${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -normal ${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name.vcf.gz --native-pair-hmm-threads 8
+#     gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic_name.vcf.gz
+#     # sample name and PON
+#     echo "####sample name and PON\n"
+#     gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -tumor ${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -normal ${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON.vcf.gz --panel-of-normals ${PON} --native-pair-hmm-threads 8
+#     gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON.vcf.gz
+#     # PON
+#     echo "####PON\n"
+#     gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_PON.vcf.gz --panel-of-normals ${PON} --native-pair-hmm-threads 8
+#     gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_PON.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic_PON.vcf.gz
+#     # sample name and PON and GR
+#     echo "####sample name and PON and GR\n"
+#     gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -tumor ${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -normal ${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON_GR.vcf.gz --panel-of-normals ${PON} --germline-resource ${GR} --native-pair-hmm-threads 8
+#     gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON_GR.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON_GR.vcf.gz
+# }
 
 
-cd ${PATH_DIR}${NUMBER}
-#echo "BEGIN sort"
-# BAM files must be resorted so that they are ordered by read ID instead of location in the reference
-samtools sort -n ${PATH_DIR}${FILE_NUM}.bam -o ${PATH_DIR}${NUMBER}/${FILE_NUM}_byName.sorted.bam
-# extract the FASTQ reads into two paired read files
-#echo "KLAAR sort"
-#echo "BEGIN 1 en 2"
-cd ${PATH_DIR}${NUMBER}
-samtools fastq -@ 8 ${PATH_DIR}${NUMBER}/${FILE_NUM}_byName.sorted.bam -1 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq -2 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq -0 /dev/null -s /dev/null -n
-
-fastqc -f fastq -o ${PATH_DIR}${NUMBER}/QC ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq
-fastqc -f bam -o ${PATH_DIR}${NUMBER}/QC ${PATH_DIR}${NUMBER}/${FILE_NUM}_byName.sorted.bam
-
-#echo "KLAAR 1 en 2"
-
-# Last steps of alignment
-align_last_steps() {
-    samtools view -Sb ${1}.sam > ${1}.bam
-    samtools sort ${1}.bam -o ${1}_sort.bam
-    samtools index ${1}_sort.bam
-    # Adding Read Group tags and indexing bam files
-    java -jar ${EBROOTPICARD}/picard.jar  AddOrReplaceReadGroups INPUT= ${1}_sort.bam OUTPUT= ${1}.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
-    samtools index ${1}.RG.bam
-    # Marking and removing duplicates
-    java -jar ${EBROOTPICARD}/picard.jar  MarkDuplicates I= ${1}.RG.bam O= ${1}.DR.bam M=${1}_output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> ${1}_logFile.log
-    samtools index ${1}.DR.bam
+# bam --> VCF, for two files (one tumor file and one normal file)
+test1() {
+    # standard
+    echo "####standard\n"
+    ${1}
+    gatk Mutect2 -R ${PATH_REF}${REF} ${2} --native-pair-hmm-threads 8
+    gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}_somatic.vcf.gz -O ${4}_somatic.vcf.gz
+    # # sample name
+    # echo "####sample name\n"
+    # gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -tumor ${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -normal ${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name.vcf.gz --native-pair-hmm-threads 8
+    # gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic_name.vcf.gz
+    # # sample name and PON
+    # echo "####sample name and PON\n"
+    # gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -tumor ${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -normal ${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON.vcf.gz --panel-of-normals ${PON} --native-pair-hmm-threads 8
+    # gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON.vcf.gz
+    # # PON
+    # echo "####PON\n"
+    # gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_PON.vcf.gz --panel-of-normals ${PON} --native-pair-hmm-threads 8
+    # gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_PON.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic_PON.vcf.gz
+    # # sample name and PON and GR
+    # echo "####sample name and PON and GR\n"
+    # gatk Mutect2 -R ${PATH_REF}${REF} -I ${PATH_DICT_one}SN_${1}.bam -tumor ${1}.bam -I ${PATH_DICT_two}SN_${2}.bam -normal ${2}.bam -O ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON_GR.vcf.gz --panel-of-normals ${PON} --germline-resource ${GR} --native-pair-hmm-threads 8
+    # gatk FilterMutectCalls -R ${PATH_REF}${REF} -V ${3}unfiltered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON_GR.vcf.gz -O ${3}filtered_${TUMOR}_${NORMAL}_${CHR}_somatic_name_PON_GR.vcf.gz
 }
 
-#echo "BWA mem"
-#BWA = Burrows-Wheeler Aligner
-#https://ucdavis-bioinformatics-training.github.io/2017-August-Variant-Analysis-Workshop/wednesday/alignment.html
-bwa mem ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/bwa_mem/mem_${FILE_NUM}.sam
-align_last_steps ${PATH_DIR}${NUMBER}/bwa_mem/mem_${FILE_NUM}
-
-#echo "BWA aln"
-bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq > ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.sai && bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.sai && bwa sampe ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.sai ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.sai ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/bwa_aln/aln_${FILE_NUM}.sam
-align_last_steps ${PATH_DIR}${NUMBER}/bwa_aln/aln_${FILE_NUM}
-
-#BOWTIE2
-#echo "bowtie2"
-bowtie2-build ${GENOOM} ${PATH_DIR}${NUMBER}/bowtie/GENOOM
-bowtie2 -p 4 -x ${PATH_DIR}${NUMBER}/bowtie/GENOOM -1 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq -2 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq -S ${PATH_DIR}${NUMBER}/bowtie/bowtie2_${FILE_NUM}.sam
-align_last_steps ${PATH_DIR}${NUMBER}/bowtie/bowtie2_${FILE_NUM}
-
-echo "EIND"
