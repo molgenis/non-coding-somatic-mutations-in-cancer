@@ -49,7 +49,7 @@ class Sample:
         elif row['category'] == 'hc':
             self.hc.append(one_run)
 
-    def get_arguments(self, head_path):
+    def get_arguments(self, head_path, type_sample='FL'):
         """
         Causes all arguments to Mutect2/FilterMutectCalls to be made with all runs of a sample.
         :param head_path:   Main path to where the file will be saved
@@ -61,6 +61,7 @@ class Sample:
         arg_mutect2 = ''
         # Add each tumor to the different parameters
         for tum in self.tumors:
+            #TODO split FL en tFL als gebruiker dat wil
             # Add tumor to arg (file name/directory name)
             arg += f'{tum.name}_'
             # For example, makes SS6005044 -> 5044
