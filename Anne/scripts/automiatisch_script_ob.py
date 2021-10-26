@@ -82,10 +82,7 @@ class Sample:
             for tum in self.tumors:
                 number_tum = tum.name.replace("SS600", "")
                 arg = f'{self.sample_name}_{tum.name}_{hc.name}'
-                arg_mutect2 = f'-I {head_path}{number_tum}/SN_{tum.name}.DR.bam \
-                    -I {head_path}{number_hc}/SN_{hc.name}.DR.bam \
-                        -normal {hc.name}.DR.bam \
-                            -O {head_path}{arg}/unfiltered_{arg}_somatic.vcf.gz'
+                arg_mutect2 = f'-I {head_path}{number_tum}/SN_{tum.name}.DR.bam -I {head_path}{number_hc}/SN_{hc.name}.DR.bam -normal {hc.name}.DR.bam -O {head_path}{arg}/unfiltered_{arg}_somatic.vcf.gz'
                 filter_mutect_calls_input = f'\n{head_path}{arg}/unfiltered_{arg}'
                 filter_mutect_calls_output = f'\n{head_path}{arg}/filtered_{arg}'
                 name_file = f'{head_path}{arg}.txt'
@@ -100,7 +97,7 @@ class Sample:
         """
         f = open(name_file, "w")
         for arg in list_args:
-            f.write(f'{arg}\n')
+            f.write(f'{arg}')
         f.close()
 
 
@@ -124,7 +121,7 @@ def filter_file(path_file):
     return df_selection
 
 
-def make_objects(df_selection, dict_sample):
+def make_objects(df_selection, dict_sample, head_path):
     """
     Creates the dictionary with the objects per participant/sample
     :param df_selection:    the custom data frame from which to create objects and a dictionary
@@ -148,18 +145,25 @@ def make_objects(df_selection, dict_sample):
     # for i in dict_sample['S2'].hc:
     #     print(f'{i.sample_num} - {i.name}')
 
+    #for key, value in d.items():
+    for key in dict_sample:
+        dict_sample[key].get_arguments(head_path)
+        dict_sample[key].get_arguments_per_two(head_path)
+
 
 def main():
     """
     
     :return:
     """
-    path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map"
-    head_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/"
+    #path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map"
+    #head_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/"
+    path_file = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/EGAD00001000292_Sample_File.map"
+    head_path = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/"
     df_selection = filter_file(path_file)
     print(df_selection.head())
     dict_sample = dict()
-    make_objects(df_selection, dict_sample)
+    make_objects(df_selection, dict_sample, head_path)
 
 
 if __name__ == "__main__":
