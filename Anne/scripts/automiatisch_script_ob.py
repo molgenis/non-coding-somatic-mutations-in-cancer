@@ -50,60 +50,6 @@ class Sample:
         elif row['category'] == 'hc':
             self.hc.append(one_run)
 
-    # def get_arguments(self, head_path, type_sample='both'):
-    #     """
-    #     Causes all arguments to Mutect2/FilterMutectCalls to be made with all runs of a sample.
-    #     :param head_path:   Main path to where the file will be saved
-    #     :return:
-    #     """
-    #     # Starting string for file name/directory name
-    #     arg = f'{self.sample_name}_'
-    #     # Starting string for arg_mutect2 (the whole argument to eventually run Mutect2)
-    #     arg_mutect2 = ''
-    #     # Add each tumor to the different parameters
-    #     for tum in self.tumors:
-    #         # TODO split FL en tFL als gebruiker dat wil
-    #         if type_sample=='both':
-    #             # Add tumor to arg (file name/directory name)
-    #             arg += f'{tum.name}_'
-    #             # For example, makes SS6005044 -> 5044
-    #             number_tum = tum.name.replace("SS600", "")
-    #             # Add tumor to arg_mutect2 (the whole argument to eventually run Mutect2)
-    #             arg_mutect2 += f'-I {head_path}{number_tum}/SN_{tum.name}.DR.bam '
-    #         elif type_sample=='tFL':
-    #             if tum.type_sample == 'tFL':
-    #                 # Add tumor to arg (file name/directory name)
-    #                 arg += f'{tum.name}_'
-    #                 # For example, makes SS6005044 -> 5044
-    #                 number_tum = tum.name.replace("SS600", "")
-    #                 # Add tumor to arg_mutect2 (the whole argument to eventually run Mutect2)
-    #                 arg_mutect2 += f'-I {head_path}{number_tum}/SN_{tum.name}.DR.bam '
-    #         elif type_sample=='FL':
-    #             if tum.type_sample != 'tFL':
-    #                 # Add tumor to arg (file name/directory name)
-    #                 arg += f'{tum.name}_'
-    #                 # For example, makes SS6005044 -> 5044
-    #                 number_tum = tum.name.replace("SS600", "")
-    #                 # Add tumor to arg_mutect2 (the whole argument to eventually run Mutect2)
-    #                 arg_mutect2 += f'-I {head_path}{number_tum}/SN_{tum.name}.DR.bam '
-    #
-    #     # Add each hc to the different parameters
-    #     for hc in self.hc:
-    #         # Add hc to arg (file name/directory name)
-    #         arg += f'{hc.name}_'
-    #         # For example, makes SS6005042 -> 5042
-    #         number_hc = hc.name.replace("SS600", "")
-    #         # Add hc to arg_mutect2 (the whole argument to eventually execute Mutect2)
-    #         arg_mutect2 += f'-I {head_path}{number_hc}/SN_{hc.name}.DR.bam -normal {hc.name}.DR.bam '
-    #     # Pastes everything together and makes three good arguments that can be passed to Mutect2/FilterMutectCalls
-    #     arg_mutect2 += f'-O {head_path}{arg[:-1]}/unfiltered_{arg}somatic.vcf.gz'
-    #     filter_mutect_calls_input = f'\n{head_path}{arg[:-1]}/unfiltered_{arg[:-1]}'
-    #     filter_mutect_calls_output = f'\n{head_path}{arg[:-1]}/filtered_{arg[:-1]}'
-    #     # File name (and path) after which these arguments are written
-    #     name_file = f'{head_path}{arg[:-1]}.txt'
-    #     # Calls the function that actually writes the arguments
-    #     self.write_file(name_file, [arg_mutect2, filter_mutect_calls_input, filter_mutect_calls_output])
-
     def get_arguments(self, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both'):
         """
         Ensures that all arguments for Mutect2/FilterMutectCalls are made with all possible combinations
@@ -114,9 +60,9 @@ class Sample:
         :param type_sample:         What type of tumor you want to have ("both", "tFL" or "FL")
         :return:
         """
-        if number_of_tumors==None:
-            number_of_tumors = len(self.tumor)
-        if number_of_hc==None:
+        if number_of_tumors is None:
+            number_of_tumors = len(self.tumors)
+        if number_of_hc is None:
             number_of_hc = len(self.hc)
         # Check if the number is possible.
         edited_list_tumors, number_of_tumors = self.check_length_list(self.tumors, number_of_tumors, type_sample)
@@ -150,7 +96,8 @@ class Sample:
                     arg_mutect2_tumor += f'-I {head_path}{number_tum}/SN_{tum.name}.DR.bam '
                 arg = arg_hc + arg_tumor
                 arg_mutect2 = arg_mutect2_hc + arg_mutect2_tumor
-                # Pastes everything together and makes three good arguments that can be passed to Mutect2/FilterMutectCalls
+                # Pastes everything together and makes three good arguments that can be passed
+                # to Mutect2/FilterMutectCalls
                 arg_mutect2 += f'-O {head_path}{arg[:-1]}/unfiltered_{arg}somatic.vcf.gz'
                 filter_mutect_calls_input = f'\n{head_path}{arg[:-1]}/unfiltered_{arg[:-1]}'
                 filter_mutect_calls_output = f'\n{head_path}{arg[:-1]}/filtered_{arg[:-1]}'
@@ -167,7 +114,8 @@ class Sample:
         :param type_sample: What type of tumor you want to have ("both", "tFL" or "FL")
         :param category:    Whether it is hc or tumor
         :return:            edit_list or number_list, whose edit_list is modified if a specific tumor type is chosen.
-                            number: possibly adjusted number to the length of the list. (Number of tumors/hc you want to combine while running Mutect2)
+                            number: possibly adjusted number to the length of the list. (Number of tumors/hc you want to
+                            combine while running Mutect2)
         """
         # Check which tumor type is chosen.
         # If it is both and if it is not tumor type but hc the following is performed.
@@ -181,9 +129,9 @@ class Sample:
         else:
             edit_list = list()
             for value in number_list:
-                if value.type_sample == 'tFL':
+                if type_sample == 'tFL' and value.type_sample == 'tFL':
                     edit_list.append(value)
-                elif value.type_sample == 'FL':
+                elif type_sample == 'FL' and value.type_sample != 'tFL':
                     edit_list.append(value)
             # Check if the number is possible
             if len(edit_list) < number:
@@ -227,11 +175,10 @@ def filter_file(path_file):
     return df_selection
 
 
-def make_objects(df_selection, head_path):
+def make_objects(df_selection):
     """
     Creates the dictionary with the objects per participant/sample
     :param df_selection:    the custom data frame from which to create objects and a dictionary
-    :param head_path:       Main path to where the file will be saved
     :return:                a dictionary containing the sample_num as key and as value Sample objects
     """
     # Empty dict:
@@ -250,7 +197,7 @@ def make_objects(df_selection, head_path):
     return dict_samples
 
 
-def arguments_to_file(dict_samples, head_path, number_of_tumors, number_of_hc, type_sample):
+def arguments_to_file(dict_samples, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both'):
     """
     Ensures that all arguments are created and written.
     :param dict_samples:     a dictionary containing the sample_num as key and as value Sample objects
@@ -260,11 +207,9 @@ def arguments_to_file(dict_samples, head_path, number_of_tumors, number_of_hc, t
     :param type_sample:     What type of tumor you want to have ("both", "tFL" or "FL")
     :return:
     """
-
     # Loop over keys from dict_sample
     for key in dict_samples:
         dict_samples[key].get_arguments(head_path, number_of_tumors, number_of_hc, type_sample)
-        # dict_samples[key].get_arguments_per_two(head_path)
 
 
 def main():
@@ -283,14 +228,14 @@ def main():
     # Filter file
     df_selection = filter_file(path_file)
     # Make objects for all samples/participants
-    dict_samples = make_objects(df_selection, head_path)
+    dict_samples = make_objects(df_selection)
     # Number of tumors you want to combine while running Mutect2.
     number_of_tumors = 1
     # Number of hc you want to combine while running Mutect2
     number_of_hc = 1
     # What type of tumor you want to have ("both", "tFL" or "FL")
-    type_sample = 'both'
-    arguments_to_file(dict_samples, head_path, number_of_tumors, number_of_hc, type_sample)
+    type_sample = 'FL'
+    arguments_to_file(dict_samples, head_path , number_of_tumors, number_of_hc, type_sample)
 
 
 if __name__ == "__main__":
