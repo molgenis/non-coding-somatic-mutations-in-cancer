@@ -73,7 +73,7 @@ class Sample:
             arg_hc = f'{self.sample_name}_numT_{number_of_tumors}_numHC_{number_of_hc}_'
             # Name the chosen tumor type in the args. (so you can see the difference in files)
             if type_sample != 'both':
-                arg_hc += f'_{type_sample}_'
+                arg_hc += f'{type_sample}_'
             # Starting string for arg_mutect2 (the whole argument to eventually run Mutect2)
             arg_mutect2_hc = ''
             # Add each tumor to the different parameters
@@ -94,17 +94,19 @@ class Sample:
                     number_tum = tum.name.replace("SS600", "")
                     # Add tumor to arg_mutect2 (the whole argument to eventually run Mutect2)
                     arg_mutect2_tumor += f'-I {head_path}{number_tum}/SN_{tum.name}.DR.bam '
+                # Merge hc and tumor arguments
                 arg = arg_hc + arg_tumor
                 arg_mutect2 = arg_mutect2_hc + arg_mutect2_tumor
                 # Pastes everything together and makes three good arguments that can be passed
                 # to Mutect2/FilterMutectCalls
-                arg_mutect2 += f'-O {head_path}{arg[:-1]}/unfiltered_{arg}somatic.vcf.gz'
-                filter_mutect_calls_input = f'\n{head_path}{arg[:-1]}/unfiltered_{arg[:-1]}'
-                filter_mutect_calls_output = f'\n{head_path}{arg[:-1]}/filtered_{arg[:-1]}'
+                # Path for mkdir
+                mkdir_path = f'{head_path}{arg[:-1]}\n'
+                # Path and first part of output files
+                file_output = f'\n{head_path}{arg[:-1]}/{arg[:-1]}_'
                 # File name (and path) after which these arguments are written
                 name_file = f'{head_path}{arg[:-1]}.txt'
                 # Calls the function that actually writes the arguments
-                self.write_file(name_file, [arg_mutect2, filter_mutect_calls_input, filter_mutect_calls_output])
+                self.write_file(name_file, [mkdir_path, arg_mutect2, file_output])
 
     def check_length_list(self, number_list, number, type_sample, category=''):
         """
@@ -143,9 +145,10 @@ class Sample:
         Writes the arguments (list_args) to a file.
         :param name_file:   File name (and path) after which the arguments are written
         :param list_args:   list of arguments with the following arguments:
-                            arg_mutect2:                    Argument to run Mutect2
-                            filter_mutect_calls_input:      input file for FilterMutectCalls (after Mutect2)
-                            filter_mutect_calls_output:     output file for FilterMutectCalls (after Mutect2)
+                            mkdir_path:     Path folder to be created
+                            arg_mutect2:    Argument to run Mutect2
+                            file_output:    Path and first part of output files
+                            
         :return:
         """
         file_arguments = open(name_file, "w")
