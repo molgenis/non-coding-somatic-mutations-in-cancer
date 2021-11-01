@@ -50,7 +50,7 @@ class Sample:
         elif row['category'] == 'hc':
             self.hc.append(one_run)
 
-    def get_arguments(self, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both'):
+    def get_arguments(self, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both', type_aln='bowtie', type_aln2='bowtie2'):
         """
         Ensures that all arguments for Mutect2/FilterMutectCalls are made with all possible combinations
         tumor vs hc of a sample (i.e. per two).
@@ -83,7 +83,7 @@ class Sample:
                 # For example, makes SS6005042 -> 5042
                 number_hc = hc.name.replace("SS600", "")
                 # Add hc to arg_mutect2 (the whole argument to eventually execute Mutect2)
-                arg_mutect2_hc += f'-I {head_path}{number_hc}/SN_{hc.name}.DR.bam -normal {hc.name}.DR.bam '
+                arg_mutect2_hc += f'-I {head_path}{self.sample_name}/{number_hc}/{type_aln}/SN_{hc.name}.bam -normal {type_aln2}_{hc.name}.DR '
             for edited_number_tumors in combinations(edited_list_tumors, number_of_tumors):
                 arg_tumor = ''
                 arg_mutect2_tumor = ''
@@ -93,18 +93,18 @@ class Sample:
                     # For example, makes SS6005044 -> 5044
                     number_tum = tum.name.replace("SS600", "")
                     # Add tumor to arg_mutect2 (the whole argument to eventually run Mutect2)
-                    arg_mutect2_tumor += f'-I {head_path}{number_tum}/SN_{tum.name}.DR.bam '
+                    arg_mutect2_tumor += f'-I {head_path}{self.sample_name}/{number_tum}/{type_aln}/SN_{tum.name}.bam '
                 # Merge hc and tumor arguments
                 arg = arg_hc + arg_tumor
                 arg_mutect2 = arg_mutect2_hc + arg_mutect2_tumor
                 # Pastes everything together and makes three good arguments that can be passed
                 # to Mutect2/FilterMutectCalls
                 # Path for mkdir
-                mkdir_path = f'{head_path}{arg[:-1]}\n'
+                mkdir_path = f'{head_path}{self.sample_name}/{arg[:-1]}/{type_aln}\n'
                 # Path and first part of output files
-                file_output = f'\n{head_path}{arg[:-1]}/{arg[:-1]}_'
+                file_output = f'\n{head_path}{self.sample_name}/{arg[:-1]}/{type_aln}/{arg}'
                 # File name (and path) after which these arguments are written
-                name_file = f'{head_path}{arg[:-1]}.txt'
+                name_file = f'{head_path}{self.sample_name}/{type_aln}_{arg[:-1]}.txt'
                 # Calls the function that actually writes the arguments
                 self.write_file(name_file, [mkdir_path, arg_mutect2, file_output])
 
@@ -200,7 +200,7 @@ def make_objects(df_selection):
     return dict_samples
 
 
-def arguments_to_file(dict_samples, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both'):
+def arguments_to_file(dict_samples, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both', type_aln='bowtie', type_aln2='bowtie2'):
     """
     Ensures that all arguments are created and written.
     :param dict_samples:     a dictionary containing the sample_num as key and as value Sample objects
@@ -212,7 +212,7 @@ def arguments_to_file(dict_samples, head_path, number_of_tumors=None, number_of_
     """
     # Loop over keys from dict_sample
     for key in dict_samples:
-        dict_samples[key].get_arguments(head_path, number_of_tumors, number_of_hc, type_sample)
+        dict_samples[key].get_arguments(head_path, number_of_tumors, number_of_hc, type_sample, type_aln, type_aln2)
 
 
 def main():
@@ -221,13 +221,13 @@ def main():
     :return:
     """
     # the path to the file
-    # path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map"
+    path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map"
     # Main path to where the file will be saved
-    # head_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/"
+    head_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/"
     # the path to the file
-    path_file = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/EGAD00001000292_Sample_File.map"
+    #path_file = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/EGAD00001000292_Sample_File.map"
     # Main path to where the file will be saved
-    head_path = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/"
+    #head_path = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/"
     # Filter file
     df_selection = filter_file(path_file)
     # Make objects for all samples/participants
@@ -237,8 +237,10 @@ def main():
     # Number of hc you want to combine while running Mutect2
     number_of_hc = 1
     # What type of tumor you want to have ("both", "tFL" or "FL")
-    type_sample = 'FL'
-    arguments_to_file(dict_samples, head_path , number_of_tumors, number_of_hc, type_sample)
+    type_sample = 'both'
+    type_aln='bowtie'
+    type_aln2='bowtie2'
+    arguments_to_file(dict_samples, head_path , number_of_tumors, number_of_hc, type_sample, type_aln, type_aln2)
 
 
 if __name__ == "__main__":
