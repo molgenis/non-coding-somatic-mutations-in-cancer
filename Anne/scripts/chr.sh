@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
-
+# Load packages
 ml Anaconda3/5.3.0
 ml SAMtools/1.9-foss-2018b
 ml GATK/4.1.4.1-Java-8-LTS
@@ -10,23 +10,27 @@ ml BWA/0.7.17-GCCcore-7.3.0
 ml Bowtie2/2.3.4.2-foss-2018b
 ml picard/2.20.5-Java-11-LTS
 
+# The chromosome that has been chosen
 CHR=chr21
+# The entire file number
 FILE=SS6005043
 
 
-#Preparation of the reference sequence
+# Preparation of the reference sequence
 bwa index -a is /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHR}.fa
 # Create a reference dictionary
 java -jar ${EBROOTPICARD}/picard.jar CreateSequenceDictionary R= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHR}.fa O= /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHR}.dict
 # Index the reference sequence with Samtools
 samtools faidx /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHR}.fa
 
-
-
+# Filter by chosen chromosome
 samtools view -h ${FILE}.sorted.bam ${CHR} > ${FILE}_TEST.${CHR}.sam
 samtools view -bS ${FILE}_TEST.${CHR}.sam > ${FILE}_TEST.${CHR}.bam
+# Print header of the bam file
 samtools view -H ${FILE}_TEST.${CHR}.bam
+# Adding Read Group tags and indexing bam files
 java -jar ${EBROOTPICARD}/picard.jar AddOrReplaceReadGroups I=${FILE}_TEST.${CHR}.bam O=${FILE}_TEST_add.${CHR}.sort.bam RGID=4 RGLB=lib1 RGPL=illumina RGPU=unit1 RGSM=20
+# Print header of the bam file
 samtools view -H ${FILE}_TEST_add.${CHR}.sort.bam
 #        (stage) [umcg-aewijk@gearshift EGAD00001000292]$ samtools view -H SS6005044_TEST_add.chr22.sort.bam
 #        @HD     VN:1.6  SO:coordinate
@@ -59,13 +63,14 @@ samtools view -H ${FILE}_TEST_add.${CHR}.sort.bam
 
 #http://broadinstitute.github.io/picard/command-line-overview.html#FixMateInformation
 java -jar ${EBROOTPICARD}/picard.jar FixMateInformation I=${FILE}_TEST_add.${CHR}.sort.bam O=${FILE}_TEST_FIXM.${CHR}.sort.bam 
+# Print header of the bam file
 samtools view -H ${FILE}_TEST_FIXM.${CHR}.sort.bam
-
+# Extracts the good parts of the header and puts it in a file
 samtools view -H ${FILE}_TEST_FIXM.${CHR}.sort.bam | grep @HD > new_header.txt
 samtools view -H ${FILE}_TEST_FIXM.${CHR}.sort.bam | grep @PG >> new_header.txt
 samtools view -H ${FILE}_TEST_FIXM.${CHR}.sort.bam | grep @RG >> new_header.txt
 samtools view -H ${FILE}_TEST_FIXM.${CHR}.sort.bam | grep ${CHR}  >> new_header.txt
-
+# Rehead the file with the created header file
 samtools reheader new_header.txt ${FILE}_TEST_FIXM.${CHR}.sort.bam > ${FILE}_TEST_FIXM.${CHR}.reheadered.bam
 samtools index ${FILE}_TEST_FIXM.${CHR}.reheadered.bam
 samtools view -H ${FILE}_TEST_FIXM.${CHR}.reheadered.bam
@@ -75,6 +80,6 @@ samtools view -H ${FILE}_TEST_FIXM.${CHR}.reheadered.bam
 #        @SQ     SN:chr22        LN:51304566
 #        @PG     ID:samtools     PN:samtools     PP:CASAVA       VN:1.9  CL:samtools reheader new_header.txt SS6005044_TEST_FIXM.chr22.sort.bam
 
-
+# Create VCF files by variant calling
 gatk Mutect2 -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHR}.fa -I ${FILE}_TEST_FIXM.${CHR}.reheadered.bam -O ${FILE}_TEST_FIXM.${CHR}.reheadered_somatic.vcf.gz
 gatk FilterMutectCalls -R /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHR}.fa -V ${FILE}_TEST_FIXM.${CHR}.reheadered_somatic.vcf.gz -O ${FILE}_TEST_FIXM.${CHR}.reheadered_somatic.vcf.gz

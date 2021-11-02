@@ -1,16 +1,15 @@
 #!/usr/bin/bash
 
+# Path to the reference genome.
 PATH_REF=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/
+# File name of the reference genome
 REF=chr22.fa
-
-#CHR_DICT=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.dict
-CHR=chr22
-
-#VCF_PON=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/
-#VCF_NAME=somatic-b37_Mutect2-WGS-panel-b37.vcf
+# Path to the file of the panel of normals (PoN)
 PON=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
+# Path to the file of the germline resource (GR)
 GR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GermlineResource/merge_af-only-gnomad.raw.sites.vcf
 
+# load packages
 ml Anaconda3/5.3.0
 ml SAMtools/1.9-foss-2018b
 ml GATK/4.1.4.1-Java-8-LTS
@@ -19,20 +18,13 @@ ml BWA/0.7.17-GCCcore-7.3.0
 ml Bowtie2/2.3.4.2-foss-2018b
 ml picard/2.20.5-Java-11-LTS
 
-# Function that changed the sample names
-change_sample_name() {
-    samtools view -H ${2}${1}.bam  | sed "s/SM:[^\t]*/SM:${1}/g" | samtools reheader - ${2}${1}.bam > ${2}SN_${1}.bam
-    samtools index ${2}SN_${1}.bam
-}
-
-echo_test(){
-    echo ${1}
-    echo ${2}
-    echo ${3}
-}
-
 # bam --> VCF
 mutect2_vcf() {
+    '''
+    Mutect2:            Mutect2 is designed to call somatic variants only
+    FilterMutectCalls:  Filter somatic SNVs and indels called by Mutect2
+    Do this now in 4 different ways, so that you can check later whether there is much difference.
+    '''
     mkdir -p ${1}
     # sample name
     echo "####sample name\n"

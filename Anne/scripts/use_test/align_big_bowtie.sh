@@ -11,11 +11,15 @@
 #SBATCH --export=NONE
 #SBATCH --get-user-env=L
 
+# Number or specific tissue of a sample
 NUMBER=4104
+# The entire file number
 FILE_NUM=SS600${NUMBER}
-GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa
+# The path where the file is located
 PATH_DIR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S01/
-
+# The path to the file of the reference genome that will be used.
+GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa
+# Load packages
 ml SAMtools/1.9-foss-2018b
 ml BWA/0.7.17-GCCcore-7.3.0
 ml Bowtie2/2.3.4.2-foss-2018b
@@ -24,27 +28,9 @@ ml FastQC/0.11.8-Java-11-LTS
 ml cutadapt/2.6-GCCcore-7.3.0-Python-3.7.4-bare
 
 echo "BEGIN"
-#echo "${NUMBER}"
-
+# Creates a specific folder
 mkdir -p ${PATH_DIR}${NUMBER}/bowtie
-
-
 cd ${PATH_DIR}${NUMBER}
-#echo "BEGIN sort"
-# BAM files must be resorted so that they are ordered by read ID instead of location in the reference
-#samtools view -h ${PATH_DIR}${FILE_NUM}.sorted.bam chr22 > ${PATH_DIR}${FILE_NUM}_chr22.sam
-#samtools view -bS ${PATH_DIR}${FILE_NUM}_chr22.sam > ${PATH_DIR}${FILE_NUM}_chr22.bam
-#samtools sort -n ${PATH_DIR}${FILE_NUM}_chr22.bam -o ${PATH_DIR}${NUMBER}/${FILE_NUM}_byName.sorted.bam
-# extract the FASTQ reads into two paired read files
-#echo "KLAAR sort"
-#echo "BEGIN 1 en 2"
-#cd ${PATH_DIR}${NUMBER}
-#samtools fastq -@ 8 ${PATH_DIR}${NUMBER}/${FILE_NUM}_byName.sorted.bam -1 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq -2 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq -0 /dev/null -s /dev/null -n
-
-#fastqc -f fastq -o ${PATH_DIR}${NUMBER}/QC ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq
-#fastqc -f bam -o ${PATH_DIR}${NUMBER}/QC ${PATH_DIR}${NUMBER}/${FILE_NUM}_byName.sorted.bam
-
-#echo "KLAAR 1 en 2"
 
 # Last steps of alignment
 align_last_steps() {
@@ -59,9 +45,8 @@ align_last_steps() {
     samtools index ${1}.DR.bam
 }
 
-
 #BOWTIE2
-#echo "bowtie2"
+# Paired-end alignment bowtie2
 bowtie2-build ${GENOOM} /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/GENOOM22
 bowtie2 -p 4 -x /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/GENOOM22 -1 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq -2 ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq -S ${PATH_DIR}${NUMBER}/bowtie/bowtie2_${FILE_NUM}.sam
 align_last_steps ${PATH_DIR}${NUMBER}/bowtie/bowtie2_${FILE_NUM}

@@ -238,7 +238,10 @@ def main():
     number_of_hc = 1
     # What type of tumor you want to have ("both", "tFL" or "FL")
     type_sample = 'both'
+    # Which method was used
+    # Name of the folder
     type_aln='bowtie'
+    # Piece with which the file name begins
     type_aln2='bowtie2'
     arguments_to_file(dict_samples, head_path , number_of_tumors, number_of_hc, type_sample, type_aln, type_aln2)
 
