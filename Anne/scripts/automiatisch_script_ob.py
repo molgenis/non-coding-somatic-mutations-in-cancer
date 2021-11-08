@@ -50,7 +50,8 @@ class Sample:
         elif row['category'] == 'hc':
             self.hc.append(one_run)
 
-    def get_arguments(self, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both', type_aln='bowtie', type_aln2='bowtie2'):
+    def get_arguments(self, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both', type_aln='bowtie',
+                      type_aln2='bowtie2'):
         """
         Ensures that all arguments for Mutect2/FilterMutectCalls are made with all possible combinations
         tumor vs hc of a sample (i.e. per two).
@@ -58,6 +59,8 @@ class Sample:
         :param number_of_tumors:    Number of hc you want to combine while running Mutect2
         :param number_of_hc:        Number of hc you want to combine while running Mutect2
         :param type_sample:         What type of tumor you want to have ("both", "tFL" or "FL")
+        :param type_aln:
+        :param type_aln2:
         :return:
         """
         if number_of_tumors is None:
@@ -82,8 +85,14 @@ class Sample:
                 arg_hc += f'{hc.name}_'
                 # For example, makes SS6005042 -> 5042
                 number_hc = hc.name.replace("SS600", "")
+                self.write_file(f'{head_path}{self.sample_name}/mutect_{type_aln}/{type_aln}_{hc.name}.txt',
+                                [f'{head_path}{self.sample_name}/{number_hc}_vcf/{type_aln}\n',
+                                 f'-I {head_path}{self.sample_name}/{number_hc}/{type_aln}/SN_{hc.name}.bam '
+                                 f'-normal {type_aln2}_{hc.name}.DR ',
+                                 f'\n{head_path}{self.sample_name}/{number_hc}_vcf/{type_aln}/{hc.name}_'])
                 # Add hc to arg_mutect2 (the whole argument to eventually execute Mutect2)
-                arg_mutect2_hc += f'-I {head_path}{self.sample_name}/{number_hc}/{type_aln}/SN_{hc.name}.bam -normal {type_aln2}_{hc.name}.DR '
+                arg_mutect2_hc += f'-I {head_path}{self.sample_name}/{number_hc}/{type_aln}/SN_{hc.name}.bam ' \
+                                  f'-normal {type_aln2}_{hc.name}.DR '
             for edited_number_tumors in combinations(edited_list_tumors, number_of_tumors):
                 arg_tumor = ''
                 arg_mutect2_tumor = ''
@@ -92,6 +101,10 @@ class Sample:
                     arg_tumor += f'{tum.name}_'
                     # For example, makes SS6005044 -> 5044
                     number_tum = tum.name.replace("SS600", "")
+                    self.write_file(f'{head_path}{self.sample_name}/mutect_{type_aln}/{type_aln}_{tum.name}.txt',
+                                    [f'{head_path}{self.sample_name}/{number_tum}_vcf/{type_aln}\n',
+                                     f'-I {head_path}{self.sample_name}/{number_tum}/{type_aln}/SN_{tum.name}.bam ',
+                                     f'\n{head_path}{self.sample_name}/{number_tum}_vcf/{type_aln}/{tum.name}_'])
                     # Add tumor to arg_mutect2 (the whole argument to eventually run Mutect2)
                     arg_mutect2_tumor += f'-I {head_path}{self.sample_name}/{number_tum}/{type_aln}/SN_{tum.name}.bam '
                 # Merge hc and tumor arguments
@@ -104,7 +117,7 @@ class Sample:
                 # Path and first part of output files
                 file_output = f'\n{head_path}{self.sample_name}/{arg[:-1]}/{type_aln}/{arg}'
                 # File name (and path) after which these arguments are written
-                name_file = f'{head_path}{self.sample_name}/{type_aln}_{arg[:-1]}.txt'
+                name_file = f'{head_path}{self.sample_name}/mutect_{type_aln}/{type_aln}_{arg[:-1]}.txt'
                 # Calls the function that actually writes the arguments
                 self.write_file(name_file, [mkdir_path, arg_mutect2, file_output])
 
@@ -148,7 +161,7 @@ class Sample:
                             mkdir_path:     Path folder to be created
                             arg_mutect2:    Argument to run Mutect2
                             file_output:    Path and first part of output files
-                            
+
         :return:
         """
         file_arguments = open(name_file, "w")
@@ -200,7 +213,8 @@ def make_objects(df_selection):
     return dict_samples
 
 
-def arguments_to_file(dict_samples, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both', type_aln='bowtie', type_aln2='bowtie2'):
+def arguments_to_file(dict_samples, head_path, number_of_tumors=None, number_of_hc=None, type_sample='both',
+                      type_aln='bowtie', type_aln2='bowtie2'):
     """
     Ensures that all arguments are created and written.
     :param dict_samples:     a dictionary containing the sample_num as key and as value Sample objects
@@ -208,6 +222,8 @@ def arguments_to_file(dict_samples, head_path, number_of_tumors=None, number_of_
     :param number_of_tumors: Number of hc you want to combine while running Mutect2
     :param number_of_hc:    Number of hc you want to combine while running Mutect2
     :param type_sample:     What type of tumor you want to have ("both", "tFL" or "FL")
+    :param type_aln:
+    :param type_aln2:
     :return:
     """
     # Loop over keys from dict_sample
@@ -225,9 +241,9 @@ def main():
     # Main path to where the file will be saved
     head_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/"
     # the path to the file
-    #path_file = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/EGAD00001000292_Sample_File.map"
+    # path_file = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/EGAD00001000292_Sample_File.map"
     # Main path to where the file will be saved
-    #head_path = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/"
+    # head_path = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/"
     # Filter file
     df_selection = filter_file(path_file)
     # Make objects for all samples/participants
@@ -240,10 +256,10 @@ def main():
     type_sample = 'both'
     # Which method was used
     # Name of the folder
-    type_aln='bowtie'
+    type_aln = 'bowtie'
     # Piece with which the file name begins
-    type_aln2='bowtie2'
-    arguments_to_file(dict_samples, head_path , number_of_tumors, number_of_hc, type_sample, type_aln, type_aln2)
+    type_aln2 = 'bowtie2'
+    arguments_to_file(dict_samples, head_path, number_of_tumors, number_of_hc, type_sample, type_aln, type_aln2)
 
 
 if __name__ == "__main__":

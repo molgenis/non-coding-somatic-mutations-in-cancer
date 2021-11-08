@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=align_big
-#SBATCH --output=align_big.out
-#SBATCH --error=align_big.err
-#SBATCH --time=167:59:59
+#SBATCH --job-name=job_bowtie
+#SBATCH --output=job_bowtie.out
+#SBATCH --error=job_bowtie.err
+#SBATCH --time=49:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
@@ -11,10 +11,7 @@
 #SBATCH --export=NONE
 #SBATCH --get-user-env=L
 
-# The path where the file is located
-PATH_DIR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S4/
-# The path to the file of the reference genome that will be used.
-GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa
+
 # Load packages
 ml SAMtools/1.9-foss-2018b
 ml BWA/0.7.17-GCCcore-7.3.0
@@ -23,17 +20,21 @@ ml picard/2.20.5-Java-11-LTS
 ml FastQC/0.11.8-Java-11-LTS
 ml cutadapt/2.6-GCCcore-7.3.0-Python-3.7.4-bare
 
-
 # Array of files it should download
-array=( 4133  4134 )
+array=( 4139  4138  5041  5043  5042  5044 )
+# Array with file output names
+array2=( S5  S5  S5  S6  S6  S6 )
 
 for i in "${!array[@]}"
 do
     # Number or specific tissue of a sample
     NUMBER="${array[i]}"
     # The entire file number
-    FILE_NUM=SS600${NUMBER}
-    
+    FILE_NUM=SS600${NUMBER}   
+    # The path where the file is located
+    PATH_DIR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/"${array2[i]}"/
+    # The path to the file of the reference genome that will be used.
+    GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa 
 
     echo "BEGIN"
     # Creates a specific folder
