@@ -2,6 +2,7 @@
 
 # Load package
 ml BCFtools/1.11-GCCcore-7.3.0
+ml GATK/4.1.4.1-Java-8-LTS
 
 # Which method
 METH=bowtie
@@ -43,6 +44,11 @@ for sample_num in */ ; do
                 mkdir -p ${OUTPUT_DIR}
                 # Compare two VCF files
                 bcftools isec ${PATH_DIR1}SS600"${ids[i]}"__somatic_filtered_PON_GERM.vcf.gz ${PATH_DIR2}SS600"${ids[j]}"__somatic_filtered_PON_GERM.vcf.gz -p ${OUTPUT_DIR}
+                for filename in ${OUTPUT_DIR}*.vcf; do
+                    bcftools view ${filename} -Oz -o ${filename}.gz
+                    bcftools index ${filename}.gz
+                #     gatk IndexFeatureFile -I ${filename}
+                done
             done
         done
     fi

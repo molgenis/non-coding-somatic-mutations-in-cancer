@@ -50,14 +50,16 @@ class Sample:
         elif row['category'] == 'hc':
             self.hc.append(one_run)
 
-    def get_arguments(self, head_path, compare_hc_tum, unique_tumor_vcfs, number_of_tumors=None, number_of_hc=None,
+    def get_arguments(self, head_path, compare_hc_tum, manual_comparison, mutect2_comparison, number_of_tumors=None,
+                      number_of_hc=None,
                       type_sample='both', type_aln='bowtie', type_aln2='bowtie2'):
         """
         Ensures that all arguments for Mutect2/FilterMutectCalls are made with all possible combinations
         tumor vs hc of a sample (i.e. per two).
         :param head_path:           Main path to where the file will be saved
         :param compare_hc_tum:
-        :param unique_tumor_vcfs:
+        :param manual_comparison:
+        :param mutect2_comparison:
         :param number_of_tumors:    Number of hc you want to combine while running Mutect2
         :param number_of_hc:        Number of hc you want to combine while running Mutect2
         :param type_sample:         What type of tumor you want to have ("both", "tFL" or "FL")
@@ -87,6 +89,7 @@ class Sample:
                 arg_hc += f'{hc.name}_'
                 # For example, makes SS6005042 -> 5042
                 number_hc = hc.name.replace("SS600", "")
+                # single mutect2
                 self.write_file(f'{head_path}{self.sample_name}/mutect_{type_aln}/{type_aln}_{hc.name}.txt',
                                 [f'{head_path}{self.sample_name}/{number_hc}_vcf/{type_aln}\n',
                                  f'-I {head_path}{self.sample_name}/{number_hc}/{type_aln}/SN_{hc.name}.bam '
@@ -105,13 +108,15 @@ class Sample:
                     number_tum = tum.name.replace("SS600", "")
                     if number_of_hc == 1 and number_of_tumors == 1:
                         compare_hc_tum.write(
-                            f"{head_path}{self.sample_name}/{number_hc}_vcf/{type_aln}/{hc.name}__somatic_filtered.vcf.gz "
-                            f"{head_path}{self.sample_name}/{number_tum}_vcf/{type_aln}/{tum.name}__somatic_filtered.vcf.gz"
+                            f"{head_path}{self.sample_name}/{number_hc}_vcf/{type_aln}/"
+                            f"{hc.name}__somatic_filtered.vcf.gz "
+                            f"{head_path}{self.sample_name}/{number_tum}_vcf/{type_aln}/"
+                            f"{tum.name}__somatic_filtered.vcf.gz"
                             f" -p {head_path}{self.sample_name}/compare_{number_hc}_{number_tum}/{type_aln}/\n")
-                        unique_tumor_vcfs.write(
-                            f"{head_path}{self.sample_name}/compare_{number_hc}_{number_tum}/{type_aln}/0001.vcf\n"
+                        manual_comparison.write(
+                            f"{head_path}{self.sample_name}/compare_{number_hc}_{number_tum}/{type_aln}/0001.vcf.gz "
                         )
-
+                    # single mutect2
                     self.write_file(f'{head_path}{self.sample_name}/mutect_{type_aln}/{type_aln}_{tum.name}.txt',
                                     [f'{head_path}{self.sample_name}/{number_tum}_vcf/{type_aln}\n',
                                      f'-I {head_path}{self.sample_name}/{number_tum}/{type_aln}/SN_{tum.name}.bam ',
@@ -125,6 +130,8 @@ class Sample:
                 # to Mutect2/FilterMutectCalls
                 # Path for mkdir
                 mkdir_path = f'{head_path}{self.sample_name}/{arg[:-1]}/{type_aln}\n'
+                mutect2_comparison.write(f'{head_path}{self.sample_name}/{arg[:-1]}/{type_aln}/'
+                                         f'{arg}_somatic_filtered_PON_GERM.vcf.gz ')
                 # Path and first part of output files
                 file_output = f'\n{head_path}{self.sample_name}/{arg[:-1]}/{type_aln}/{arg}'
                 # File name (and path) after which these arguments are written
@@ -239,14 +246,17 @@ def arguments_to_file(dict_samples, head_path, number_of_tumors=None, number_of_
     :return:
     """
     # Loop over keys from dict_sample
-    compare_hc_tum = open(f'{head_path}Compare_hc_tumor_{type_aln}_{type_sample}.txt', "w")
-    unique_tumor_vcfs = open(f'{head_path}unique_tumor_vcfs_{type_aln}_{type_sample}.txt', "w")
+    compare_hc_tum = open(f'{head_path}compare_hc_tumor_{type_aln}_{type_sample}.txt', "w")
+    manual_comparison = open(f'{head_path}manual_comparison_{type_aln}_{type_sample}.txt', "w")
+    mutect2_comparison = open(f'{head_path}mutect2_comparison_{type_aln}_{type_sample}.txt', "w")
     for key in dict_samples:
-        dict_samples[key].get_arguments(head_path, compare_hc_tum, unique_tumor_vcfs, number_of_tumors, number_of_hc,
+        dict_samples[key].get_arguments(head_path, compare_hc_tum, manual_comparison, mutect2_comparison,
+                                        number_of_tumors, number_of_hc,
                                         type_sample, type_aln,
                                         type_aln2)
     compare_hc_tum.close()
-    unique_tumor_vcfs.close()
+    manual_comparison.close()
+    mutect2_comparison.close()
 
 
 def main():
@@ -255,13 +265,13 @@ def main():
     :return:
     """
     # the path to the file
-    # path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map"
+    path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map"
     # Main path to where the file will be saved
-    # head_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/"
+    head_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/"
     # the path to the file
-    path_file = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/EGAD00001000292_Sample_File.map"
+    # path_file = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/EGAD00001000292_Sample_File.map"
     # Main path to where the file will be saved
-    head_path = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/"
+    # head_path = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/"
 
     # Number of tumors you want to combine while running Mutect2.
     number_of_tumors = 1
@@ -271,9 +281,9 @@ def main():
     type_sample = 'both'
     # Which method was used
     # Name of the folder
-    type_aln = 'bowtie'
+    type_aln = 'bowtie'  # bowtie, bwa_aln, bwa_mem
     # Piece with which the file name begins
-    type_aln2 = 'bowtie2'
+    type_aln2 = 'bowtie2'  # bowtie2, aln, mem
 
     # Filter file
     df_selection = filter_file(path_file)
