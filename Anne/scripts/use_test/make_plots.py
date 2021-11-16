@@ -5,6 +5,8 @@ import pandas as pd
 import io
 import seaborn as sns
 import matplotlib.pyplot as plt
+# https://stackoverflow.com/questions/35737116/runtimeerror-invalid-display-variable
+plt.switch_backend('agg')
 import sys
 
 path = sys.argv[1]
@@ -34,16 +36,12 @@ for column in list(df.columns):
     print(column)
     data = df[df[column].notna()]
     if column in ['AD', 'AF', 'F2R1', 'F1R2', 'SB']:
-        # cols = ['REF', 'ALT']
-        AD = df[column].str.split(',', expand=True)
-        data = AD.apply(pd.to_numeric)
-        # df[cols] = df['AD'].str.split(',', expand=True)
-        # data[cols] = data[cols].apply(pd.to_numeric, errors='coerce', axis=1)
-        f, axes = plt.subplots(len(data.columns), 1, figsize=(20, 20), sharey=False)
+        split_df = df[column].str.split(',', expand=True)
+        data = split_df.apply(pd.to_numeric)
+        f, axes = plt.subplots(len(data.columns), 1, figsize=(20, 20))
         f.tight_layout(pad=8.0)
         for i, col in enumerate(data.columns):
             if not data.empty:
-                # plt.figure(figsize=(15, 15))
                 ax = sns.histplot(data=data, x=col, ax=axes[i])
                 ax.set_yscale('log')
                 if column == 'AD':
@@ -52,11 +50,8 @@ for column in list(df.columns):
                         ax.title.set_text("REF")
                     else:
                         ax.title.set_text(f"ALT{i}")
-                # plt.yscale('log')
             else:
                 print(f'{col} EMPTY')
-        # plt.xlabel(f"AD (Allelic depths)")
-        # plt.ylabel(f"Counts")
         f.suptitle(f'{titles_dict[column]}', fontsize=20)
         plt.savefig(
             f'{sys.argv[2]}{basename}_{column}_seaborn_hist.png')
