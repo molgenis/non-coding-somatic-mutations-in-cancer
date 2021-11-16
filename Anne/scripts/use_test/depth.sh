@@ -5,10 +5,10 @@ ml SAMtools/1.9-foss-2018b
 ml R/4.0.3-foss-2018b-bare
 
 
-# Array of files it should download
+# Array of tissue numbers
 #array=( 4094  4099  4104  4109  4113  4114  4118  4119  4123  4124  4129  4128  4133  4134  4139  4138  5041  5043  5042  5044 )
 array=( 4109   )
-# Array with file output names
+# Array of sample numbers
 #array2=( S1  S1  S1  S2  S2  S2  S2  S2  S3  S3  S3  S4  S4  S4  S5  S5  S5  S6  S6  S6 )
 array2=( S2  )
 PATH_GLOBAL=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/

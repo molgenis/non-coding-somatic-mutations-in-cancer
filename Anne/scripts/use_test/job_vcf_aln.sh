@@ -12,7 +12,7 @@
 #SBATCH --get-user-env=L
 
 
-# Array with file output names
+# Array of sample numbers
 array2=( S2  S3  S4  S5  S6 )
 TYPE_ALN="mutect_bwa_aln"
 

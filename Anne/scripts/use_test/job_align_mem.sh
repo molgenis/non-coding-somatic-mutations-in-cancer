@@ -20,9 +20,9 @@ ml picard/2.20.5-Java-11-LTS
 ml FastQC/0.11.8-Java-11-LTS
 ml cutadapt/2.6-GCCcore-7.3.0-Python-3.7.4-bare
 
-# Array of files it should download
+# Array of tissue numbers
 array=( 5042  5044 )
-# Array with file output names
+# Array of sample numbers
 array2=( S6  S6 )
 
 for i in "${!array[@]}"

@@ -11,7 +11,7 @@
 #SBATCH --export=NONE
 #SBATCH --get-user-env=L
 
-# Array with file output names
+# Array of sample numbers
 array2=( S4  S5 S6 )
 TYPE_ALN="mutect_bowtie"
 

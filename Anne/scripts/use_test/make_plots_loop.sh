@@ -13,10 +13,13 @@
 
 PATH_PLOT=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/FORMAT/
 
+# Loop over all .csv files in this folder
 for filename in ${PATH_PLOT}/*.csv; do
+    # Get file path without last extension (.csv)
     NEW_FOLDER="${filename%.*}"
-    echo ${NEW_FOLDER}
+    # Create new folder, to save all images in
     mkdir -p ${NEW_FOLDER}
-    echo ${filename}
+    # Call python file
+    # Python file creates histograms of the entered data per column
     python3 ${PATH_PLOT}make_plots.py ${filename} ${NEW_FOLDER}/
 done

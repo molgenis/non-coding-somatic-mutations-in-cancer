@@ -3,9 +3,9 @@
 # Load packages
 ml SAMtools/1.9-foss-2018b
 
-# Array of files it should download
+# Array of tissue numbers
 array=( 4109  4113  4114  4118  4119  4123  4124  4129 )
-# Array with file output names
+# Array of sample numbers
 array2=( S2  S2  S2  S2  S2  S3  S3  S3)
 
 METHOD=bwa_aln #bowtie,   bwa_aln, bwa_mem

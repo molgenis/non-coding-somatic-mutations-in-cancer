@@ -11,9 +11,9 @@ ml picard/2.20.5-Java-11-LTS
 ml FastQC/0.11.8-Java-11-LTS
 ml cutadapt/2.6-GCCcore-7.3.0-Python-3.7.4-bare
 
-# Array of files it should download
+# Array of tissue numbers
 array=( 4109  4113  4114  4118  4119  4123  4124  4129  4128  4133  4134  4139  4138  5041  5043  5042  5044 )
-# Array with file output names
+# Array of sample numbers
 array2=( S2  S2  S2  S2  S2  S3  S3  S3  S4  S4  S4  S5  S5  S5  S6  S6  S6 )
 
 METHOD=bwa_aln #bowtie,   bwa_aln, bwa_mem
