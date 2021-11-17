@@ -4,7 +4,7 @@ ml SAMtools/1.9-foss-2018b
 cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/
 
 
-# Array of files it should download
+# Array of files that need to be sorted
 array=( ./SS6004099.bam  ./SS6004094.bam  ./SS6004104.bam  ./SS6004113.bam  ./SS6004114.bam
 ./SS6004118.bam  ./SS6004109.bam  ./SS6004119.bam  ./SS6004124.bam  ./SS6004123.bam
 ./SS6004129.bam  ./SS6004133.bam  ./SS6004128.bam  ./SS6004134.bam  ./SS6004139.bam
