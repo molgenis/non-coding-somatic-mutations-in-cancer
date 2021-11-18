@@ -3,6 +3,7 @@ from numpy.core.numeric import NaN
 import pandas as pd
 import io
 import sys
+import os
 
 
 # https://gist.github.com/dceoy/99d976a2c01e7f0ba1c813778f9db744
@@ -21,10 +22,20 @@ def read_vcf(path):
         sep='\t'
     ).rename(columns={'#CHROM': 'CHROM'})
 
-path = "D:/Hanze_Groningen/STAGE/VCF/0001.vcf"
+path = sys.argv[1].strip()
+if ".gz" in path:
+    path_command_file = path
+    path = os.path.splitext(path)[0]
+    num_samples = 2
+else:
+    path_command_file = path + '.gz'
+    num_samples = 1
+    
 # Read vcf file
-df = read_vcf(sys.argv[1].strip())#(sys.argv[1].strip())
-df_columns = list(df.columns[:-1])
+df = read_vcf(path)#(sys.argv[1].strip())
+df_columns = list(df.columns[:-int(num_samples)])
+name_new_file = '_'.join(list(df.columns[-int(num_samples):]))
+
 
 # Create a set of all abbreviations in the FORMAT column that are separated by :
 list_format = [i.split(':') for i in list(set(list(df['FORMAT'])))]
@@ -55,7 +66,7 @@ for col_name in sorted(list(set_format), key=str.lower):
 stringToGetFiles+='\\n'
 
 # bcftools query -Hf "%CHROM\t%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FILTER\t%INFO/CONTQ\t%INFO/DP\t%INFO/ECNT\t%INFO/GERMQ\t%INFO/MBQ\t%INFO/MFRL\t%INFO/MMQ\t%INFO/MPOS\t%INFO/POPAF\t%INFO/RPA\t%INFO/RU\t%INFO/SEQQ\t%INFO/STR\t%INFO/STRANDQ\t%INFO/STRQ\t%INFO/TLOD[\t%AD][\t%AF][\t%DP][\t%F1R2][\t%F2R1][\t%GT][\t%PGT][\t%PID][\t%PS][\t%SB]\n" /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S6/compare_5042_5044/bowtie/0001.vcf.gz > 00011RESULTSSSexcel.vcf
-part_command = f'"{stringToGetFiles}" {sys.argv[1].strip()}.gz -o {sys.argv[2]}{df.columns[-1].split(".")[0]}.vcf'
+part_command = f'"{stringToGetFiles}" {path_command_file} -o {sys.argv[2]}{name_new_file}.vcf'
 #print(part_command)
 
 f = open(sys.argv[3].strip(), 'a')
