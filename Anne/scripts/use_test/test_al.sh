@@ -20,50 +20,77 @@ def read_vcf(path):
         sep='\t'
     ).rename(columns={'#CHROM': 'CHROM'})
 
-
+path = "D:/Hanze_Groningen/STAGE/VCF/0001.vcf"
 # Read vcf file
-df = read_vcf(sys.argv[1].strip())
+df = read_vcf(path)#(sys.argv[1].strip())
 # Select the columns from the column named 'FORMAT'
-df_only_samples = df.iloc[:, df.columns.get_loc("FORMAT"):]
-print(df_only_samples.columns)
-df_columns = df.columns[:-1]
+df_only_samples = df.iloc[:10000, :]
+#df_only_samples = df.iloc[:, df.columns.get_loc("FORMAT"):]
+df_columns = list(df.columns[:-1])
+
+new_list = set(list(df['FORMAT']))
+
 
 # Create a set of all abbreviations in the FORMAT column that are separated by :
-set_format = set()
-# Loop over each line of the vcf file
-for index, row in df_only_samples.iterrows():
-    list_format = row['FORMAT'].split(':')
-    set_format.update(list_format)
+list_format = [i.split(':') for i in list(set(list(df['FORMAT'])))]
+# Use list comprehension to convert a list of lists to a flat list 
+set_format = set([ item for elem in list_format for item in elem])
+# Create a set of all abbreviations in the INFO column that are separated by ;
+# Replace all values =NUMBER; with ;
+df['INFO'] = df['INFO'].replace(to_replace ='=(.*?)\;', value = ';', regex = True)
+# Replace values =NUMBER with ''
+set_info_joined = set(list(df['INFO'].replace(to_replace ='=.*', value = '', regex = True)))
+list_info = [i.split(';') for i in list(set_info_joined)]
+set_info = set([ item for elem in list_info for item in elem])
 print(set_format)
+print(set_info)
 
-new_columns_list = df_columns + list(set_format)
 
+new_columns_list = df_columns + sorted(list(set_format), key=str.lower) + sorted(list(set_info), key=str.lower)
+print(new_columns_list)
 # Make a dataframe with column names equal to the values from the new_columns_list
 df_format_value = pd.DataFrame(columns=list(new_columns_list))
 # Loop over each line of the vcf file
-for index, row in df_only_samples.iterrows():
+for index, row in df.iterrows():
     # Create list that will contain values for each row
     list_values = list()
     # Split column with name FORMAT on :
     names_format = row['FORMAT'].split(':')
     # Split the last (also the second column) on :
-    values_format = row[1].split(':')
-    # Loop over the column names of the new dataframe (new_columns_list)
-    for col_name in list(new_columns_list):
-        # Check if the col_name occurs in the abbreviations of the FORMAT column (in this specific row)
-        # It is possible that one row contains some values and the other row does not
-        if col_name in names_format:
-            # Find the index the specific abbreviation (col_name) in names_format
-            index_value = names_format.index(col_name)
-            # Add the specific value corresponding to the index (index_value) in the values_format list
-            list_values.append(values_format[index_value])
-        elif col_name in new_columns_list:
-            list_values.append(row[col_name])
+    values_format = row[-1].split(':')
+    # Get names INFO
+    names_info = list()
+    values_info = list()
+    list_info = row['INFO'].split(';')
+    for inf in list_info:
+        names_info.append(inf.split('=')[0])
+        if len(inf.split('=')) > 1:
+            values_info.append(inf.split('=')[1]) 
         else:
-            # If the col_names does not exist in the names_format, it means that this row
-            # does not have that particular value. NaN is then added to list_values
-            list_values.append(float("NaN"))
-    # Always add the list_values as the last row in the new dataframe
-    df_format_value.loc[len(df_format_value)] = list_values
-# Save the dataframe as a csv file
-df_format_value.to_csv(f'{sys.argv[2]}{df_only_samples.columns[-1].split(".")[0]}.csv', sep='\t', encoding='utf-8')
+            values_info.append(float("NaN")) 
+#     # Loop over the column names of the new dataframe (new_columns_list)
+#     for col_name in list(new_columns_list):
+#         # Check if the col_name occurs in the abbreviations of the FORMAT column (in this specific row)
+#         # It is possible that one row contains some values and the other row does not
+#         if col_name in names_format:
+#             # Find the index the specific abbreviation (col_name) in names_format
+#             index_value = names_format.index(col_name)
+#             # Add the specific value corresponding to the index (index_value) in the values_format list
+#             list_values.append(values_format[index_value])
+#         elif col_name in names_info:
+#             # Find the index the specific abbreviation (col_name) in names_info
+#             index_value = names_info.index(col_name)
+#             # Add the specific value corresponding to the index (index_value) in the values_format list
+#             list_values.append(values_info[index_value])
+#         elif col_name in list(df_columns):
+#             list_values.append(row[col_name])
+#         else:
+#             # If the col_names does not exist in the names_format, it means that this row
+#             # does not have that particular value. NaN is then added to list_values
+#             list_values.append(float("NaN"))
+#     # Always add the list_values as the last row in the new dataframe
+#     df_format_value.loc[len(df_format_value)] = list_values
+# # Save the dataframe as a csv file
+# # df_format_value.to_csv(f'{sys.argv[2]}{df.columns[-1].split(".")[0]}.csv', sep='\t', encoding='utf-8')
+# # print(df.columns[-1])
+print(df_format_value.head())

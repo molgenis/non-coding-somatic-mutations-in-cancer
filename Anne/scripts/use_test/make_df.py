@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from numpy.core.numeric import NaN
 import pandas as pd
 import io
 import sys
@@ -20,71 +21,43 @@ def read_vcf(path):
         sep='\t'
     ).rename(columns={'#CHROM': 'CHROM'})
 
-
+path = "D:/Hanze_Groningen/STAGE/VCF/0001.vcf"
 # Read vcf file
-df = read_vcf(sys.argv[1].strip())
-# Select the columns from the column named 'FORMAT'
-#df_only_samples = df.iloc[:, df.columns.get_loc("FORMAT"):]
+df = read_vcf(sys.argv[1].strip())#(sys.argv[1].strip())
 df_columns = list(df.columns[:-1])
 
 # Create a set of all abbreviations in the FORMAT column that are separated by :
-set_format = set()
-set_info = set()
-# Loop over each line of the vcf file
-for index, row in df.iterrows():
-    list_format = row['FORMAT'].split(':')
-    list_info = row['INFO'].split(';')
-    for inf in list_info:
-        set_info.add(inf.split('=')[0])
-    set_format.update(list_format)
-print(set_format)
-print(set_info)
+list_format = [i.split(':') for i in list(set(list(df['FORMAT'])))]
+# Use list comprehension to convert a list of lists to a flat list 
+set_format = set([ item for elem in list_format for item in elem])
+# Create a set of all abbreviations in the INFO column that are separated by ;
+# Replace all values =NUMBER; with ;
+df['INFO'] = df['INFO'].replace(to_replace ='=(.*?)\;', value = ';', regex = True)
+# Replace values =NUMBER with ''
+set_info_joined = set(list(df['INFO'].replace(to_replace ='=.*', value = '', regex = True)))
+list_info = [i.split(';') for i in list(set_info_joined)]
+set_info = set([ item for elem in list_info for item in elem])
+#print(set_format)
+#print(set_info)
 
+#https://www.biostars.org/p/226965/
+#'%CHROM\t%POS\t%REF\t%ALT\t%INFO/AC\t%INFO/AF\n'
+#bcftools query -Hf "%CHROM\t%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FORMAT\t%FILTER$FIELDS[\t%GT]\n" V42.vcf.gz > RESULTSSSexcel
+stringToGetFiles= ''
+for col_name in df_columns:
+    if col_name not in ['INFO', 'FORMAT']:
+        stringToGetFiles+=f'%{col_name}\\t'
+for col_name in sorted(list(set_info), key=str.lower):
+    stringToGetFiles+=f'%INFO/{col_name}\\t'
+stringToGetFiles = stringToGetFiles[:-2]
+for col_name in sorted(list(set_format), key=str.lower):
+    stringToGetFiles+=f'[\\t%{col_name}]' #[\t%GT]
+stringToGetFiles+='\\n'
 
-new_columns_list = df_columns + sorted(list(set_format), key=str.lower) + sorted(list(set_info), key=str.lower)
+# bcftools query -Hf "%CHROM\t%POS\t%ID\t%REF\t%ALT\t%QUAL\t%FILTER\t%INFO/CONTQ\t%INFO/DP\t%INFO/ECNT\t%INFO/GERMQ\t%INFO/MBQ\t%INFO/MFRL\t%INFO/MMQ\t%INFO/MPOS\t%INFO/POPAF\t%INFO/RPA\t%INFO/RU\t%INFO/SEQQ\t%INFO/STR\t%INFO/STRANDQ\t%INFO/STRQ\t%INFO/TLOD[\t%AD][\t%AF][\t%DP][\t%F1R2][\t%F2R1][\t%GT][\t%PGT][\t%PID][\t%PS][\t%SB]\n" /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S6/compare_5042_5044/bowtie/0001.vcf.gz > 00011RESULTSSSexcel.vcf
+part_command = f'"{stringToGetFiles}" {sys.argv[1].strip()}.gz -o {sys.argv[2]}{df.columns[-1].split(".")[0]}.vcf'
+#print(part_command)
 
-# Make a dataframe with column names equal to the values from the new_columns_list
-df_format_value = pd.DataFrame(columns=list(new_columns_list))
-# Loop over each line of the vcf file
-for index, row in df.iterrows():
-    # Create list that will contain values for each row
-    list_values = list()
-    # Split column with name FORMAT on :
-    names_format = row['FORMAT'].split(':')
-    # Split the last (also the second column) on :
-    values_format = row[-1].split(':')
-    # Get names INFO
-    names_info = list()
-    values_info = list()
-    list_info = row['INFO'].split(';')
-    for inf in list_info:
-        names_info.append(inf.split('=')[0])
-        if len(inf.split('=')) > 1:
-            values_info.append(inf.split('=')[1]) 
-        else:
-            values_info.append(float("NaN")) 
-    # Loop over the column names of the new dataframe (new_columns_list)
-    for col_name in list(new_columns_list):
-        # Check if the col_name occurs in the abbreviations of the FORMAT column (in this specific row)
-        # It is possible that one row contains some values and the other row does not
-        if col_name in names_format:
-            # Find the index the specific abbreviation (col_name) in names_format
-            index_value = names_format.index(col_name)
-            # Add the specific value corresponding to the index (index_value) in the values_format list
-            list_values.append(values_format[index_value])
-        elif col_name in names_info:
-            # Find the index the specific abbreviation (col_name) in names_info
-            index_value = names_info.index(col_name)
-            # Add the specific value corresponding to the index (index_value) in the values_format list
-            list_values.append(values_info[index_value])
-        elif col_name in list(df_columns):
-            list_values.append(row[col_name])
-        else:
-            # If the col_names does not exist in the names_format, it means that this row
-            # does not have that particular value. NaN is then added to list_values
-            list_values.append(float("NaN"))
-    # Always add the list_values as the last row in the new dataframe
-    df_format_value.loc[len(df_format_value)] = list_values
-# Save the dataframe as a csv file
-df_format_value.to_csv(f'{sys.argv[2]}{df.columns[-1].split(".")[0]}.csv', sep='\t', encoding='utf-8')
-print(df.columns[-1])
+f = open(sys.argv[3].strip(), 'a')
+f.write(f'{part_command}\n')
+f.close()
