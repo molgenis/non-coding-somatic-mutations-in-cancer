@@ -19,7 +19,9 @@ done < "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGA
 
 echo 'LOOP OVER COMMANDS'
 while IFS= read -r line; do
-  #FILE_NAME=$(echo $line | rev | cut -d ' ' -f '1' | rev)
+  OUTPUT_FILE=$(echo $line | rev | cut -d ' ' -f '1' | rev)
+  DIR=${OUTPUT_FILE%/*}
+  mkdir -p ${DIR}
   #echo "$(basename -- $FILE_NAME)"
   echo $line
   bcftools query -Hf $line
