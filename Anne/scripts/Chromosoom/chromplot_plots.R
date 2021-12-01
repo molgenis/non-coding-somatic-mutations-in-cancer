@@ -29,29 +29,6 @@ delete_chr <- function(data) {
   return(delete_na_values)
 }
 
-##########
-# gaps
-# https://bioconductor.riken.jp/packages/3.6/bioc/vignettes/chromPlot/inst/doc/chromPlot.pdf
-# The format for the ‘Gap’track in the Table Browser of the UCSC website
-# From this table, chromPlot extracts the number of chromosomes, chromosomes names and lengths, and the
-# position of centromeres (shown as solid circles).
-##########
-# Zelfde als hg_gap?
-#chromosomes<-read.table("D:/Hanze_Groningen/STAGE/bed/snp132_ucsc_hg19_gap.bed",sep="\t",header=F)
-# bin	chrom	chromStart	chromEnd	ix	n	size	type	bridge
-#colnames(chromosomes)<-c("bin", "chr","Start", "End", 'ix',	'n',	'size',	'Name',	'bridge')
-#chromosomes <- chromosomes[,c("chr","Start", "End", "Name")]
-#sort_chromosomes <- delete_chr(chromosomes)
-data(hg_gap)
-head(hg_gap)
-
-
-##########
-# bands
-# For the colors in the chromosome
-##########
-# Open and read files
-# exon file was edited with python script
 
 gene_exon_files <- function(file_name) {
   # Remove '#' in file, so that the file has headers
@@ -76,17 +53,6 @@ gene_exon_files <- function(file_name) {
   return(only_gene)
 }
 
-UCSC_gene <- gene_exon_files('snp132_ucsc_hg19_UCSC')
-NCBI_gene <- gene_exon_files('snp132_ucsc_hg19_NCBI')
-V38_gene <- gene_exon_files('snp132_ucsc_hg19_V38')
-
-
-
-##########
-# annot1
-# For the histogram
-##########
-# The 'somatic' mutations out the vcf files
 
 create_data_chromplot <- function(file_name) {
   path = 'D:/Hanze_Groningen/STAGE/bed/files/'
@@ -95,15 +61,63 @@ create_data_chromplot <- function(file_name) {
   sort_snps <- delete_chr(snps)
   return(sort_snps)
 }
+
+
+make_chromPlot <- function(sample, name_sample) {
+  path = 'D:/Hanze_Groningen/STAGE/bed/PLOTS/'
+  
+  png(paste(path, name_sample, 'plot_chrom_UCSC.png', sep=""), width = 1500, height = 1000)
+  chromPlot(gaps=hg_gap, bands=UCSC_gene, colBand = "#9e9f93", annot1=sample,  colAnnot1="brown", figCols=3, scale.title="Counts", title = paste(name_sample, 'UCSC', sep=" - "), legChrom=22, chr=c(20:22))
+  dev.off()
+  
+  png(paste(path, name_sample, 'plot_chrom_NCBI.png', sep=""), width = 1500, height = 1000)
+  chromPlot(gaps=hg_gap, bands=NCBI_gene, colBand = "##9e9f93", annot1=chro_sample1,  colAnnot1="brown", figCols=3, scale.title="Counts", title = paste(name_sample, 'NCBI', sep=" - "), legChrom=22, chr=c(20:22))
+  dev.off()
+  
+  png(paste(path, name_sample, 'plot_chrom_V38.png', sep=""), width = 1500, height = 1000)
+  chromPlot(gaps=hg_gap, bands=V38_gene, colBand = "##9e9f93", annot1=chro_sample1,  colAnnot1="brown", figCols=3, scale.title="Counts", title = paste(name_sample, 'V38', sep=" - "), legChrom=22, chr=c(20:22))
+  dev.off()
+}
+
+
+
+##########
+# gaps
+# https://bioconductor.riken.jp/packages/3.6/bioc/vignettes/chromPlot/inst/doc/chromPlot.pdf
+# The format for the ‘Gap’track in the Table Browser of the UCSC website
+# From this table, chromPlot extracts the number of chromosomes, chromosomes names and lengths, and the
+# position of centromeres (shown as solid circles).
+##########
+# Zelfde als hg_gap?
+#chromosomes<-read.table("D:/Hanze_Groningen/STAGE/bed/snp132_ucsc_hg19_gap.bed",sep="\t",header=F)
+# bin	chrom	chromStart	chromEnd	ix	n	size	type	bridge
+#colnames(chromosomes)<-c("bin", "chr","Start", "End", 'ix',	'n',	'size',	'Name',	'bridge')
+#chromosomes <- chromosomes[,c("chr","Start", "End", "Name")]
+#sort_chromosomes <- delete_chr(chromosomes)
+data(hg_gap)
+head(hg_gap)
+
+
+##########
+# bands
+# For the colors in the chromosome
+##########
+# Open and read files
+# exon file was edited with python script
+UCSC_gene <- gene_exon_files('snp132_ucsc_hg19_UCSC')
+NCBI_gene <- gene_exon_files('snp132_ucsc_hg19_NCBI')
+V38_gene <- gene_exon_files('snp132_ucsc_hg19_V38')
+
+
+##########
+# annot1
+# For the histogram
+##########
+# The 'somatic' mutations out the vcf files
 chro_sample1 <- create_data_chromplot('SS6004099_merge_manual_bowtie.tsv')
-
 chro_sample2 <- create_data_chromplot('SS6004104_merge_manual_bowtie.tsv')
-
 chro_sample3 <- create_data_chromplot('SS6004113_merge_manual_bowtie.tsv')
-
 chro_sample4 <- create_data_chromplot('SS6004114_merge_manual_bowtie.tsv')
-
-
 
 
 ##########
@@ -111,14 +125,8 @@ chro_sample4 <- create_data_chromplot('SS6004114_merge_manual_bowtie.tsv')
 # Making the chromosome plots
 ##########
 #chromPlot(gaps=delete_na_values, bands=only_gene, figCols=6)  
-chromPlot(gaps=hg_gap, bands=UCSC_gene, colBand = "##9e9f93", annot1=chro_sample1,  colAnnot1="brown", figCols=3, scale.title="Counts", title = "UCSC_gene", legChrom=22, chr=c(20:22))
+make_chromPlot(chro_sample1, 'SS6004099')
+make_chromPlot(chro_sample2, 'SS6004104')
+make_chromPlot(chro_sample3, 'SS6004113')
+make_chromPlot(chro_sample4, 'SS6004114')
 
-#chromPlot(gaps=hg_gap, bands=NCBI_gene, colBand = "##9e9f93", annot1=chro_sample1,  colAnnot1="brown", figCols=3, scale.title="Counts", title = "NCBI_gene", legChrom=22, chr=c(20:22))
-
-#chromPlot(gaps=hg_gap, bands=V38_gene, colBand = "##9e9f93", annot1=chro_sample1,  colAnnot1="brown", figCols=3, scale.title="Counts", title = "V38_gene", legChrom=22, chr=c(20:22))
-
-chromPlot(gaps=hg_gap, bands=UCSC_gene, colBand = "##9e9f93", annot1=chro_sample2,  colAnnot1="brown", figCols=3, scale.title="Counts", title = "UCSC_gene", legChrom=22, chr=c(20:22))
-
-chromPlot(gaps=hg_gap, bands=UCSC_gene, colBand = "##9e9f93", annot1=chro_sample3,  colAnnot1="brown", figCols=3, scale.title="Counts", title = "UCSC_gene", legChrom=22, chr=c(20:22))
-
-chromPlot(gaps=hg_gap, bands=UCSC_gene, colBand = "##9e9f93", annot1=chro_sample4,  colAnnot1="brown", figCols=3, scale.title="Counts", title = "UCSC_gene", legChrom=22, chr=c(20:22))
