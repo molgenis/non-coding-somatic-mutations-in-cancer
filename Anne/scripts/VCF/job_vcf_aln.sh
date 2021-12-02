@@ -13,12 +13,14 @@
 
 
 # Array of sample numbers
-array2=( S2  S3  S4  S5  S6 )
+array2=( S1  S2  S3  S4  S5  S6 )
 TYPE_ALN="mutect_bwa_aln"
+
+CHROM=chr22
 
 for i in "${array2[@]}"
 do 
-    PATH_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/"${i}"/${TYPE_ALN}/
+    PATH_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/"${i}"/${CHROM}/${TYPE_ALN}/
     for filename in ${PATH_FILE}*.txt
     do
         # Name of input file

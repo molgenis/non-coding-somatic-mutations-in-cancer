@@ -21,9 +21,11 @@ ml FastQC/0.11.8-Java-11-LTS
 ml cutadapt/2.6-GCCcore-7.3.0-Python-3.7.4-bare
 
 # Array of tissue numbers
-array=( 5041  5043  5042  5044 )
+array=( 4094  4099  4101  4109  4113  4114  4118  4119  4123  4124  4129  4128  4133  4134  4139  4138  5041  5043  5042  5044 )
 # Array of sample numbers
-array2=( S5  S6  S6  S6 )
+array2=( S1  S1  S1  S2  S2  S2  S2  S2  S3  S3  S3  S4  S4  S4  S5  S5  S5  S6  S6  S6 )
+
+CHROM=chr22
 
 for i in "${!array[@]}"
 do
@@ -34,11 +36,11 @@ do
     # The path where the file is located
     PATH_DIR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/"${array2[i]}"/
     # The path to the file of the reference genome that will be used.
-    GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/chr22.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa  
+    GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa  
 
     echo "BEGIN"
     # Creates a specific folder
-    mkdir -p ${PATH_DIR}${NUMBER}/bwa_aln
+    mkdir -p ${PATH_DIR}${NUMBER}/bwa_aln/${CHROM}
     cd ${PATH_DIR}${NUMBER}
 
     # Last steps of alignment
@@ -56,8 +58,8 @@ do
 
     # BWA = Burrows-Wheeler Aligner
     # Paired-end alignment BWA-aln
-    bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq > ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.sai && bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.sai && bwa sampe ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.sai ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.sai ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/bwa_aln/aln_${FILE_NUM}.sam
-    align_last_steps ${PATH_DIR}${NUMBER}/bwa_aln/aln_${FILE_NUM}
+    bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq > ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.sai && bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.sai && bwa sampe ${GENOOM} ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.sai ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.sai ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/bwa_aln/${CHROM}/aln_${FILE_NUM}.sam
+    align_last_steps ${PATH_DIR}${NUMBER}/bwa_aln/${CHROM}/aln_${FILE_NUM}
 
     echo "EIND"
 done
