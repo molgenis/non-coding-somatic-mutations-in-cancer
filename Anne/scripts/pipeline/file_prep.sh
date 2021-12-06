@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+echo 'file PREP'
 
 for i in "${!array[@]}"
 do
