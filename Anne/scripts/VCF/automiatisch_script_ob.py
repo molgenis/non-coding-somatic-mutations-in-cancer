@@ -109,10 +109,10 @@ class Sample:
                     number_tum = tum.name.replace("SS600", "")
                     if number_of_hc == 1 and number_of_tumors == 1:
                         compare_hc_tum.write(
-                            f"{head_path}{self.sample_name}/{number_hc}_vcf/{chrom}{type_aln}/"
-                            f"{hc.name}__somatic_filtered.vcf.gz "
+                            f"{head_path}{self.sample_name}/{number_hc}_vcf/{chrom}/{type_aln}/"
+                            f"{hc.name}_somatic_filtered.vcf.gz "
                             f"{head_path}{self.sample_name}/{number_tum}_vcf/{chrom}/{type_aln}/"
-                            f"{tum.name}__somatic_filtered.vcf.gz"
+                            f"{tum.name}_somatic_filtered.vcf.gz"
                             f" -p {head_path}{self.sample_name}/compare_{number_hc}_{number_tum}/{chrom}/{type_aln}/\n")
                         manual_comparison.write(
                             f"{head_path}{self.sample_name}/compare_{number_hc}_{number_tum}/{chrom}/{type_aln}/0001.vcf.gz "
@@ -132,7 +132,7 @@ class Sample:
                 # Path for mkdir
                 mkdir_path = f'{head_path}{self.sample_name}/{arg[:-1]}/{chrom}/{type_aln}\n'
                 mutect2_comparison.write(f'{head_path}{self.sample_name}/{arg[:-1]}/{chrom}/{type_aln}/'
-                                         f'{arg}_somatic_filtered_PON_GERM.vcf.gz ')
+                                         f'{arg}somatic_filtered_PON_GERM.vcf.gz ')
                 # Path and first part of output files
                 file_output = f'\n{head_path}{self.sample_name}/{arg[:-1]}/{chrom}/{type_aln}/{arg}'
                 # File name (and path) after which these arguments are written
