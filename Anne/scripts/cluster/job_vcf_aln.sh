@@ -30,7 +30,7 @@ do
         arg_mutect2=$(sed '2q;d' ${INPUT_FILE})
         file_output=$(sed '3q;d' ${INPUT_FILE})
         # The file from which a function is called.
-        source ${GENERAL_PATH}make_vcf_auto.sh
+        source ${SCRIPT_PATH}make_vcf_auto.sh
         # The function called from the file.
         # The three arguments are given.
         # The argument in quotes "" consists of multiple words (split by space), 

@@ -17,12 +17,15 @@
 
 
 PATH_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/
+SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/Anne/non-coding-somatic-mutations-in-cancer/Anne/scripts/cluster/
 for filename in ${PATH_FILE}download*.tsv #.gz
 do
     # Name of input file
-    echo ${filename}
+    #echo ${filename}
     #gunzip ${filename}
-    python3 ${PATH_FILE}read_cancer_data.py ${filename} ${PATH_FILE}
+    ml Anaconda3/5.3.0
+    source activate stage
+    python3 ${SCRIPT_PATH}read_cancer_data.py ${filename} ${PATH_FILE}
     #echo ${filename%/*}
     #echo "$(basename -- $filename)"
     echo "EIND"
