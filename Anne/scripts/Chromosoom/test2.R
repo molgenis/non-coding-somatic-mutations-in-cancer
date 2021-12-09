@@ -18,48 +18,35 @@ add_density <- function(kp, data, r0, r1, label) {
 
 numbers <-  seq(1, 22, by=1)
 chrom <- append(numbers, c('X', 'Y'))
-type_files <- 'other' # other or vcf
 
-filenames <- list.files(paste("D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/", type_files, '/', sep=''), pattern="*.bed", full.names=TRUE)
-print(filenames)
+chrom <- c(1,2)
+
+filenames <- list.files("D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/other/", pattern="*.bed", full.names=TRUE)
 for (chr in chrom){
   chr <- paste('chr', chr, sep="")
+  counter <- -1.5
   for (i in 1:length(filenames)){
     r0=0
     r1=0.10
-    if (type_files == 'other'){
-      basename <- strsplit(basename(filenames[i]), "_", fixed = TRUE)[[1]][1]
-    } else {
-      basename <- strsplit(basename(filenames[i]), ".", fixed = TRUE)[[1]][1]
-    }
     
-    if ( (i%%12) == 0 || i == 1){
-      if (i != 1){
-        dev.off()
-      }
-      counter <- 0     
-      
-      name <- paste('D:/Hanze_Groningen/STAGE/bed/PLOTS/kary/', type_files, '/', chr, '/plot', i, basename, '.png', sep="")
+    counter <- counter + 1
+    basename <- strsplit(basename(filenames[i]), "_", fixed = TRUE)[[1]][1]
+    if (i == 1){
+      name <- paste('D:/Hanze_Groningen/STAGE/bed/PLOTS/kary/', chr, '/plotttttttt',  basename, '.png', sep="")
       png(name, width = 2000, height = 1000) #width = 2000, height = 1000
       kp <- plotKaryotype()
       # select chromomes
-      kp <- plotKaryotype(genome="hg19", plot.type=1, chromosomes=c(chr)) #chromosomes=c("chr22") main="Gene Density", 
+      kp <- plotKaryotype(genome="hg19", plot.type=1, main="Gene Density", chromosomes=c(chr)) #chromosomes=c("chr22")
       # add base numbers
       kpAddBaseNumbers(kp, tick.dist = 10000000, minor.tick.dist = 1000000, minor.tick.len = 5, minor.tick.col = "gray", cex=0.8)
-      sample1 <- create_data_karyoploteR(filenames[i])
-      add <- (counter*0.14)
-      kp <- add_density(kp, sample1, r0+add, r1+add, basename)
-      
-    } else{
-      sample1 <- create_data_karyoploteR(filenames[i])
-      counter <- counter + 1
-      add <- (counter*0.14)
-      kp <- add_density(kp, sample1, r0+add, r1+add, basename)
-      
-    }
-    if (i == length(filenames)) {
+    }    
+    
+    sample1 <- create_data_karyoploteR(filenames[i])
+    add <- (counter*0.14)
+    kp <- add_density(kp, sample1, r0+add, r1+add, basename)
+    if (i == length(filenames)){
       dev.off()
-    }
+    }    
   }
 }
 
