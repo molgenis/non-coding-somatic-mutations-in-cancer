@@ -36,6 +36,8 @@ fi
 
 GENOOM=${PATH_GENOOM}${CHROM}.fa
 
+
+ml SAMtools/1.9-foss-2018b
 # When file doesn't exist.
 if [ ! -f ${PATH_GENOOM}${CHROM}.dict ]; then
     echo "FILE does not exist."
@@ -77,7 +79,6 @@ TYPE_SAMPLE_py='both'
 # load conda and activate to execute python script
 ml Anaconda3/5.3.0
 source activate stage
-ml SAMtools/1.9-foss-2018b
 
 # RUN: file_prep.sh
 source ${SCRIPT_PATH}file_prep.sh
