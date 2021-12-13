@@ -82,46 +82,46 @@ ml SAMtools/1.9-foss-2018b
 # RUN: file_prep.sh
 source ${SCRIPT_PATH}file_prep.sh
 
-# Lexicographic (greater than, less than) comparison.
-if [ "${METHOD}" == "bwa_aln" ]; then
-    echo ${METHOD}
-    # RUN: job_align_aln.sh
-     source ${SCRIPT_PATH}job_align_aln.sh
-    for i in "${array3[@]}"
-    do 
-        mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
-    done
-    # RUN: automatic_script_ob.py
-    python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
-    # RUN: change_sample_name.sh
-    source ${SCRIPT_PATH}change_sample_name.sh
-    # RUN: job_vcf_aln.sh
-    # DUURT ERG LANG!
-    source ${SCRIPT_PATH}job_vcf_aln.sh    
-    # RUN: vcf_compare_auto.sh
-    source ${SCRIPT_PATH}vcf_compare_auto.sh
+# # Lexicographic (greater than, less than) comparison.
+# if [ "${METHOD}" == "bwa_aln" ]; then
+#     echo ${METHOD}
+#     # RUN: job_align_aln.sh
+#      source ${SCRIPT_PATH}job_align_aln.sh
+#     for i in "${array3[@]}"
+#     do 
+#         mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
+#     done
+#     # RUN: automatic_script_ob.py
+#     python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
+#     # RUN: change_sample_name.sh
+#     source ${SCRIPT_PATH}change_sample_name.sh
+#     # RUN: job_vcf_aln.sh
+#     # DUURT ERG LANG!
+#     source ${SCRIPT_PATH}job_vcf_aln.sh    
+#     # RUN: vcf_compare_auto.sh
+#     source ${SCRIPT_PATH}vcf_compare_auto.sh
     
     
-    #COMP_TYPE=mutect2 # manual, mutect2
-    # source ${SCRIPT_PATH}vcf_merge_auto.sh
-    # source ${SCRIPT_PATH}annotate.sh
-    # source ${SCRIPT_PATH}FORMAT/write_df.sh
-    # source ${SCRIPT_PATH}FORMAT/make_plots_loop.sh
-    # ml R/4.0.3-foss-2018b-bare
-    # make_file_for_chromosome_plots.py
-    # split.py
-    # karyoploteR_plots.R
-    # chromplot_plots.R
+#     #COMP_TYPE=mutect2 # manual, mutect2
+#     # source ${SCRIPT_PATH}vcf_merge_auto.sh
+#     # source ${SCRIPT_PATH}annotate.sh
+#     # source ${SCRIPT_PATH}FORMAT/write_df.sh
+#     # source ${SCRIPT_PATH}FORMAT/make_plots_loop.sh
+#     # ml R/4.0.3-foss-2018b-bare
+#     # make_file_for_chromosome_plots.py
+#     # split.py
+#     # karyoploteR_plots.R
+#     # chromplot_plots.R
     
 
-elif [ "${METHOD}" == "bwa_mem" ]; then
-    echo ${METHOD}
+# elif [ "${METHOD}" == "bwa_mem" ]; then
+#     echo ${METHOD}
     
-elif [ "${METHOD}" == "bowtie" ]; then
-    echo ${METHOD}
+# elif [ "${METHOD}" == "bowtie" ]; then
+#     echo ${METHOD}
     
-else
-    echo "ERROR"
-fi
+# else
+#     echo "ERROR"
+# fi
 
-echo 'THE END END END END'
+# echo 'THE END END END END'
