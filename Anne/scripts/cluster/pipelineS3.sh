@@ -60,7 +60,7 @@ METH_FILE=aln #bowtie2, aln, mem
 TYPE_ALN=mutect_${METHOD}
 
 GENERAL_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/
-SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/Anne/non-coding-somatic-mutations-in-cancer/Anne/scripts/cluster/
+SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/cluster/
 # Path to the file of the panel of normals (PoN)
 PON=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf
 # Path to the file of the germline resource (GR)
