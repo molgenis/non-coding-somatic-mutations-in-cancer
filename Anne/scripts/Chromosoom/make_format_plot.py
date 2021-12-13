@@ -45,26 +45,29 @@ def make_plot_format_other(path, basename):
     samples_df = list(set(df['icgc_donor_id']))
     print(len(samples_df))
     for sample in samples_df:
-        print(sample)
+        print(f'----{sample}')
         filter_sample = df.loc[df['icgc_donor_id'] == sample]
         filter_sample = filter_sample.loc[filter_sample['sequencing_strategy'] == 'WGS']
+        # Remove duplicates (de kolommen in de list kunnen wel anders zijn, maar worden dan toch verwijderd (eerste voorbeeld wordt dan gehouden))
+        filter_sample = filter_sample.drop_duplicates(subset=filter_sample.columns.difference(['consequence_type', 'aa_mutation', 'cds_mutation', 'gene_affected', 'transcript_affected']))
+        print(len(filter_sample))
         if len(filter_sample) > 10:            
-            sort_df = filter_sample.sort_values(["chromosome", "chromosome_start"])
-            sort_df['SNPnum'] = np.arange(len(sort_df))
-            plot_format = sort_df[['SNPnum', 'chromosome', 'chromosome_start', 'chromosome_end']]
+            sort_df = filter_sample.sort_values(["chromosome", "chromosome_start"])            
+            plot_format = sort_df[['chromosome', 'chromosome_start', 'chromosome_end']]
+            #plot_format = plot_format.drop_duplicates() 
+            plot_format.insert(loc=0, column='SNPnum', value=np.arange(len(plot_format)))
+            print(len(plot_format))
+            #sort_df['SNPnum'] = np.arange(len(sort_df))
             plot_format['chromosome'] = 'chr' + plot_format['chromosome'].astype(str)
             plot_format.to_csv(f'D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/other/{sample}_{basename}.bed', sep="\t", index=False, header=None)
             
         
-
-
-
-# path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/simple_somatic_mutation.open.BOCA-UK.tsv" 
-path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/merge_manual_bwa_aln.vcf"
+path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/simple_somatic_mutation.open.BOCA-UK.tsv" 
+# path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/merge_manual_bwa_aln.vcf"
 print(path)
 # Get the basename of the file
 basename = os.path.basename(path) #.split('.')[0]
-type_file = 'vcf'
+type_file = 'xxx'
 if type_file == 'vcf':
     make_plot_format_vcf(path, basename)
 else:
