@@ -126,60 +126,43 @@ df = pd.read_csv(path, sep='\t')
 print(df.columns)
 
 def per_row():
-  for project_id in list(set(df['project_id'])):
-      mycursor.execute("""INSERT INTO project (project_id)
+    for project_id in list(set(df['project_id'])):
+        mycursor.execute("""INSERT INTO project (project_id)
                     VALUES ('%s')""" % (str(project_id)))
-      last_id_project = mycursor.lastrowid
-      print(last_id_project)  
-      select_project = df.loc[df['project_id'] == project_id]
-      print(len(set(select_project['donor_id'])))  
-      for donor_id in list(set(select_project['donor_id']))[:2]:        
-          mycursor.execute("""INSERT INTO donor (donor_ID, project_ID)
+        last_id_project = mycursor.lastrowid
+        print(last_id_project)  
+        select_project = df.loc[df['project_id'] == project_id]
+        print(len(set(select_project['donor_id'])))  
+        for donor_id in list(set(select_project['donor_id']))[:2]:        
+            mycursor.execute("""INSERT INTO donor (donor_ID, project_ID)
                     VALUES ('%s', %s)""" % (str(donor_id), int(last_id_project)))
-          last_id_donor = mycursor.lastrowid
+            last_id_donor = mycursor.lastrowid
           
 
-          select_donor = df.loc[df['donor_id'] == donor_id]
-          print(len(select_donor))
-          print('---')
-          for index, row in df.iterrows():
-            if index < 10000:
-              # print(index)
-              # TODO KIJKEN HOE JE DEZELFDE SNPS MOET OPSLAAN
-              # """SELECT *
-              #   FROM snp
-              #   WHERE chr = 2 and pos_start = 209113113
-              #   AND pos_end = 209113113;
-              #   GROUP BY chr"""
+            select_donor = df.loc[df['donor_id'] == donor_id]
+            print(len(select_donor))
+            print('---')
+            for index, row in df.iterrows():
+                # if index < 20:
+                print(index)
+                # TODO KIJKEN HOE JE DEZELFDE SNPS MOET OPSLAAN
+                try:
+                    mycursor.execute("""INSERT INTO snp (chr, pos_start, pos_end, ref, alt, genome_version, depth, GLOC, platform, seq_strategy, tissue_id)
+                            VALUES ('%s', %s, %s, '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s')""" % (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
+                            str(row['ref']), str(row['alt']), str(row['genome_version']), int(row['depth']), str('int'), str(row['platform']), str(row['seq_strategy']), str(row['tissue_id'])))
+                    last_id_snp = mycursor.lastrowid
+                    mycursor.execute("""INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID)
+                            VALUES (%s, %s, %s)""" % (int(last_id_project), int(last_id_donor), int(last_id_snp)))
+                except:
+                    print()
 
-              
-              mycursor.execute("""INSERT INTO snp (chr, pos_start, pos_end, ref, alt, genome_version, depth, GLOC, platform, seq_strategy, tissue_id)
-                    VALUES ('%s', %s, %s, '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s')""" % (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
-                    str(row['ref']), str(row['alt']), str(row['genome_version']), int(row['depth']), str('int'), str(row['platform']), str(row['seq_strategy']), str(row['tissue_id'])))
-              last_id_snp = mycursor.lastrowid
-              mycursor.execute("""INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID)
-                    VALUES (%s, %s, %s)""" % (int(last_id_project), int(last_id_donor), int(last_id_snp)))
-              mycursor.execute(
-                """SELECT *
-                  FROM snp
-                  WHERE chr = %s AND pos_start = %s AND pos_end = %s AND ref = %s AND alt = %s AND genome_version = %s AND GLOC = %s AND platform = %s AND seq_strategy = %s AND tissue_id = %s;
-                  GROUP BY chr""",
-                (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
-                  str(row['ref']), str(row['alt']), str(row['genome_version']), str('int'), str(row['platform']), str(row['seq_strategy']), str(row['tissue_id']))
-              )
-              # gets the number of rows affected by the command executed
-              row_count = mycursor.rowcount
-              print(f'number of affected rows {row_count} --- {index}')
-      mydb.commit()
-      mycursor.execute('SELECT * FROM donor')
-      for x in mycursor:
-          print(x)
-
-      
-
+        mydb.commit()
+        mycursor.execute('SELECT * FROM donor')
+        for x in mycursor:
+            print(x)
 
 def per_tabel():
-  print()
+    print()
 
 per_row()
 
