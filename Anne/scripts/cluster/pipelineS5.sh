@@ -50,9 +50,9 @@ fi
 
 
 # Array of tissue numbers
-array=(  4139  4138  5041  ) # 4094  4099  4104  # 4109  4113  4114  4118  4119 #4123  4124  4129  # 4128  4133  4134 #  4139  4138  5041 # 5043  5042  5044 
+array=(  4138  ) #4139  5041  ) # 4094  4099  4104  # 4109  4113  4114  4118  4119 #4123  4124  4129  # 4128  4133  4134 #  4139  4138  5041 # 5043  5042  5044 
 # Array of sample numbers
-array2=(  S5  S5  S5  ) # S1  S1  S1  # S2  S2  S2  S2  S2 # S3  S3  S3  # S4  S4  S4 # S5  S5  S5  # S6  S6  S6
+array2=(  S5  ) #S5  S5  ) # S1  S1  S1  # S2  S2  S2  S2  S2 # S3  S3  S3  # S4  S4  S4 # S5  S5  S5  # S6  S6  S6
 array3=( S1  S2  S3  S4  S5 ) #  S4  S5  S6 )
 
 METHOD=bwa_aln #bowtie,   bwa_aln, bwa_mem
@@ -93,7 +93,7 @@ if [ "${METHOD}" == "bwa_aln" ]; then
         mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
     done
     # RUN: automatic_script_ob.py
-    python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
+    # python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
     # RUN: change_sample_name.sh
     # source ${SCRIPT_PATH}change_sample_name.sh
     # # RUN: job_vcf_aln.sh
