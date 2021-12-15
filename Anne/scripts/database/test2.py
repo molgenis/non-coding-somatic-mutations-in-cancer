@@ -6,6 +6,7 @@ passwd = ''
 # python3 -m pip install --upgrade pip
 
 """
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -76,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `internship`.`snp` (
   `tissue_id` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE INDEX `ID_UNIQUE` (`ID` ASC) VISIBLE,
-  UNIQUE INDEX `unique_index` (`chr` ASC, `pos_start` ASC, `pos_end` ASC, `ref` ASC, `alt` ASC, `genome_version` ASC, `GLOC` ASC, `platform` ASC, `seq_strategy` ASC, `tissue_id` ASC) VISIBLE)
+  UNIQUE INDEX `unique_index` (`chr` ASC, `pos_start` ASC, `pos_end` ASC, `ref` ASC, `alt` ASC, `genome_version` ASC, `GLOC` ASC, `platform` ASC, `seq_strategy` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -108,25 +109,11 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
-
 """
 
 import mysql.connector
+from mysql.connector import connection
 import pandas as pd
-
-mydb = mysql.connector.connect(host='127.0.0.1', user='root', passwd=passwd, database='internship')
-mycursor = mydb.cursor()
-
-mycursor.execute("SHOW TABLES")
-for x in mycursor:
-    print(x)
-
-path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/db/BOCA-UK_db.tsv"
-df = pd.read_csv(path, sep='\t')
-print(len(df))
-df = df.drop_duplicates(subset=df.columns.difference(['depth']))
-print(len(df))
-print(df.columns)
 
 def per_row():
     for project_id in list(set(df['project_id'])):
@@ -141,28 +128,42 @@ def per_row():
             mycursor.execute("""INSERT INTO donor (donor_ID, project_ID)
                         VALUES ('%s', %s)""" % (str(donor_id), int(last_id_project)))
             last_id_donor = mycursor.lastrowid
-            
 
             select_donor = df.loc[df['donor_id'] == donor_id]
             print(len(select_donor))
             print('---')
             for index, row in df.iterrows():
                 if index < 10000: 
-                    mycursor.execute("""INSERT INTO snp (chr, pos_start, pos_end, ref, alt, genome_version, depth, GLOC, platform, seq_strategy, tissue_id)
-                        VALUES ('%s', %s, %s, '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s')""" % (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
-                        str(row['ref']), str(row['alt']), str(row['genome_version']), int(row['depth']), str('int'), str(row['platform']), str(row['seq_strategy']), str(row['tissue_id'])))
-                    last_id_snp = mycursor.lastrowid
-                    mycursor.execute("""INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID)
-                            VALUES (%s, %s, %s)""" % (int(last_id_project), int(last_id_donor), int(last_id_snp)))
-                    # mycursor.execute(
-                    #     """SELECT *
-                    #     FROM snp
-                    #     WHERE chr = %s AND pos_start = %s AND pos_end = %s AND ref = %s AND alt = %s AND genome_version = %s AND GLOC = %s AND platform = %s AND seq_strategy = %s AND tissue_id = %s;
-                    #     GROUP BY chr""",
-                    #     (str(2), int(209113113), int(209113113),
-                    #     str('G'), str('A'), str('GRCh37'), str('int'), str('Illumina HiSeq'), str('WXS'), str('SA6045'))
-                    # )
-                    # # gets the number of rows affected by the command executed
+                    mycursor.execute(
+                        """SELECT *
+                        FROM snp
+                        WHERE chr = %s AND pos_start = %s AND pos_end = %s AND ref = %s AND alt = %s AND genome_version = %s AND GLOC = %s AND platform = %s AND seq_strategy = %s;""",
+                        (str(row['chr']), int(row['pos_start']), int(row['pos_end']), str(row['ref']), str(row['alt']), str(row['genome_version']), str('int'), str(row['platform']), str(row['seq_strategy']))
+                    )
+                    check_snp = mycursor.fetchall()
+                    
+                    # print('test')
+                    if not check_snp:
+                        mycursor.execute("""INSERT INTO snp (chr, pos_start, pos_end, ref, alt, genome_version, depth, GLOC, platform, seq_strategy, tissue_id)
+                            VALUES ('%s', %s, %s, '%s', '%s', '%s', %s, '%s', '%s', '%s', '%s')""" % (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
+                            str(row['ref']), str(row['alt']), str(row['genome_version']), int(row['depth']), str('int'), str(row['platform']), str(row['seq_strategy']), str(row['tissue_id'])))                    
+                        last_id_snp = mycursor.lastrowid
+                        mycursor.execute("""INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID)
+                                VALUES (%s, %s, %s)""" % (int(last_id_project), int(last_id_donor), int(last_id_snp)))
+                    else:
+                        for info in check_snp:
+                            id_snp = info['ID']
+                            mycursor.execute(
+                                """SELECT *
+                                FROM donor_has_snp
+                                WHERE donor_project_ID = %s AND donor_ID = %s AND snp_ID = %s;""",
+                                (int(last_id_project), int(last_id_donor), int(id_snp))
+                            )
+                            check_donor_snp = mycursor.fetchall()
+                            if not check_donor_snp:
+                                mycursor.execute("""INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID)
+                                        VALUES (%s, %s, %s)""" % (int(last_id_project), int(last_id_donor), int(id_snp)))
+                    # gets the number of rows affected by the command executed
                     # row_count = mycursor.rowcount
                     # print(f'number of affected rows {row_count} --- {index}')
                     # print('hoi')
@@ -177,7 +178,32 @@ def per_row():
 def per_tabel():
   print()
 
-per_row()
+
+path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/db/BOCA-UK_db.tsv"
+df = pd.read_csv(path, sep='\t')
+print(len(df))
+df = df.drop_duplicates(subset=df.columns.difference(['depth']))
+print(len(df))
+print(df.columns)
+
+# https://pynative.com/python-mysql-select-query-to-fetch-data/
+try:
+    mydb = mysql.connector.connect(host='127.0.0.1', user='root', passwd=passwd, database='internship')
+    mycursor = mydb.cursor(dictionary=True)
+
+    mycursor.execute("SHOW TABLES")
+    for x in mycursor:
+        print(x)
+
+
+    per_row()
+except mysql.connector.Error as e:
+    print(f'ERROR - {e}')
+finally:
+    if mydb.is_connected():
+        mydb.close()
+        mycursor.close()
+        print('MySQL connection is closed')
 
 
 print('END')

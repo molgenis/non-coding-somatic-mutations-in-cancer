@@ -115,7 +115,7 @@ import mysql.connector
 import pandas as pd
 
 mydb = mysql.connector.connect(host='127.0.0.1', user='root', passwd=passwd, database='internship')
-mycursor = mydb.cursor()
+mycursor = mydb.cursor(dictionary=True)
 
 mycursor.execute("SHOW TABLES")
 for x in mycursor:
@@ -143,22 +143,13 @@ mycursor.execute(
 #     print(index)
 #     print(x)
 
+data = mycursor.fetchall()
+print(data)
+print(len(data))
+if not data:
+  print('jaaa')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+for i in data:
+  print(i['ID'])
 
 
