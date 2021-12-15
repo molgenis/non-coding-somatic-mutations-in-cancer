@@ -21,7 +21,7 @@ ml cutadapt/2.6-GCCcore-7.3.0-Python-3.7.4-bare
 ml FastQC/0.11.8-Java-11-LTS
 ml GATK/4.1.4.1-Java-8-LTS
 ml Java/11-LTS
-#ml libjpeg-turbo/2.0.2-GCCcore-7.3.0 #?
+ml libjpeg-turbo/2.0.2-GCCcore-7.3.0 #?
 ml picard/2.20.5-Java-11-LTS
 
 
@@ -87,7 +87,7 @@ source activate stage
 if [ "${METHOD}" == "bwa_aln" ]; then
     echo ${METHOD}
     # RUN: job_align_aln.sh
-     source ${SCRIPT_PATH}job_align_aln.sh
+    source ${SCRIPT_PATH}job_align_aln.sh
     for i in "${array3[@]}"
     do 
         mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
