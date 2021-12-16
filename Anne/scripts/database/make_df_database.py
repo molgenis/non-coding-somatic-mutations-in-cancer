@@ -4,6 +4,7 @@ import numpy as np
 import io
 import sys
 import os
+import glob
 
 
 # https://gist.github.com/dceoy/99d976a2c01e7f0ba1c813778f9db744
@@ -55,13 +56,25 @@ def make_plot_format_other(path, basename):
     select_df.to_csv(f'D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/db/{basename}_db.tsv', sep="\t", index=False)
     
         
-path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/simple_somatic_mutation.open.BOCA-UK.tsv" 
-# path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/merge_manual_bwa_aln.vcf"
+# path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/simple_somatic_mutation.open.BOCA-UK.tsv" 
+# # path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/merge_manual_bwa_aln.vcf"
+path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/'
+out_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/'
 print(path)
+path_files = f"{path}*.tsv"
+for fname in glob.glob(path_files):
+    print(fname)
+    basename = os.path.basename(path).split('%2F')[3]
+    print(basename)
+    print('------')
 # Get the basename of the file
-basename = os.path.basename(path) #.split('.')[0]
-type_file = 'xxx'
-if type_file == 'vcf':
-    make_plot_format_vcf(path, basename)
-else:
-    make_plot_format_other(path, basename)
+# basename = os.path.basename(path) #.split('.')[0]
+# type_file = 'xxx'
+# if type_file == 'vcf':
+#     make_plot_format_vcf(path, basename)
+# else:
+#     make_plot_format_other(path, basename)
+
+
+
+
