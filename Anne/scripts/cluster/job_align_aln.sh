@@ -33,6 +33,7 @@ do
 
     # Last steps of alignment
     align_last_steps() {
+        ml SAMtools/1.9-foss-2018b
         samtools view -Sb ${1}.sam > ${1}.bam
         print('TEST1')
         samtools sort ${1}.bam -o ${1}_sort.bam
