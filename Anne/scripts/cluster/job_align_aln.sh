@@ -53,7 +53,7 @@ do
 
     # BWA = Burrows-Wheeler Aligner
     # Paired-end alignment BWA-aln
-    #bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.sai && bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai && bwa sampe ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.sai ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/bwa_aln/aln_${FILE_NUM}.sam
+    bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.sai && bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai && bwa sampe ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.sai ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/bwa_aln/aln_${FILE_NUM}.sam
     echo 'begin alignen'
     align_last_steps ${PATH_DIR}${NUMBER}/${CHROM}/bwa_aln/aln_${FILE_NUM}
 

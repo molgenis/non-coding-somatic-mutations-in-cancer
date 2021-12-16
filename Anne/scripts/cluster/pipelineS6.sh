@@ -95,7 +95,7 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     # RUN: automatic_script_ob.py
     python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
     # RUN: change_sample_name.sh
-    #source ${SCRIPT_PATH}change_sample_name.sh
+    source ${SCRIPT_PATH}change_sample_name.sh
     # RUN: job_vcf_aln.sh
     # DUURT ERG LANG!
     #source ${SCRIPT_PATH}job_vcf_aln.sh    
