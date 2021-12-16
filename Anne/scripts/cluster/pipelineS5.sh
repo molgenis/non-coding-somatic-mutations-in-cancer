@@ -88,10 +88,10 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     echo ${METHOD}
     # RUN: job_align_aln.sh
     source ${SCRIPT_PATH}job_align_aln.sh
-    for i in "${array3[@]}"
-    do 
-        mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
-    done
+    # for i in "${array3[@]}"
+    # do 
+    #     mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
+    # done
     # RUN: automatic_script_ob.py
     # python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
     # RUN: change_sample_name.sh
