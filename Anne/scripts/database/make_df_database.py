@@ -31,9 +31,7 @@ def make_plot_format_vcf(path, basename):
     print(df.head())
     print(df.columns)
 
-def make_plot_format_other(path, basename):
-    basename = 'download?fn=%2Fcurrent%2FProjects%2FBOCA-UK%2Fsimple_somatic_mutation.open.BOCA-UK.tsv'
-    basename = basename.split('%2F')[3]
+def make_plot_format_other(path, basename, out_path):
     df = pd.read_csv(path, sep='\t')
     print(df.head())
     print(df.columns)
@@ -45,7 +43,7 @@ def make_plot_format_other(path, basename):
                         'chromosome': 'chr', 'chromosome_start': 'pos_start', 'chromosome_end': 'pos_end', 
                         'assembly_version': 'genome_version', 'reference_genome_allele': 'ref', 'mutated_to_allele': 'alt', 
                          'total_read_count': 'depth',  'platform': 'platform', 'sequencing_strategy': 'seq_strategy'}, inplace=True) 
-    print(select_df)
+   # print(select_df.head())
 
     # nan_values = select_df.isna()
     # nan_columns = nan_values.any()
@@ -53,7 +51,7 @@ def make_plot_format_other(path, basename):
     # print(columns_with_nan)
     select_df['depth'].fillna(0, inplace=True)
     select_df = select_df.astype({'pos_start': 'int64', 'pos_end': 'int64', 'depth': 'int64'})
-    select_df.to_csv(f'D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/db/{basename}_db.tsv', sep="\t", index=False)
+    select_df.to_csv(f'{out_path}{basename}_db.tsv', sep="\t", index=False)
     
         
 # path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/simple_somatic_mutation.open.BOCA-UK.tsv" 
@@ -63,10 +61,15 @@ out_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_d
 print(path)
 path_files = f"{path}*.tsv"
 for fname in glob.glob(path_files):
-    print(fname)
-    basename = os.path.basename(path).split('%2F')[3]
-    print(basename)
+    print(f'fname {fname}')
+    basename = os.path.basename(fname).split('%2F')[3]
+    print(f'basename {basename}')
     print('------')
+    type_file = 'xxx'
+    if type_file == 'vcf':
+        make_plot_format_vcf(fname, basename, out_path)
+    else:
+        make_plot_format_other(fname, basename, out_path)
 # Get the basename of the file
 # basename = os.path.basename(path) #.split('.')[0]
 # type_file = 'xxx'
