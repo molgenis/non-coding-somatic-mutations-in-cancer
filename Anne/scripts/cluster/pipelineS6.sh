@@ -3,7 +3,7 @@
 #SBATCH --job-name=pipelineS6
 #SBATCH --output=pipelineS6.out
 #SBATCH --error=pipelineS6.err
-#SBATCH --time=49:59:59
+#SBATCH --time=89:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
@@ -98,9 +98,9 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     source ${SCRIPT_PATH}change_sample_name.sh
     # RUN: job_vcf_aln.sh
     # DUURT ERG LANG!
-    #source ${SCRIPT_PATH}job_vcf_aln.sh    
+    source ${SCRIPT_PATH}job_vcf_aln.sh    
     # RUN: vcf_compare_auto.sh
-    #source ${SCRIPT_PATH}vcf_compare_auto.sh
+    source ${SCRIPT_PATH}vcf_compare_auto.sh
     
     
     #COMP_TYPE=mutect2 # manual, mutect2

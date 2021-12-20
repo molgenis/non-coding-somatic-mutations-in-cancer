@@ -3,7 +3,7 @@
 #SBATCH --job-name=pipelineS5
 #SBATCH --output=pipelineS5.out
 #SBATCH --error=pipelineS5.err
-#SBATCH --time=49:59:59
+#SBATCH --time=89:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
@@ -21,7 +21,7 @@ ml cutadapt/2.6-GCCcore-7.3.0-Python-3.7.4-bare
 ml FastQC/0.11.8-Java-11-LTS
 ml GATK/4.1.4.1-Java-8-LTS
 ml Java/11-LTS
-ml libjpeg-turbo/2.0.2-GCCcore-7.3.0 #?
+#ml libjpeg-turbo/2.0.2-GCCcore-7.3.0 #?
 ml picard/2.20.5-Java-11-LTS
 
 
@@ -50,10 +50,10 @@ fi
 
 
 # Array of tissue numbers
-array=(  4138  4139  5041  ) # 4094  4099  4104  # 4109  4113  4114  4118  4119 #4123  4124  4129  # 4128  4133  4134 #  4139  4138  5041 # 5043  5042  5044 
+array=(  4139  4138  5041  ) # 4094  4099  4104  # 4109  4113  4114  4118  4119 #4123  4124  4129  # 4128  4133  4134 #  4139  4138  5041 # 5043  5042  5044 
 # Array of sample numbers
-array2=(  S5  ) #S5  S5  ) # S1  S1  S1  # S2  S2  S2  S2  S2 # S3  S3  S3  # S4  S4  S4 # S5  S5  S5  # S6  S6  S6
-array3=( S1  S2  S3  S4  S5 ) #  S4  S5  S6 )
+array2=(  S5  S5  S5  ) # S1  S1  S1  # S2  S2  S2  S2  S2 # S3  S3  S3  # S4  S4  S4 # S5  S5  S5  # S6  S6  S6
+array3=( S1  S2  S3  S4  S5 ) 
 
 METHOD=bwa_aln #bowtie,   bwa_aln, bwa_mem
 METH_FILE=aln #bowtie2, aln, mem
@@ -81,13 +81,13 @@ ml Anaconda3/5.3.0
 source activate stage
 
 # RUN: file_prep.sh
-# source ${SCRIPT_PATH}file_prep.sh
+#source ${SCRIPT_PATH}file_prep.sh
 
 # Lexicographic (greater than, less than) comparison.
 if [ "${METHOD}" == "bwa_aln" ]; then
     echo ${METHOD}
     # RUN: job_align_aln.sh
-    source ${SCRIPT_PATH}job_align_aln.sh
+     source ${SCRIPT_PATH}job_align_aln.sh
     for i in "${array3[@]}"
     do 
         mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
@@ -95,12 +95,12 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     # RUN: automatic_script_ob.py
     python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
     # RUN: change_sample_name.sh
-    # source ${SCRIPT_PATH}change_sample_name.sh
-    # # RUN: job_vcf_aln.sh
-    # # DUURT ERG LANG!
-    # source ${SCRIPT_PATH}job_vcf_aln.sh    
-    # # RUN: vcf_compare_auto.sh
-    # source ${SCRIPT_PATH}vcf_compare_auto.sh
+    source ${SCRIPT_PATH}change_sample_name.sh
+    # RUN: job_vcf_aln.sh
+    # DUURT ERG LANG!
+    source ${SCRIPT_PATH}job_vcf_aln.sh    
+    # RUN: vcf_compare_auto.sh
+    source ${SCRIPT_PATH}vcf_compare_auto.sh
     
     
     #COMP_TYPE=mutect2 # manual, mutect2
