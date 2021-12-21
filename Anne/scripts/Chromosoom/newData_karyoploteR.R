@@ -1,5 +1,8 @@
 library(karyoploteR)
+library(GenomicRanges)
 #library(zeallot) #https://stackoverflow.com/questions/13538628/returning-different-data-frames-in-a-function-r
+
+
 
 create_data_karyoploteR <- function(path, df, i, last_par, chr) {
   # Check if it's not the sum picture but just per sample
@@ -45,6 +48,26 @@ add_density <- function(kp, data, r0, r1, label) {
   #kpAbline(kp, h=mean(kp$latest.plot$computed.values$density), lty=2, ymax=kp$latest.plot$computed.values$max.density, r0=r0, r1=r1)
   kpAddLabels(kp, labels=label, label.margin=0.04, r0=r0, r1=r1, data.panel = 1, cex=1.2, col = "cornflowerblue")
   return(kp)
+}
+
+peaks <- function(kp, peaks_file){
+  density <- kp$latest.plot$computed.values$density
+  windows <- kp$latest.plot$computed.values$windows
+  
+  
+  textfile=file.path(peaks_file);
+  printer = file(textfile,"a+");
+  indexes <- order(density, decreasing=TRUE)[1:10]
+  for (index in indexes){
+    #print(density[index])
+    # https://bioconductor.org/packages/devel/bioc/vignettes/GenomicRanges/inst/doc/GRanges_and_GRangesList_slides.pdf
+    #print(start(windows[index]))
+    #print(end(windows[index]))
+    #print('--------')
+    write(c(density[index], start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 3);
+    #write("\n", textfile, append=TRUE)
+  }
+  close(printer)
 }
 
 # List of chromosomes
@@ -107,6 +130,7 @@ for (chr in chrom){
       if (i == length(filenames)) {
         dev.off()
         name <- paste('D:/Hanze_Groningen/STAGE/bed/PLOTS/kary/', type_files, '/', chr, '/ALLplot', i, basename, '.png', sep="")
+        peaks_file <- paste('D:/Hanze_Groningen/STAGE/bed/PLOTS/kary/', type_files, '/', chr, '/ALLplot_',basename, '_', chr, '.tsv', sep="")
         png(name, width = 2000, height = 1000)
         kp <- plotKaryotype()
         # select chromomes
@@ -115,6 +139,7 @@ for (chr in chrom){
         kpAddBaseNumbers(kp, tick.dist = 10000000, minor.tick.dist = 1000000, minor.tick.len = 5, minor.tick.col = "gray", cex=0.8)
         sample1 <- create_data_karyoploteR(filenames[i], df, i, 'sum', chr)
         kp <- add_density(kp, sample1, 0.0, 1.0, 'ALL')
+        peaks(kp, peaks_file)
         dev.off()        
       }
       
