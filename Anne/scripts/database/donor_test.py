@@ -10,8 +10,13 @@ for fname in glob.glob(path_files):
     print(fname)
     # Read file
     df = pd.read_csv(fname, sep='\t')
+    print(df.columns)
     set_donor.update(set(df['icgc_donor_id']))
     list_donor.extend(list(set(df['icgc_donor_id'])))
+    print(len(set_donor))
+    print(len(list_donor))
 
+print('END')
 print(len(set_donor))
 print(len(list_donor))
+print('ENDENDENDENDEND')
