@@ -1,0 +1,36 @@
+bwa_aln
+BEGIN
+4139
+begin alignen
+TEST1
+TEST2
+TEST3
+TEST4
+TEST5
+EIND
+BEGIN
+4138
+begin alignen
+TEST1
+TEST2
+TEST3
+TEST4
+TEST5
+EIND
+BEGIN
+5041
+begin alignen
+TEST1
+TEST2
+TEST3
+TEST4
+TEST5
+EIND
+4139
+EIND
+4138
+EIND
+5041
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_aln/bwa_aln_S1_numT_1_numHC_1_SS6004094_SS6004099.txt
+####sample name\n

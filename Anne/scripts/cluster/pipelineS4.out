@@ -1,0 +1,191 @@
+bwa_aln
+BEGIN
+4128
+begin alignen
+TEST1
+TEST2
+TEST3
+TEST4
+TEST5
+EIND
+BEGIN
+4133
+begin alignen
+TEST1
+TEST2
+TEST3
+TEST4
+TEST5
+EIND
+BEGIN
+4134
+begin alignen
+TEST1
+TEST2
+TEST3
+TEST4
+TEST5
+EIND
+4128
+EIND
+4133
+EIND
+4134
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_aln/bwa_aln_S1_numT_1_numHC_1_SS6004094_SS6004099.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_aln/bwa_aln_S1_numT_1_numHC_1_SS6004094_SS6004104.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_aln/bwa_aln_SS6004094.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_aln/bwa_aln_SS6004099.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_aln/bwa_aln_SS6004104.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_S2_numT_1_numHC_1_SS6004109_SS6004113.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_S2_numT_1_numHC_1_SS6004109_SS6004114.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_S2_numT_1_numHC_1_SS6004109_SS6004118.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_S2_numT_1_numHC_1_SS6004109_SS6004119.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_SS6004109.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_SS6004113.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_SS6004114.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_SS6004118.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S2/chr21/mutect_bwa_aln/bwa_aln_SS6004119.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S3/chr21/mutect_bwa_aln/bwa_aln_S3_numT_1_numHC_1_SS6004123_SS6004124.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S3/chr21/mutect_bwa_aln/bwa_aln_S3_numT_1_numHC_1_SS6004123_SS6004129.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S3/chr21/mutect_bwa_aln/bwa_aln_SS6004123.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S3/chr21/mutect_bwa_aln/bwa_aln_SS6004124.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S3/chr21/mutect_bwa_aln/bwa_aln_SS6004129.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S4/chr21/mutect_bwa_aln/bwa_aln_S4_numT_1_numHC_1_SS6004128_SS6004133.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
