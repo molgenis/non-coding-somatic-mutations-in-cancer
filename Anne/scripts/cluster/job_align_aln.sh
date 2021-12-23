@@ -11,8 +11,7 @@
 #SBATCH --export=NONE
 #SBATCH --get-user-env=L
 
-
-
+echo 'job align aln'
 
 for i in "${!array[@]}"
 do
@@ -22,8 +21,6 @@ do
     FILE_NUM=SS600${NUMBER}  
     # The path where the file is located
     PATH_DIR=${GENERAL_PATH}"${array2[i]}"/
-    # The path to the file of the reference genome that will be used.
-    #GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/${CHROM}.fa #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.fa  
 
     echo "BEGIN"
     echo $NUMBER
@@ -33,30 +30,31 @@ do
 
     # Last steps of alignment
     align_last_steps() {
+        # Load samtools (again otherwise error)
         ml SAMtools/1.9-foss-2018b
+        # Make sam file into bam file 
         samtools view -Sb ${1}.sam > ${1}.bam
-        echo 'TEST1'
+        # Sort bam file
         samtools sort ${1}.bam -o ${1}_sort.bam
-        echo 'TEST2'
+        # Index bam file
         samtools index ${1}_sort.bam
-        echo 'TEST3'
         # Adding Read Group tags and indexing bam files
         # ml picard/2.20.5-Java-11-LTS
-        echo 'TEST4'
         java -jar /apps/software/picard/2.20.5-Java-11-LTS/picard.jar  AddOrReplaceReadGroups INPUT= ${1}_sort.bam OUTPUT= ${1}.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
+        # Index bam file
         samtools index ${1}.RG.bam
-        echo 'TEST5'
         # Marking and removing duplicates
         java -jar /apps/software/picard/2.20.5-Java-11-LTS/picard.jar  MarkDuplicates I= ${1}.RG.bam O= ${1}.DR.bam M=${1}_output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> ${1}_logFile.log
+        # Index bam file
         samtools index ${1}.DR.bam
     }
 
     # BWA = Burrows-Wheeler Aligner
     # Paired-end alignment BWA-aln
     bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.sai && bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai && bwa sampe ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.sai ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/bwa_aln/aln_${FILE_NUM}.sam
-    echo 'begin alignen'
+    echo 'Begin alignen'
     align_last_steps ${PATH_DIR}${NUMBER}/${CHROM}/bwa_aln/aln_${FILE_NUM}
 
-    echo "EIND"
+    echo "EIND job align aln - ${NUMBER}"
 done
 

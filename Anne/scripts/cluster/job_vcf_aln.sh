@@ -11,13 +11,13 @@
 #SBATCH --export=NONE
 #SBATCH --get-user-env=L
 
-
-# Array with file output names
-#array2=( S2  S3  S4  S5  S6 )
+echo 'job vcf aln'
 
 for i in "${array3[@]}"
 do 
+    # The path where the file is located
     PATH_FILE=${GENERAL_PATH}"${i}"/${CHROM}/${TYPE_ALN}/
+    # Runs over all files matching the path and ending in .txt
     for filename in ${PATH_FILE}*.txt
     do
         # Name of input file
@@ -37,7 +37,8 @@ do
         # so it must be passed in quotes. Otherwise, only the first 'word' 
         # will be grabbed before the first space character.
         mutect2_vcf ${mkdir_path} "${arg_mutect2}" ${file_output}
-        echo "EIND"
-    done    
+        echo "EIND job vcf aln - ${filename}"
+    done
+    echo "EIND job vcf aln - ${i}"    
 done
 

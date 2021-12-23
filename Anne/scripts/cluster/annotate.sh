@@ -1,16 +1,28 @@
 #!/usr/bin/bash
 
-# Load packages
-ml BCFtools/1.11-GCCcore-7.3.0
+#SBATCH --job-name=annotate
+#SBATCH --output=annotate.out
+#SBATCH --error=annotate.err
+#SBATCH --time=49:59:59
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=96gb
+#SBATCH --nodes=1
+#SBATCH --open-mode=append
+#SBATCH --export=NONE
+#SBATCH --get-user-env=L
 
-PATH_GENERAL=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/merge_vcf/
+# Load packages
+#ml BCFtools/1.11-GCCcore-7.3.0
+
+PATH_GENERAL=${GENERAL_PATH}merge_vcf/
 OUTPUT_PATH=${PATH_GENERAL}annotated/
 #bcftools annotate -a /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/dbSNP/merge_All_20180423.vcf.gz   -o /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/00112test_5044_OUTPUT.vcf  /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/00test_5044.vcf.gz  
 
-# Loop over all .csv files in this folder
+# Loop over all .vcf files in this folder
 for filename in ${PATH_GENERAL}/*.vcf; do
     echo ${filename}
     echo "$(basename -- $filename)"
+    # Get basename of file
     BASENAME=$( echo "$(basename -- $filename)")
     bcftools view ${filename} -Oz -o ${filename}.gz
     bcftools index ${filename}.gz

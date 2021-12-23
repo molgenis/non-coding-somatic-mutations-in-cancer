@@ -269,11 +269,6 @@ def main():
     path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map"
     # Main path to where the file will be saved
     head_path = sys.argv[1]
-    # the path to the file
-    # path_file = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/EGAD00001000292_Sample_File.map"
-    # Main path to where the file will be saved
-    # head_path = "D:/Hanze_Groningen/STAGE/non-coding-somatic-mutations-in-cancer/Anne/data/"
-
     # Number of tumors you want to combine while running Mutect2.
     number_of_tumors = int(sys.argv[2])
     # Number of hc you want to combine while running Mutect2
@@ -286,7 +281,6 @@ def main():
     # Piece with which the file name begins
     type_aln2 = sys.argv[6]  # bowtie2, aln, mem
     chrom = sys.argv[7]
-
     # Filter file
     df_selection = filter_file(path_file)
     # Make objects for all samples/participants
