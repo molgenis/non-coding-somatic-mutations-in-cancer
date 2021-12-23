@@ -218,9 +218,9 @@ def main():
 
     :return:
     """
-    path_fgene = 'D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed'
-    path = 'D:/Hanze_Groningen/STAGE/db/files/'  # '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/'
-    path_db = 'D:/Hanze_Groningen/STAGE/db/dbdb.db'  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship.db
+    path_fgene = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed'
+    path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/'
+    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene.db'
     try:
         # Returns a connection object that we will use to interact with the SQLite database held in the file test.db
         mydb_connection = sqlite3.connect(path_db)
@@ -230,7 +230,7 @@ def main():
         # Cursor object allow us to send SQL statements to a SQLite database using cursor.execute()
         cursor = mydb_connection.cursor()
         cursor = create_db(cursor)
-        # read_files(path, mydb_connection, cursor)
+        read_files(path, mydb_connection, cursor)
         check_gene(path_fgene, mydb_connection, cursor)
 
         cursor.execute('SELECT * FROM snp')
