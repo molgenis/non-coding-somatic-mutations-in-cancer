@@ -101,14 +101,17 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     # # mutect2
     # source ${SCRIPT_PATH}job_vcf_aln.sh    
     # # RUN: vcf_compare_auto.sh
-    # source ${SCRIPT_PATH}vcf_compare_auto.sh
+    # source ${SCRIPT_PATH}vcf_compare_auto.sh    
+    # # RUN: vcf_merge_auto.sh
+    # # Merge files
+    # COMP_TYPE=mutect2 # manual, mutect2
+    # source ${SCRIPT_PATH}vcf_merge_auto.sh
+    # COMP_TYPE=manual # manual, mutect2
+    # source ${SCRIPT_PATH}vcf_merge_auto.sh
+
+
+    source ${SCRIPT_PATH}annotate.sh
     
-    
-    COMP_TYPE=mutect2 # manual, mutect2
-    source ${SCRIPT_PATH}vcf_merge_auto.sh
-    COMP_TYPE=manual # manual, mutect2
-    source ${SCRIPT_PATH}vcf_merge_auto.sh
-    # source ${SCRIPT_PATH}annotate.sh
     # source ${SCRIPT_PATH}FORMAT/write_df.sh
     # source ${SCRIPT_PATH}FORMAT/make_plots_loop.sh
     # ml R/4.0.3-foss-2018b-bare
