@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=job_aln
-#SBATCH --output=job_aln.out
-#SBATCH --error=job_aln.err
+#SBATCH --job-name=job_bowtie
+#SBATCH --output=job_bowtie.out
+#SBATCH --error=job_bowtie.err
 #SBATCH --time=49:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb
@@ -11,19 +11,19 @@
 #SBATCH --export=NONE
 #SBATCH --get-user-env=L
 
-echo 'job align aln'
+echo 'job align bowtie'
 
 for i in "${!array[@]}"
 do
     # Number or specific tissue of a sample
     NUMBER="${array[i]}"
     # The entire file number
-    FILE_NUM=SS600${NUMBER}  
+    FILE_NUM=SS600${NUMBER}   
     # The path where the file is located
     PATH_DIR=${GENERAL_PATH}"${array2[i]}"/
-
+    
     echo "BEGIN"
-    echo $NUMBER
+    echo ${NUMBER}
     # Creates a specific folder
     mkdir -p ${PATH_DIR}${NUMBER}/${CHROM}/${METHOD}/
     cd ${PATH_DIR}${NUMBER}
@@ -49,12 +49,12 @@ do
         samtools index ${1}.DR.bam
     }
 
-    # BWA = Burrows-Wheeler Aligner
-    # Paired-end alignment BWA-aln
-    bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.sai && bwa aln ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai && bwa sampe ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.sai ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/bwa_aln/aln_${FILE_NUM}.sam
-    echo 'Begin alignen'
-    align_last_steps ${PATH_DIR}${NUMBER}/${CHROM}/${METHOD}/aln_${FILE_NUM}
+    #BOWTIE2
+    # Paired-end alignment bowtie2
+    bowtie2-build ${GENOOM} ${GENERAL_PATH}GENOOM_${CHROM}
+    bowtie2 -p 4 -x ${GENERAL_PATH}GENOOM_${CHROM} -1 ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq -2 ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq -S ${PATH_DIR}${NUMBER}/${CHROM}/${METHOD}/bowtie2_${FILE_NUM}.sam
+    align_last_steps ${PATH_DIR}${NUMBER}/${CHROM}/${METHOD}/bowtie2_${FILE_NUM}
 
-    echo "EIND job align aln - ${NUMBER}"
+    echo "EIND"
 done
 

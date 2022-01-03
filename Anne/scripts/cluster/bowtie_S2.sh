@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=pipelineS5
-#SBATCH --output=pipelineS5.out
-#SBATCH --error=pipelineS5.err
+#SBATCH --job-name=bw_S2
+#SBATCH --output=bw_S2.out
+#SBATCH --error=bw_S2.err
 #SBATCH --time=89:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb
@@ -50,13 +50,13 @@ fi
 
 
 # Array of tissue numbers
-array=(  4139  4138  5041  ) # 4094  4099  4104  # 4109  4113  4114  4118  4119 #4123  4124  4129  # 4128  4133  4134 #  4139  4138  5041 # 5043  5042  5044 
+array=(  4109  4113  4114  4118  4119  ) # 4109  4113  4114  4118  4119 #4123  4124  4129  # 4128  4133  4134 #  4139  4138  5041 # 5043  5042  5044 
 # Array of sample numbers
-array2=(  S5  S5  S5  ) # S1  S1  S1  # S2  S2  S2  S2  S2 # S3  S3  S3  # S4  S4  S4 # S5  S5  S5  # S6  S6  S6
-array3=( S1  S2  S3  S4  S5 ) 
+array2=(  S2  S2  S2  S2  S2  ) # S2  S2  S2  S2  S2 # S3  S3  S3  # S4  S4  S4 # S5  S5  S5  # S6  S6  S6
+array3=( S1  S2 ) 
 
-METHOD=bwa_aln #bowtie,   bwa_aln, bwa_mem
-METH_FILE=aln #bowtie2, aln, mem
+METHOD=bowtie #bowtie,   bwa_aln, bwa_mem
+METH_FILE=bowtie2 #bowtie2, aln, mem
 TYPE_ALN=mutect_${METHOD}
 
 GENERAL_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/
@@ -85,9 +85,15 @@ source activate stage
 
 # Lexicographic (greater than, less than) comparison.
 if [ "${METHOD}" == "bwa_aln" ]; then
+    echo ${METHOD}    
+
+elif [ "${METHOD}" == "bwa_mem" ]; then
     echo ${METHOD}
-    # RUN: job_align_aln.sh
-     source ${SCRIPT_PATH}job_align_aln.sh
+    
+elif [ "${METHOD}" == "bowtie" ]; then
+    echo ${METHOD}
+    # RUN: job_align_bowtie.sh
+     source ${SCRIPT_PATH}job_align_bowtie.sh
     for i in "${array3[@]}"
     do 
         mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
@@ -96,10 +102,10 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
     # RUN: change_sample_name.sh
     source ${SCRIPT_PATH}change_sample_name.sh
-    # RUN: job_vcf_aln.sh
+    # RUN: job_vcf_bowtie.sh
     # DUURT ERG LANG!
     # mutect2
-    source ${SCRIPT_PATH}job_vcf_aln.sh    
+    source ${SCRIPT_PATH}job_vcf_bowtie.sh    
     # RUN: vcf_compare_auto.sh
     source ${SCRIPT_PATH}vcf_compare_auto.sh    
     # RUN: vcf_merge_auto.sh
@@ -124,13 +130,6 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     # split.py
     # karyoploteR_plots.R
     # chromplot_plots.R
-    
-
-elif [ "${METHOD}" == "bwa_mem" ]; then
-    echo ${METHOD}
-    
-elif [ "${METHOD}" == "bowtie" ]; then
-    echo ${METHOD}
     
 else
     echo "ERROR"

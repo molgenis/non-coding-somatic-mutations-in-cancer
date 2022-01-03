@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=pipelineS5
-#SBATCH --output=pipelineS5.out
-#SBATCH --error=pipelineS5.err
+#SBATCH --job-name=aln_S5
+#SBATCH --output=aln_S5.out
+#SBATCH --error=aln_S5.err
 #SBATCH --time=89:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb

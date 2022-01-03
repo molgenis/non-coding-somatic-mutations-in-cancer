@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=pipelineS5
-#SBATCH --output=pipelineS5.out
-#SBATCH --error=pipelineS5.err
+#SBATCH --job-name=aln_S6
+#SBATCH --output=aln_S6.out
+#SBATCH --error=aln_S6.err
 #SBATCH --time=89:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb
@@ -50,10 +50,10 @@ fi
 
 
 # Array of tissue numbers
-array=(  4139  4138  5041  ) # 4094  4099  4104  # 4109  4113  4114  4118  4119 #4123  4124  4129  # 4128  4133  4134 #  4139  4138  5041 # 5043  5042  5044 
+array=(  5043  5042  5044  ) # 5043  5042  5044 
 # Array of sample numbers
-array2=(  S5  S5  S5  ) # S1  S1  S1  # S2  S2  S2  S2  S2 # S3  S3  S3  # S4  S4  S4 # S5  S5  S5  # S6  S6  S6
-array3=( S1  S2  S3  S4  S5 ) 
+array2=(  S6  S6  S6  ) # S6  S6  S6
+array3=( S1  S2  S3  S4  S5 S6  ) 
 
 METHOD=bwa_aln #bowtie,   bwa_aln, bwa_mem
 METH_FILE=aln #bowtie2, aln, mem
