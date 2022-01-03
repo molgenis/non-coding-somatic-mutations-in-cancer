@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=gene_db
-#SBATCH --output=gene_db.out
-#SBATCH --error=gene_db.err
-#SBATCH --time=289:59:59
+#SBATCH --job-name=gene_db2
+#SBATCH --output=gene_db2.out
+#SBATCH --error=gene_db2.err
+#SBATCH --time=159:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
