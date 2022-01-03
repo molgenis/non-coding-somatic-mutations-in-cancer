@@ -84,6 +84,7 @@ def fill_database(mydb_connection, cursor, df):
     """
     # Loop over set of project_ids and add it to the database
     for project_id in list(set(df['project_id'])):
+        print(project_id)
         cursor.execute("""INSERT INTO project (project_ID) 
                           VALUES ('%s')""" % (str(project_id)))
         # Committing the current transactions
@@ -186,6 +187,7 @@ def check_gene(path_fgene, mydb_connection, cursor):
     :param cursor:
     :return:
     """
+    print('check_gene')
     gene_df = pd.read_csv(path_fgene, sep='\t')
     for index, row in gene_df.iterrows():
         print(index)
@@ -220,7 +222,7 @@ def main():
     """
     path_fgene = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed'
     path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/'
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene.db'
+    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long.db'
     try:
         # Returns a connection object that we will use to interact with the SQLite database held in the file test.db
         mydb_connection = sqlite3.connect(path_db)

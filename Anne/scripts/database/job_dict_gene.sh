@@ -3,7 +3,7 @@
 #SBATCH --job-name=gene_db
 #SBATCH --output=gene_db.out
 #SBATCH --error=gene_db.err
-#SBATCH --time=89:59:59
+#SBATCH --time=289:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
