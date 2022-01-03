@@ -114,7 +114,7 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     # source ${SCRIPT_PATH}annotate.sh
 
     # RUN: write_df.sh
-    source ${SCRIPT_PATH}FORMAT/write_df.sh
+    source ${SCRIPT_PATH}write_df.sh
 
     # source ${SCRIPT_PATH}FORMAT/make_plots_loop.sh
     # ml R/4.0.3-foss-2018b-bare
