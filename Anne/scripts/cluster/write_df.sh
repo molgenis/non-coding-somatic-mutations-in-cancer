@@ -2,20 +2,20 @@
 
 # Load packages
 #ml BCFtools/1.11-GCCcore-7.3.0
-ml Anaconda3/5.3.0
-source activate stage
+# ml Anaconda3/5.3.0
+# source activate stage
 
-PATH_PLOT=${GENERAL_PATH}FORMAT/
-
-> ${GENERAL_PATH}FORMAT/part_command.txt
+PATH_PLOT=${GENERAL_PATH}FORMAT/${CHROM}/
+mkdir -p ${GENERAL_PATH}FORMAT/${CHROM}/
+> ${GENERAL_PATH}FORMAT/${CHROM}/part_command.txt
 
 # Loop over lines in file
 while IFS= read -r line; do
   # Call python file
   # The python file creates dataframe from the manually created tumor files 
   # (by comparing hc against tumor, and grabbing the unique tumor SNPs)
-  python3 ${PATH_PLOT}make_df.py ${line} ${PATH_PLOT} ${PATH_PLOT}part_command.txt
-done < "${GENERAL_PATH}files.txt"
+  python3 ${SCRIPT_PATH}make_df.py ${line} ${PATH_PLOT} ${PATH_PLOT}part_command.txt
+done < "${GENERAL_PATH}files_${METHOD}.txt"
 
 echo 'LOOP OVER COMMANDS'
 # Loop over commands (as lines in file)
@@ -28,6 +28,6 @@ while IFS= read -r line; do
   mkdir -p ${DIR}
   echo $line
   bcftools query -Hf $line
-done < "${GENERAL_PATH}FORMAT/part_command.txt"
+done < "${PATH_PLOT}part_command.txt"
 
 echo 'END'

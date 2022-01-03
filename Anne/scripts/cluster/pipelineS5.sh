@@ -108,10 +108,12 @@ if [ "${METHOD}" == "bwa_aln" ]; then
     # source ${SCRIPT_PATH}vcf_merge_auto.sh
     # COMP_TYPE=manual # manual, mutect2
     # source ${SCRIPT_PATH}vcf_merge_auto.sh
-
-
-    source ${SCRIPT_PATH}annotate.sh
     
+    # RUN: annotate.sh
+    # DUURT ERG LANG
+    # filteren van dbSNP (annoteren)
+    source ${SCRIPT_PATH}annotate.sh
+
     # source ${SCRIPT_PATH}FORMAT/write_df.sh
     # source ${SCRIPT_PATH}FORMAT/make_plots_loop.sh
     # ml R/4.0.3-foss-2018b-bare
