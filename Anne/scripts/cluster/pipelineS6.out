@@ -1,6 +1,6 @@
 bwa_aln
 BEGIN
-4128
+5043
 begin alignen
 TEST1
 TEST2
@@ -9,7 +9,7 @@ TEST4
 TEST5
 EIND
 BEGIN
-4133
+5042
 begin alignen
 TEST1
 TEST2
@@ -18,7 +18,7 @@ TEST4
 TEST5
 EIND
 BEGIN
-4134
+5044
 begin alignen
 TEST1
 TEST2
@@ -26,11 +26,11 @@ TEST3
 TEST4
 TEST5
 EIND
-4128
+5043
 EIND
-4133
+5042
 EIND
-4134
+5044
 EIND
 /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_aln/bwa_aln_S1_numT_1_numHC_1_SS6004094_SS6004099.txt
 ####sample name\n
@@ -224,6 +224,86 @@ SUCCESS
 Tool returned:
 SUCCESS
 EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S5/chr21/mutect_bwa_aln/bwa_aln_S5_numT_1_numHC_1_SS6004138_SS6004139.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S5/chr21/mutect_bwa_aln/bwa_aln_S5_numT_1_numHC_1_SS6004138_SS6005041.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S5/chr21/mutect_bwa_aln/bwa_aln_SS6004138.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S5/chr21/mutect_bwa_aln/bwa_aln_SS6004139.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S5/chr21/mutect_bwa_aln/bwa_aln_SS6005041.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S6/chr21/mutect_bwa_aln/bwa_aln_S6_numT_1_numHC_1_SS6005042_SS6005043.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S6/chr21/mutect_bwa_aln/bwa_aln_S6_numT_1_numHC_1_SS6005042_SS6005044.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S6/chr21/mutect_bwa_aln/bwa_aln_SS6005042.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S6/chr21/mutect_bwa_aln/bwa_aln_SS6005043.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S6/chr21/mutect_bwa_aln/bwa_aln_SS6005044.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND
 tester: /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/4094_vcf/chr21/bwa_aln/SS6004094_somatic_filtered.vcf.gz /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/4099_vcf/chr21/bwa_aln/SS6004099_somatic_filtered.vcf.gz -p /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/compare_4094_4099/chr21/bwa_aln/
 /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/compare_4094_4099/chr21/bwa_aln/
 KLAAR
@@ -270,8 +350,8 @@ THE END END END END
 #################################################################################################################
 # Job details recorded by SLURM job epilog using sacct.                                                         #
 #################################################################################################################
-Resources consumed by job 977139 for user umcg-aewijk running on compute node gs-vcompute02:
+Resources consumed by job 977141 for user umcg-aewijk running on compute node gs-vcompute03:
 ================================================================================================================
 JobID         Elapsed     AllocCPUS  AveCPU    ReqMem  MaxVMSize  MaxRSS     MaxDiskRead  MaxDiskWrite  
-977139.batch  1-12:00:34  8          00:00:00  96Gn    30528272K  13462686K  201806.83M   47714.34M     
+977141.batch  1-20:20:22  8          00:00:00  96Gn    30561032K  12534047K  234318.35M   42949.22M     
 #################################################################################################################
