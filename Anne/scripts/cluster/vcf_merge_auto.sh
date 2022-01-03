@@ -12,7 +12,7 @@
 #SBATCH --get-user-env=L
 
 # Path of the file that will be used
-FILE_PATH=${GENERAL_PATH}${COMP_TYPE}_comparison_${METHOD}_both.txt
+FILE_PATH=${GENERAL_PATH}${CHROM}_${COMP_TYPE}_comparison_${METHOD}_both.txt
 # 
 MERGE_COM=$(sed '1q;d' ${FILE_PATH})
 echo ${MERGE_COM}
