@@ -53,7 +53,7 @@ def make_plot_format_other(path, basename, out_path):
     select_df = select_df.astype({'FROM': 'int64', 'TO': 'int64', 'depth': 'int64'})
     select_df['CHROM'] = 'chr' + select_df['CHROM'].astype(str)
     select_df["ID"] = ""
-    select_df.to_csv(f'{out_path}{basename}_db2.tsv', sep="\t", index=False)
+    select_df.to_csv(f'{out_path}{basename}_db3.tsv', sep="\t", index=False)
     
         
 # path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/simple_somatic_mutation.open.BOCA-UK.tsv" 
