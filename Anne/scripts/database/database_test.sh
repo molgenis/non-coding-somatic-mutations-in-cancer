@@ -16,13 +16,16 @@ source activate stage
 
 PATH_DB=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/
 PATH_DATA=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/
+DB_NAME='db_test'
 
+
+python3 ${PATH_DB}database_test_make.py ${DB_NAME}
 
 for filename in ${PATH_DATA}B*.tsv
 do
     # Name of input file
     echo ${filename}
-    python3 ${PATH_DB}database_test.py ${filename} 'db_test'
+    python3 ${PATH_DB}database_test.py ${filename} ${DB_NAME}
     echo "EIND" ${filename}
 done    
 
