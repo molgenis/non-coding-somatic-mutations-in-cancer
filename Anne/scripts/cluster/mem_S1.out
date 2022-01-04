@@ -1,0 +1,73 @@
+bwa_mem
+job align mem
+BEGIN
+4094
+EIND
+BEGIN
+4099
+EIND
+BEGIN
+4104
+EIND
+change sample name
+BEGIN
+4094
+EIND change sample name - 4094
+BEGIN
+4099
+EIND change sample name - 4099
+BEGIN
+4104
+EIND change sample name - 4104
+job vcf mem
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_S1_numT_1_numHC_1_SS6004094_SS6004099.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND job vcf mem - /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_S1_numT_1_numHC_1_SS6004094_SS6004099.txt
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_S1_numT_1_numHC_1_SS6004094_SS6004104.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND job vcf mem - /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_S1_numT_1_numHC_1_SS6004094_SS6004104.txt
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_SS6004094.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND job vcf mem - /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_SS6004094.txt
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_SS6004099.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND job vcf mem - /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_SS6004099.txt
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_SS6004104.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND job vcf mem - /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_SS6004104.txt
+EIND job vcf mem - S1
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_S1_numT_1_numHC_1_SS6004094_SS6004099.txt
+####sample name\n
+Tool returned:
+SUCCESS
+####PON and GR\n
+Tool returned:
+SUCCESS
+EIND job vcf mem - /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_S1_numT_1_numHC_1_SS6004094_SS6004099.txt
+/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/S1/chr21/mutect_bwa_mem/bwa_mem_S1_numT_1_numHC_1_SS6004094_SS6004104.txt
+####sample name\n
