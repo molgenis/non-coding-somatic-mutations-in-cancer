@@ -93,30 +93,38 @@ elif [ "${METHOD}" == "bwa_mem" ]; then
 elif [ "${METHOD}" == "bowtie" ]; then
     echo ${METHOD}
     # RUN: job_align_bowtie.sh
-     source ${SCRIPT_PATH}job_align_bowtie.sh
+    echo 'job_align_bowtie'
+    source ${SCRIPT_PATH}job_align_bowtie.sh
     for i in "${array3[@]}"
     do 
         mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/
     done
     # RUN: automatic_script_ob.py
+    echo 'automatic_script_ob'
     python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
     # RUN: change_sample_name.sh
+    echo 'change_sample_name'
     source ${SCRIPT_PATH}change_sample_name.sh
     # RUN: job_vcf_bowtie.sh
     # DUURT ERG LANG!
     # mutect2
+    echo 'job_vcf_bowtie'
     source ${SCRIPT_PATH}job_vcf_bowtie.sh    
     # RUN: vcf_compare_auto.sh
+    echo 'vcf_compare_auto'
     source ${SCRIPT_PATH}vcf_compare_auto.sh    
     # RUN: vcf_merge_auto.sh
     # Merge files
     COMP_TYPE=mutect2 # manual, mutect2
+    echo 'vcf_merge_auto1'
     source ${SCRIPT_PATH}vcf_merge_auto.sh
     COMP_TYPE=manual # manual, mutect2
+    echo 'vcf_merge_auto2'
     source ${SCRIPT_PATH}vcf_merge_auto.sh    
     # RUN: annotate.sh
     # DUURT ERG LANG
     # filteren van dbSNP (annoteren)
+    echo 'annotate'
     source ${SCRIPT_PATH}annotate.sh
 
     # # TODO
