@@ -25,7 +25,10 @@ for filename in ${PATH_DATA}B*.tsv
 do
     # Name of input file
     echo ${filename}
+    echo '------------ fill DB'
     python3 ${PATH_DB}database_test.py ${filename} ${DB_NAME}
+    echo '------------ Check genes'
+    python3 ${PATH_DB}database_test_checkgene.py ${DB_NAME}
     echo "EIND" ${filename}
 done    
 
