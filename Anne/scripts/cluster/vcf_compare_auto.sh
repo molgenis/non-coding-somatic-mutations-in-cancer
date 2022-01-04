@@ -23,6 +23,8 @@ while IFS= read -r line; do
     # Compare two VCF files
     bcftools isec ${line}
     for filename in ${line##* }*.vcf; do
+        echo ${filename}
+        echo 'COMPARE'
         bcftools view ${filename} -Oz -o ${filename}.gz
         bcftools index ${filename}.gz
     done
