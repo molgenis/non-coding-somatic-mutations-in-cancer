@@ -50,7 +50,7 @@ def make_plot_format_other(path, basename, out_path):
     # columns_with_nan = select_df.columns[nan_columns].tolist()
     # print(columns_with_nan)
     select_df['depth'].fillna(0, inplace=True)
-    select_df = select_df.astype({'pos_start': 'int64', 'pos_end': 'int64', 'depth': 'int64'})
+    select_df = select_df.astype({'FROM': 'int64', 'TO': 'int64', 'depth': 'int64'})
     select_df["ID"] = ""
     select_df.to_csv(f'{out_path}{basename}_db2.tsv', sep="\t", index=False)
     
