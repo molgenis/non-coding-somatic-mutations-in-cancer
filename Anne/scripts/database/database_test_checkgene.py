@@ -56,9 +56,9 @@ def main():
         
         check_gene(path_fgene, mydb_connection, cursor)
 
-        cursor.execute('SELECT * FROM snp')
-        for x in cursor:
-            print(f"{x['in_transcript']} - {x['in_coding']} - {x['in_exon']}")
+        # cursor.execute('SELECT * FROM snp')
+        # for x in cursor:
+        #     print(f"{x['in_transcript']} - {x['in_coding']} - {x['in_exon']}")
     except sqlite3.Error as er:
         print("Error while connecting to sqlite", er)
     finally:

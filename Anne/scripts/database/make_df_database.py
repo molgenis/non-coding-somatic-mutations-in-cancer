@@ -40,7 +40,7 @@ def make_plot_format_other(path, basename, out_path):
                          'total_read_count', 'platform', 'sequencing_strategy'] ##'mutant_allele_read_count', 'gene_affected', 'transcript_affected',
     select_df = df[select_columns]
     select_df.rename(columns={'icgc_donor_id': 'donor_id', 'project_code': 'project_id', 'icgc_sample_id': 'tissue_id', 
-                        'chromosome': 'chr', 'chromosome_start': 'pos_start', 'chromosome_end': 'pos_end', 
+                        'chromosome': 'CHROM', 'chromosome_start': 'FROM', 'chromosome_end': 'TO', 
                         'assembly_version': 'genome_version', 'reference_genome_allele': 'ref', 'mutated_to_allele': 'alt', 
                          'total_read_count': 'depth',  'platform': 'platform', 'sequencing_strategy': 'seq_strategy'}, inplace=True) 
    # print(select_df.head())
@@ -51,7 +51,8 @@ def make_plot_format_other(path, basename, out_path):
     # print(columns_with_nan)
     select_df['depth'].fillna(0, inplace=True)
     select_df = select_df.astype({'pos_start': 'int64', 'pos_end': 'int64', 'depth': 'int64'})
-    select_df.to_csv(f'{out_path}{basename}_db.tsv', sep="\t", index=False)
+    select_df["ID"] = ""
+    select_df.to_csv(f'{out_path}{basename}_db2.tsv', sep="\t", index=False)
     
         
 # path = "D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/simple_somatic_mutation.open.BOCA-UK.tsv" 
