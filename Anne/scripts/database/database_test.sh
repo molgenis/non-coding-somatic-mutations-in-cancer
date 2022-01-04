@@ -23,7 +23,7 @@ do
     # Name of input file
     echo ${filename}
     python3 ${PATH_DB}database_test.py ${filename} 'db_test'
-    echo "EIND"
+    echo "EIND" ${filename}
 done    
 
 echo 'END END END'
