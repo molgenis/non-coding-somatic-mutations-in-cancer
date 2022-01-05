@@ -18,27 +18,28 @@ chrom_num+=("X" "Y")
 
 for i in "${chrom_num[@]}"
 do
+    JOB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/jobs/
+    FILE=${JOB_PATH}file${i}.sh
     echo $i
-    echo "#!/usr/bin/bash" > /jobs/file${i}.sh
-    echo "" >> /jobs/file${i}.sh
-    echo "#SBATCH --job-name=file${i}" >> /jobs/file${i}.sh
-    echo "#SBATCH --output=/jobs/file${i}.out" >> /jobs/file${i}.sh
-    echo "#SBATCH --error=/jobs/file${i}.err" >> /jobs/file${i}.sh
-    echo "#SBATCH --time=159:59:59" >> /jobs/file${i}.sh
-    echo "#SBATCH --mem=96gb" >> /jobs/file${i}.sh
-    echo "#SBATCH --nodes=1" >> /jobs/file${i}.sh
-    echo "#SBATCH --open-mode=append" >> /jobs/file${i}.sh
-    echo "#SBATCH --export=NONE" >> /jobs/file${i}.sh
-    echo "#SBATCH --get-user-env=L" >> /jobs/file${i}.sh
-    echo "" >> /jobs/file${i}.sh
-    echo "# Load ml" >> /jobs/file${i}.sh
-    echo "ml Anaconda3/5.3.0" >> /jobs/file${i}.sh
-    echo "source activate stage" >> /jobs/file${i}.sh
-    echo "" >> /jobs/file${i}.sh
-    echo "echo 'HALLO ${i}'" >> /jobs/file${i}.sh
-    echo "" >> /jobs/file${i}.sh
-    echo "" >> /jobs/file${i}.sh
-    echo "" >> /jobs/file${i}.sh
-    echo "" >> /jobs/file${i}.sh
-    echo "" >> /jobs/file${i}.sh
+    echo "#!/usr/bin/bash" > ${FILE}
+    echo "" >> ${FILE}
+    echo "#SBATCH --job-name=file${i}" >> ${FILE}
+    echo "#SBATCH --output=${JOB_PATH}file${i}.out" >> ${FILE}
+    echo "#SBATCH --error=${JOB_PATH}file${i}.err" >> ${FILE}
+    echo "#SBATCH --time=159:59:59" >> ${FILE}
+    echo "#SBATCH --mem=96gb" >> ${FILE}
+    echo "#SBATCH --nodes=1" >> ${FILE}
+    echo "#SBATCH --open-mode=append" >> ${FILE}
+    echo "#SBATCH --export=NONE" >> ${FILE}
+    echo "#SBATCH --get-user-env=L" >> ${FILE}
+    echo "" >> ${FILE}
+    echo "# Load ml" >> ${FILE}
+    echo "ml Anaconda3/5.3.0" >> ${FILE}
+    echo "source activate stage" >> ${FILE}
+    echo "" >> ${FILE}
+    echo "echo 'HALLO ${i}'" >> ${FILE}
+    echo "" >> ${FILE}
+    echo "" >> ${FILE}
+    echo "" >> ${FILE}
+    echo "" >> ${FILE}
 done
