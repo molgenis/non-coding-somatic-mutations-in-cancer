@@ -13,8 +13,11 @@
 
 #seq FIRST STEP LAST
 chrom_num=($(seq 1 1 22))
-
 chrom_num+=("X" "Y")
+
+DB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene.db
+DB_FILES=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/files_to_annotate/
+SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/
 
 for i in "${chrom_num[@]}"
 do
@@ -37,7 +40,7 @@ do
     echo "ml Anaconda3/5.3.0" >> ${FILE}
     echo "source activate stage" >> ${FILE}
     echo "" >> ${FILE}
-    echo "echo 'HALLO ${i}'" >> ${FILE}
+    echo "python3 ${SCRIPT_PATH}create_vcf_file.py ${DB_PATH} ${DB_FILES} ${i}" >> ${FILE}
     echo "" >> ${FILE}
     echo "" >> ${FILE}
     echo "" >> ${FILE}

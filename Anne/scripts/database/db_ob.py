@@ -350,7 +350,7 @@ def main():
     # db.count_values('in_coding', 'snp')
     # db.count_values('in_exon', 'snp')
     # db.check_table('snp')
-    read_externDB(dbSNP_path, db)
+    # read_externDB(dbSNP_path, db)
     
 
     db.close()
