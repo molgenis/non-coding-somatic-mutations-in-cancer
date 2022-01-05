@@ -29,7 +29,6 @@ do
     echo "${TISSUE[i]}"
     IFS=', ' read -r -a array <<< "${TISSUE[i]}"
     echo "${array[@]}"
-    echo "${array}"
     #echo "${hallo[i]}"
 
     echo "#!/usr/bin/bash" > "${JOB_FILE}"
@@ -78,7 +77,7 @@ do
     echo "fi" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
     echo "# Array of tissue numbers" >> "${JOB_FILE}"
-    echo "TISSUE_ARR="${array[i]}"" >> "${JOB_FILE}"
+    echo "TISSUE_ARR="${array[@]}"" >> "${JOB_FILE}"
     echo "# Array of sample numbers" >> "${JOB_FILE}"
     echo "SAMPLE="${SAMPLES[i]}"" >> "${JOB_FILE}" #TODO TODO TODO
     echo "array3=${SAMPLES}" >> "${JOB_FILE}" #TODO TODO TODO
