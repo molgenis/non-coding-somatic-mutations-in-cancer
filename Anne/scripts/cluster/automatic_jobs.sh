@@ -80,7 +80,7 @@ do
     echo "TISSUE_ARR=("${array[@]}")" >> "${JOB_FILE}"
     echo "# Array of sample numbers" >> "${JOB_FILE}"
     echo "SAMPLE="${SAMPLES[i]}"" >> "${JOB_FILE}" #TODO TODO TODO
-    echo "array3="${SAMPLES[@]}"" >> "${JOB_FILE}" #TODO TODO TODO
+    echo "array3=("${SAMPLES[@]}")" >> "${JOB_FILE}" #TODO TODO TODO
     echo "" >> "${JOB_FILE}"
     echo "METHOD=${METHOD_BIG} #bowtie,   bwa_aln, bwa_mem" >> "${JOB_FILE}"
     echo "METH_FILE=${METH_FILE_BIG} #bowtie2, aln, mem" >> "${JOB_FILE}"
