@@ -13,6 +13,7 @@ mydb_connection = db.mydb_connection
 cursor = db.cursor
 
 f = open(f"{sys.argv[2]}chr{sys.argv[3]}_db.vcf", "a")
+f.write("##fileformat=VCFv4.0\n")
 f.write("#CHROM\tPOS\tID\tREF\tALT\ttQUAL\tFILTER\tINFO\tFORMAT\tTEST\n")
 
 cursor.execute(
