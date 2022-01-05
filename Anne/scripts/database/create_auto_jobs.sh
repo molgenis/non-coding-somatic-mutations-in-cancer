@@ -41,7 +41,7 @@ do
     echo "source activate stage" >> ${FILE}
     echo "" >> ${FILE}
     echo "python3 ${SCRIPT_PATH}create_vcf_file.py ${DB_PATH} ${DB_FILES} ${i}" >> ${FILE}
-    echo "bgzip file.vcf ${DB_FILES}chr${i}_db.vcf" >> ${FILE}
+    echo "bgzip ${DB_FILES}chr${i}_db.vcf" >> ${FILE}
     echo "" >> ${FILE}
     echo "" >> ${FILE}
     echo "" >> ${FILE}
