@@ -315,46 +315,46 @@ class Database:
         print()
 
 
-def read_file(path, db):
-    """
+# def read_file(path, db):
+#     """
     
-    :param path: 
-    :param db: 
-    :return: 
-    """
-    df = pd.read_csv(path, sep='\t')
-    # Drop all duplicates (only depth and tissue_id may differ from all columns)
-    df = df.drop_duplicates(subset=df.columns.difference(['depth', 'tissue_id']))
-    db.fill_database(df)
+#     :param path: 
+#     :param db: 
+#     :return: 
+#     """
+#     df = pd.read_csv(path, sep='\t')
+#     # Drop all duplicates (only depth and tissue_id may differ from all columns)
+#     df = df.drop_duplicates(subset=df.columns.difference(['depth', 'tissue_id']))
+#     db.fill_database(df)
 
-def read_externDB(path, db):
-    dbsnp = pd.read_csv(path, sep='\t')
-    print(dbsnp.head())
-    # db.compare_db()
+# def read_externDB(path, db):
+#     dbsnp = pd.read_csv(path, sep='\t')
+#     print(dbsnp.head())
+#     # db.compare_db()
 
 
 
-def main():
-    """
+# def main():
+#     """
     
-    :return: 
-    """
-    path = "D:/Hanze_Groningen/STAGE/db/files/ALL-US_db.tsv"
-    path_fgene = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"
-    dbSNP_path = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"
-    db = Database()
-    # db.create_db()
-    # read_file(path, db)
-    # db.check_gene(path_fgene)
-    # db.check_donor()
-    # db.count_values('in_transcript', 'snp')
-    # db.count_values('in_coding', 'snp')
-    # db.count_values('in_exon', 'snp')
-    # db.check_table('snp')
-    # read_externDB(dbSNP_path, db)
+#     :return: 
+#     """
+#     path = "D:/Hanze_Groningen/STAGE/db/files/ALL-US_db.tsv"
+#     path_fgene = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"
+#     dbSNP_path = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"
+#     db = Database()
+#     # db.create_db()
+#     # read_file(path, db)
+#     # db.check_gene(path_fgene)
+#     # db.check_donor()
+#     # db.count_values('in_transcript', 'snp')
+#     # db.count_values('in_coding', 'snp')
+#     # db.count_values('in_exon', 'snp')
+#     # db.check_table('snp')
+#     # read_externDB(dbSNP_path, db)
     
 
-    db.close()
+#     db.close()
 
 
-main()
+# main()
