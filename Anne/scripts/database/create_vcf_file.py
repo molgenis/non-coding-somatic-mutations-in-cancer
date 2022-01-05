@@ -14,7 +14,7 @@ cursor = db.cursor
 
 f = open(f"{sys.argv[2]}chr{sys.argv[3]}_db.vcf", "a")
 f.write("##fileformat=VCFv4.0\n")
-f.write("#CHROM\tPOS\tID\tREF\tALT\ttQUAL\tFILTER\tINFO\tFORMAT\tTEST\n")
+f.write("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\n")
 
 cursor.execute(
             """SELECT *
@@ -25,6 +25,6 @@ cursor.execute(
             #str(sys.argv[4]), str(sys.argv[5])))
 results = cursor.fetchall()
 for res in results:
-    f.write(f"chr{res['chr']}\t{res['pos_start']}\t.\t{res['ref']}\t{res['alt']}\t.\t.\t.\t.\t.\n")
+    f.write(f"chr{res['chr']}\t{res['pos_start']}\t.\t{res['ref']}\t{res['alt']}\t.\t.\t.\t.\n")
 
 f.close()
