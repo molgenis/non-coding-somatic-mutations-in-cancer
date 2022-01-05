@@ -64,7 +64,7 @@ do
     echo "  PATH_GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/ #chrall" >> "${JOB_FILE}"
     echo "fi" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
-    echo 'GENOOM="${PATH_GENOOM}""${CHROM}".fa' >> "${JOB_FILE}"
+    echo 'GENOOM=${PATH_GENOOM}${CHROM}.fa' >> '${JOB_FILE}'
     echo "" >> "${JOB_FILE}"
     echo "ml SAMtools/1.9-foss-2018b" >> "${JOB_FILE}"
     echo "# When file doesn't exist." >> "${JOB_FILE}"
