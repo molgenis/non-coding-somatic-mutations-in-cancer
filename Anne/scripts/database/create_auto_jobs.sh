@@ -22,7 +22,7 @@ SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/
 for i in "${chrom_num[@]}"
 do
     JOB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/jobs/
-    FILE=${JOB_PATH}file${i}.sh
+    FILE=${JOB_PATH}chr${i}_create_vcf_and_annotate_dbSNP.sh
     echo $i
     echo "#!/usr/bin/bash" > ${FILE}
     echo "" >> ${FILE}
