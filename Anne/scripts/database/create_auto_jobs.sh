@@ -41,8 +41,8 @@ do
     echo "source activate stage" >> ${FILE}
     echo "" >> ${FILE}
     echo "python3 ${SCRIPT_PATH}create_vcf_file.py ${DB_PATH} ${DB_FILES} ${i}" >> ${FILE}
-    echo "bgzip ${DB_FILES}chr${i}_db.vcf" >> ${FILE}
-    echo "" >> ${FILE}
+    echo "bgzip ${DB_FILES}chr${i}_db.vcf #bcftools view file.vcf -Oz -o file.vcf.gz" >> ${FILE}
+    echo "tabix ${DB_FILES}chr${i}_db.vcf.gz #bcftools index file.vcf.gz" >> ${FILE}
     echo "" >> ${FILE}
     echo "" >> ${FILE}
 done
