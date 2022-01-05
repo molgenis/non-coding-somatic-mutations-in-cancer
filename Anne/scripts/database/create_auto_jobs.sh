@@ -43,6 +43,6 @@ do
     echo "python3 ${SCRIPT_PATH}create_vcf_file.py ${DB_PATH} ${DB_FILES} ${i}" >> ${FILE}
     echo "bgzip ${DB_FILES}chr${i}_db.vcf #bcftools view file.vcf -Oz -o file.vcf.gz" >> ${FILE}
     echo "tabix ${DB_FILES}chr${i}_db.vcf.gz #bcftools index file.vcf.gz" >> ${FILE}
-    echo "" >> ${FILE}
+    echo "bcftools annotate -c ID -a /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/dbSNP/per_chr/chr${i}_merge_All_20180423.vcf.gz   -o ${DB_FILES}annotate/chr${i}_ann.vcf  ${DB_FILES}chr${i}_db.vcf.gz" >> ${FILE}
     echo "" >> ${FILE}
 done
