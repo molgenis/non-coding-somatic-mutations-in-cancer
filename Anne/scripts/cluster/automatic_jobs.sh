@@ -99,7 +99,7 @@ do
     echo "# Number of hc you want to combine while running Mutect2" >> "${JOB_FILE}"
     echo "NUMBER_OF_HC_py=1" >> "${JOB_FILE}"
     echo "# What type of tumor you want to have ('both', 'tFL' or 'FL')" >> "${JOB_FILE}"
-    echo "TYPE_SAMPLE_py='both" >> "${JOB_FILE}"
+    echo "TYPE_SAMPLE_py='both'" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
     # PIPELINE
     echo "# load conda and activate to execute python script" >> "${JOB_FILE}"
