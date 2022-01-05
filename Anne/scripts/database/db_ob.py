@@ -66,6 +66,7 @@ class Database:
         """
         self.name = db_name
         self.mydb_connection = self.connect()
+        print(self.mydb_connection)
         self.mydb_connection.row_factory = sqlite3.Row
         self.cursor = self.mydb_connection.cursor()
 
