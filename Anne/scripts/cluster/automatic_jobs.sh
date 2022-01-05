@@ -6,13 +6,13 @@ TISSUE=( '4094  4099  4104' '4109  4113  4114  4118  4119' '4123  4124  4129' '4
 METHOD_BIG=bwa_aln #bowtie,   bwa_aln, bwa_mem
 CHROM_CHOOSEN=chr21
 
-if [ "${METHOD}" == bwa_aln ]; then
+if [ "${METHOD_BIG}" == "bwa_aln" ]; then
     VARIABLE=( job_align_aln job_vcf_aln )
     METH_FILE_BIG=aln #bowtie2, aln, mem
-elif [ "${METHOD}" == bwa_mem ]; then
+elif [ "${METHOD_BIG}" == "bwa_mem" ]; then
     VARIABLE=( job_align_mem job_vcf_mem ) 
     METH_FILE_BIG=mem #bowtie2, aln, mem   
-elif [ "${METHOD}" == bowtie ]; then
+elif [ "${METHOD_BIG}" == "bowtie" ]; then
     VARIABLE=( job_align_bowtie job_vcf_bowtie )
     METH_FILE_BIG=bowtie2 #bowtie2, aln, mem  
 else
@@ -24,7 +24,7 @@ mkdir -p /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-
 for i in "${!SAMPLES[@]}"
 do  
     JOB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/cluster/jobs/
-    FILE_NAME_JOB=${JOB_PATH}"${SAMPLES[i]}"_${METHOD}
+    FILE_NAME_JOB=${JOB_PATH}"${SAMPLES[i]}"_${METHOD_BIG}
     JOB_FILE=${FILE_NAME_JOB}.sh
     echo "${TISSUE[i]}"
     IFS=', ' read -r -a array <<< "${TISSUE[i]}"
