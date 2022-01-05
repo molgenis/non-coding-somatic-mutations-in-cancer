@@ -28,7 +28,8 @@ do
     JOB_FILE=${FILE_NAME_JOB}.sh
     echo "${TISSUE[i]}"
     IFS=', ' read -r -a array <<< "${TISSUE[i]}"
-    echo "${array[1]}"
+    echo "${array[@]}"
+    echo "${array}"
     #echo "${hallo[i]}"
 
     echo "#!/usr/bin/bash" > "${JOB_FILE}"
