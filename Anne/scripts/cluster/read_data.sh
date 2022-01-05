@@ -12,10 +12,6 @@
 #SBATCH --get-user-env=L
 
 
-# Array with file output names
-#array2=( S2  S3  S4  S5  S6 )
-
-
 PATH_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/Anne/non-coding-somatic-mutations-in-cancer/Anne/scripts/cluster/
 for filename in ${PATH_FILE}download*.tsv #.gz

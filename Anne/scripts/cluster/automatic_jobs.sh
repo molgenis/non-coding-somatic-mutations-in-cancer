@@ -78,9 +78,9 @@ do
     # INSTALL PARAMS
     echo "# Array of tissue numbers" >> "${JOB_FILE}"
     echo "TISSUE_ARR=("${array[@]}")" >> "${JOB_FILE}"
-    echo "# Array of sample numbers" >> "${JOB_FILE}"
+    echo "# Sample numbers" >> "${JOB_FILE}"
     echo "SAMPLE="${SAMPLES[i]}"" >> "${JOB_FILE}" #TODO TODO TODO
-    echo "array3=("${SAMPLES[@]}")" >> "${JOB_FILE}" #TODO TODO TODO
+    # echo "array3=("${SAMPLES[@]}")" >> "${JOB_FILE}" #TODO TODO TODO
     echo "" >> "${JOB_FILE}"
     echo "METHOD=${METHOD_BIG} #bowtie,   bwa_aln, bwa_mem" >> "${JOB_FILE}"
     echo "METH_FILE=${METH_FILE_BIG} #bowtie2, aln, mem" >> "${JOB_FILE}"
@@ -113,10 +113,10 @@ do
     echo "# RUN: "${VARIABLE[0]}".sh" >> "${JOB_FILE}"
     echo "echo '${VARIABLE[0]}'" >> "${JOB_FILE}"
     echo 'source ${SCRIPT_PATH}'${VARIABLE[0]}'.sh' >> "${JOB_FILE}"
-    echo 'for i in "${array3[@]}"' >> "${JOB_FILE}" ## TODO TODO
-    echo "do" >> "${JOB_FILE}"
-    echo '  mkdir -p ${GENERAL_PATH}"${i}"/${CHROM}/mutect_${METHOD}/' >> "${JOB_FILE}"
-    echo "done" >> "${JOB_FILE}"
+    # echo 'for i in "${array3[@]}"' >> "${JOB_FILE}" ## TODO TODO
+    # echo "do" >> "${JOB_FILE}"
+    echo '  mkdir -p ${GENERAL_PATH}${SAMPLE}/${CHROM}/mutect_${METHOD}/' >> "${JOB_FILE}"
+    # echo "done" >> "${JOB_FILE}"
     echo "# RUN: automatic_script_ob.py" >> "${JOB_FILE}"
     echo "echo 'automatic_script_ob'" >> "${JOB_FILE}"
     echo 'python3 ${SCRIPT_PATH}automatic_script_ob.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}' >> "${JOB_FILE}"

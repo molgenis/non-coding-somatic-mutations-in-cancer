@@ -13,14 +13,14 @@
 
 echo 'job align bowtie'
 
-for i in "${!array[@]}"
+for i in "${TISSUE_ARR[@]}"
 do
     # Number or specific tissue of a sample
-    NUMBER="${array[i]}"
+    NUMBER=${i}
     # The entire file number
     FILE_NUM=SS600${NUMBER}   
     # The path where the file is located
-    PATH_DIR=${GENERAL_PATH}"${array2[i]}"/
+    PATH_DIR=${GENERAL_PATH}${SAMPLE}/
     
     echo "BEGIN"
     echo ${NUMBER}
