@@ -28,9 +28,7 @@ do
     JOB_FILE=${FILE_NAME_JOB}.sh
     echo "${TISSUE[i]}"
     IFS=', ' read -r -a array <<< "${TISSUE[i]}"
-    echo "${array[@]}"
-    #echo "${hallo[i]}"
-
+    #
     echo "#!/usr/bin/bash" > "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
     echo "#SBATCH --job-name=${FILE_NAME_JOB}" >> "${JOB_FILE}"
@@ -54,6 +52,7 @@ do
     echo "ml Java/11-LTS" >> "${JOB_FILE}"
     echo "#ml libjpeg-turbo/2.0.2-GCCcore-7.3.0 #?" >> "${JOB_FILE}"
     echo "ml picard/2.20.5-Java-11-LTS" >> "${JOB_FILE}"
+    #
     echo "" >> "${JOB_FILE}"
     echo "#Chrom" >> "${JOB_FILE}"
     echo "CHROM=${CHROM_CHOOSEN}" >> "${JOB_FILE}"
@@ -76,11 +75,12 @@ do
     echo '  samtools faidx ${GENOOM}' >> "${JOB_FILE}"
     echo "fi" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
+    # INSTALL PARAMS
     echo "# Array of tissue numbers" >> "${JOB_FILE}"
     echo "TISSUE_ARR=("${array[@]}")" >> "${JOB_FILE}"
     echo "# Array of sample numbers" >> "${JOB_FILE}"
     echo "SAMPLE="${SAMPLES[i]}"" >> "${JOB_FILE}" #TODO TODO TODO
-    echo "array3=${SAMPLES}" >> "${JOB_FILE}" #TODO TODO TODO
+    echo "array3="${SAMPLES[@]}"" >> "${JOB_FILE}" #TODO TODO TODO
     echo "" >> "${JOB_FILE}"
     echo "METHOD=${METHOD_BIG} #bowtie,   bwa_aln, bwa_mem" >> "${JOB_FILE}"
     echo "METH_FILE=${METH_FILE_BIG} #bowtie2, aln, mem" >> "${JOB_FILE}"
@@ -101,6 +101,7 @@ do
     echo "# What type of tumor you want to have ('both', 'tFL' or 'FL')" >> "${JOB_FILE}"
     echo "TYPE_SAMPLE_py='both" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
+    # PIPELINE
     echo "# load conda and activate to execute python script" >> "${JOB_FILE}"
     echo "ml Anaconda3/5.3.0" >> "${JOB_FILE}"
     echo "source activate stage" >> "${JOB_FILE}"
@@ -144,26 +145,5 @@ do
     echo "" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
-    echo "" >> "${JOB_FILE}"
     echo "echo 'THE END END END END'" >> "${JOB_FILE}"
-
-
-
-
-
-
-
-
-
-
-
 done
