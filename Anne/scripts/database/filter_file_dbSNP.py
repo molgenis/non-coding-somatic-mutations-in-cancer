@@ -23,16 +23,16 @@ def read_vcf(path):
         sep='\t'
     ).rename(columns={'#CHROM': 'CHROM'})
 
-def filter_add(df, mydb_connection, cursor):
+def filter_add(df, mydb_connection, cursor, alter):
     dbSNP = df[df['ID'].str.contains("rs")]
     print(dbSNP.head())
-    # cursor.execute(f"""
-    #                 ALTER TABLE snp
-    #                 ADD `ID_dbSNP` VARCHAR(45) NULL DEFAULT NULL
-    #                 """)
+    if alter == 'ALTER':
+        cursor.execute(f"""
+                        ALTER TABLE snp
+                        ADD `ID_dbSNP` VARCHAR(45) NULL DEFAULT NULL
+                        """)
     print(len(dbSNP))
     for index, row in dbSNP.iterrows():
-        # print(index)
         cursor.execute(
                 """UPDATE snp
                     SET ID_dbSNP = '%s'
@@ -43,22 +43,16 @@ def filter_add(df, mydb_connection, cursor):
         mydb_connection.commit()
 
 
-#     ALTER TABLE table_name  
-#  ADD new_column_name column_definition 
-
-
-
-
 def main():
-    db = Database() #sys.argv[1]
+    db = Database(sys.argv[1]) #sys.argv[1]
     mydb_connection = db.mydb_connection
     cursor = db.cursor
 
     path = "D:/Hanze_Groningen/STAGE/db/bdsnp filter/chr1_ann.vcf"
     # Read vcf file
-    df = read_vcf(path)#(sys.argv[1].strip())
-    filter_add(df, mydb_connection, cursor)
-    db.count_values('snp', 'ID_dbSNP')
+    df = read_vcf(sys.argv[2])#(sys.argv[1].strip())
+    filter_add(df, mydb_connection, cursor, sys.argv[3])
+    db.count_values('ID_dbSNP', 'snp')
     # cursor.execute('SELECT * FROM snp')
     # for x in cursor:
     #     print(f"{x['ID_dbSNP']}")
