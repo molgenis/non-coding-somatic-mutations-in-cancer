@@ -4,7 +4,7 @@
 #SBATCH --output=db_test.out
 #SBATCH --error=db_test.err
 #SBATCH --time=159:59:59
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=20
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
 #SBATCH --open-mode=append
@@ -18,6 +18,8 @@ chrom_num+=("X" "Y")
 DB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene.db
 DB_FILES=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/files_to_annotate/
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/
+CPUS=20
+
 
 for i in "${chrom_num[@]}"
 do
@@ -31,6 +33,7 @@ do
     echo "#SBATCH --output=${JOB_PATH}file${i}.out" >> ${FILE}
     echo "#SBATCH --error=${JOB_PATH}file${i}.err" >> ${FILE}
     echo "#SBATCH --time=159:59:59" >> ${FILE}
+    echo "#SBATCH --cpus-per-task=${CPUS}" >> ${FILE}
     echo "#SBATCH --mem=96gb" >> ${FILE}
     echo "#SBATCH --nodes=1" >> ${FILE}
     echo "#SBATCH --open-mode=append" >> ${FILE}
@@ -48,9 +51,9 @@ do
     if  [[ ${i} == 1 ]]
     then
         echo "------${i}"
-        echo "python3 ${SCRIPT_PATH}filter_file_dbSNP.py ${DB_PATH} ${DB_SNP_FILE} ALTER" >> ${FILE}
+        echo "python3 ${SCRIPT_PATH}filter_file_dbSNP.py ${DB_PATH} ${DB_SNP_FILE} ALTER ${CPUS}" >> ${FILE}
     else
-        echo "python3 ${SCRIPT_PATH}filter_file_dbSNP.py ${DB_PATH} ${DB_SNP_FILE} EMPTY" >> ${FILE}
+        echo "python3 ${SCRIPT_PATH}filter_file_dbSNP.py ${DB_PATH} ${DB_SNP_FILE} EMPTY ${CPUS}" >> ${FILE}
     fi    
     
     echo "" >> ${FILE}

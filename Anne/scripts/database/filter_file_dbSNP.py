@@ -2,6 +2,8 @@ import sqlite3
 import pandas as pd
 import sys
 import io
+import numpy as np
+from multiprocessing import Pool
 
 from db_ob import Database
 
@@ -55,7 +57,18 @@ def main():
     path = "D:/Hanze_Groningen/STAGE/db/bdsnp filter/chr1_ann.vcf"
     # Read vcf file
     df = read_vcf(sys.argv[2])#(sys.argv[1].strip())
-    filter_add(df, mydb_connection, cursor, sys.argv[3])
+    df_shuffled = df.sample(frac=1)
+    df_splits = np.array_split(df_shuffled, 20)
+    arg_multi_list = []
+    for df_s in df_splits:
+        arg_multi_list.append((df_s, mydb_connection, cursor, sys.argv[3]))
+
+    pool = Pool(processes=sys.argv[4])
+    pool.starmap(func=filter_add, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
+
+    # filter_add(df, mydb_connection, cursor, sys.argv[3])
     db.count_values('ID_dbSNP', 'snp')
     # cursor.execute('SELECT * FROM snp')
     # for x in cursor:
