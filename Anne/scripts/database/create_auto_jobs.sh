@@ -41,6 +41,7 @@ do
     echo "#SBATCH --get-user-env=L" >> ${FILE}
     echo "" >> ${FILE}
     echo "# Load ml" >> ${FILE}
+    echo "ml BCFtools/1.11-GCCcore-7.3.0" >> ${FILE}
     echo "ml Anaconda3/5.3.0" >> ${FILE}
     echo "source activate stage" >> ${FILE}
     echo "" >> ${FILE}

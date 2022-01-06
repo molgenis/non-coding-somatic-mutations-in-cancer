@@ -25,7 +25,10 @@ def read_vcf(path):
         sep='\t'
     ).rename(columns={'#CHROM': 'CHROM'})
 
-def filter_add(df, mydb_connection, cursor, alter):
+def filter_add(db_path, df, alter):
+    db = Database(db_path) #sys.argv[1]
+    mydb_connection = db.mydb_connection
+    cursor = db.cursor
     dbSNP = df[df['ID'].str.contains("rs")]
     print(dbSNP.head())
     if alter == 'ALTER':
@@ -50,9 +53,7 @@ def filter_add(df, mydb_connection, cursor, alter):
 
 
 def main():
-    db = Database(sys.argv[1]) #sys.argv[1]
-    mydb_connection = db.mydb_connection
-    cursor = db.cursor
+    
 
     path = "D:/Hanze_Groningen/STAGE/db/bdsnp filter/chr1_ann.vcf"
     # Read vcf file
@@ -61,7 +62,7 @@ def main():
     df_splits = np.array_split(df_shuffled, int(sys.argv[4]))
     arg_multi_list = []
     for df_s in df_splits:
-        arg_multi_list.append((df_s, mydb_connection, cursor, sys.argv[3]))
+        arg_multi_list.append((sys.argv[1], df_s, sys.argv[3]))
 
     pool = Pool(processes=int(sys.argv[4]))
     pool.starmap(func=filter_add, iterable=arg_multi_list)
@@ -69,11 +70,11 @@ def main():
     pool.join()
 
     # filter_add(df, mydb_connection, cursor, sys.argv[3])
-    db.count_values('ID_dbSNP', 'snp')
+    # db.count_values('ID_dbSNP', 'snp')
     # cursor.execute('SELECT * FROM snp')
     # for x in cursor:
     #     print(f"{x['ID_dbSNP']}")
 
-    db.close()
+    # db.close()
 
 main()
