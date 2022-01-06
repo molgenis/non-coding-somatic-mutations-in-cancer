@@ -58,7 +58,7 @@ def main():
     # Read vcf file
     df = read_vcf(sys.argv[2])#(sys.argv[1].strip())
     df_shuffled = df.sample(frac=1)
-    df_splits = np.array_split(df_shuffled, 20)
+    df_splits = np.array_split(df_shuffled, sys.argv[4])
     arg_multi_list = []
     for df_s in df_splits:
         arg_multi_list.append((df_s, mydb_connection, cursor, sys.argv[3]))
