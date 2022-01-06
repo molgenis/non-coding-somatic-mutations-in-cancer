@@ -58,12 +58,12 @@ def main():
     # Read vcf file
     df = read_vcf(sys.argv[2])#(sys.argv[1].strip())
     df_shuffled = df.sample(frac=1)
-    df_splits = np.array_split(df_shuffled, sys.argv[4])
+    df_splits = np.array_split(df_shuffled, int(sys.argv[4]))
     arg_multi_list = []
     for df_s in df_splits:
         arg_multi_list.append((df_s, mydb_connection, cursor, sys.argv[3]))
 
-    pool = Pool(processes=sys.argv[4])
+    pool = Pool(processes=int(sys.argv[4]))
     pool.starmap(func=filter_add, iterable=arg_multi_list)
     pool.close()
     pool.join()
