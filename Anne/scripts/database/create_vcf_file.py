@@ -28,3 +28,4 @@ for res in results:
     f.write(f"chr{res['chr']}\t{res['pos_start']}\t.\t{res['ref']}\t{res['alt']}\t.\t.\t.\t.\n")
 
 f.close()
+db.close()
