@@ -48,6 +48,6 @@ do
     echo "python3 ${SCRIPT_PATH}create_vcf_file.py ${DB_PATH} ${DB_SNP_FILE} ALTER" >> ${FILE}
     echo "" >> ${FILE}
     echo "RUN ${FILE}"
-    sh ./${FILE}
+    source ${FILE}
 done
 
