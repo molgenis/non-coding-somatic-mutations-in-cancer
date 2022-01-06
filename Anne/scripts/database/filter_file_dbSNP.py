@@ -31,11 +31,15 @@ def filter_add(df, mydb_connection, cursor, alter):
                         ALTER TABLE snp
                         ADD `ID_dbSNP` VARCHAR(45) NULL DEFAULT NULL
                         """)
+        cursor.execute(f"""
+                        ALTER TABLE snp
+                        ADD `germline` BOOLEAN DEFAULT(FALSE)
+                        """)
     print(len(dbSNP))
     for index, row in dbSNP.iterrows():
         cursor.execute(
                 """UPDATE snp
-                    SET ID_dbSNP = '%s'
+                    SET ID_dbSNP = '%s', germline = TRUE
                     WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s
                     AND ref = '%s' AND alt = '%s';""" %
                 (str(row['ID']), str(row['CHROM'].replace('chr', '')), int(row['POS']), 
