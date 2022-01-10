@@ -11,7 +11,7 @@ import multiprocessing as mp
 from db_ob import Database
 
 
-def check_gene(gene_df, db):
+def check_gene(gene_df, mydb_connection, cursor):
     """
 
     :param path_fgene:
@@ -21,28 +21,28 @@ def check_gene(gene_df, db):
     
     for index, row in gene_df.iterrows():
         print(index)
-        db.cursor.execute(
+        cursor.execute(
             """UPDATE snp
                 SET in_transcript = TRUE
                 WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
             (str(row['chrom'].replace('chr', '')), int(row['txStart']), int(row['txEnd'])))
-        db.mydb_connection.commit()
-        db.cursor.execute(
+        mydb_connection.commit()
+        cursor.execute(
             """UPDATE snp
                 SET in_coding = TRUE
                 WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
             (str(row['chrom'].replace('chr', '')), int(row['cdsStart']), int(row['cdsEnd'])))
-        db.mydb_connection.commit()
+        mydb_connection.commit()
         exon_start = row['exonStarts'].rstrip(',').split(',')
         exon_end = row['exonEnds'].rstrip(',').split(',')
         print(f"COUNT - {row['exonCount']}")
         for i in range(int(row['exonCount'])):
-            db.cursor.execute(
+            cursor.execute(
                 """UPDATE snp
                     SET in_exon = TRUE
                     WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
                 (str(row['chrom'].replace('chr', '')), int(exon_start[i]), int(exon_end[i])))
-            db.mydb_connection.commit()
+            mydb_connection.commit()
 
 
 
@@ -52,15 +52,15 @@ def main():
     # path_fgene = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed'
     # path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long2.db'
     db = Database(sys.argv[1]) #sys.argv[1]
-    # mydb_connection = db.mydb_connection
-    # cursor = db.cursor
+    mydb_connection = db.mydb_connection
+    cursor = db.cursor
 
     gene_df = pd.read_csv(sys.argv[1], sep='\t')
     gene_shuffled = gene_df.sample(frac=1)
     gene_splits = np.array_split(gene_shuffled, mp.cpu_count())
     arg_gene = []
     for df_s in gene_splits:
-        arg_gene.append((df_s, db))
+        arg_gene.append((df_s, mydb_connection, cursor))
     pool = Pool(processes=mp.cpu_count())
     pool.starmap(func=check_gene, iterable=arg_gene)
     pool.close()
