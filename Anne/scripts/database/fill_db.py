@@ -111,6 +111,7 @@ def read_file(path):
     df = pd.read_csv(path, sep='\t')
     # Drop all duplicates (only depth and tissue_id may differ from all columns)
     df = df.drop_duplicates(subset=df.columns.difference(['depth', 'tissue_id']))
+    print(mp.cpu_count())
     df_shuffled = df.sample(frac=1)
     df_splits = np.array_split(df_shuffled, mp.cpu_count())
     arg_multi_list = []
