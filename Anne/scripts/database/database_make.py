@@ -2,16 +2,21 @@ import sqlite3
 import glob
 import pandas as pd
 import sys
+import io
+import os
+import numpy as np
 
 
-def create_db(cursor):
+from db_ob import Database
+
+def create_db(db):
     """
 
     :param cursor:
     :return:
     """
     # Create tables
-    cursor.execute("""
+    db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `project`
     -- -----------------------------------------------------
@@ -20,7 +25,7 @@ def create_db(cursor):
         `project_ID` VARCHAR(45) NOT NULL  
     )
     """)
-    cursor.execute("""
+    db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `donor`
     -- -----------------------------------------------------
@@ -33,7 +38,7 @@ def create_db(cursor):
             REFERENCES `project` (`ID`)
     )
     """)
-    cursor.execute("""
+    db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `snp`
     -- -----------------------------------------------------
@@ -56,7 +61,7 @@ def create_db(cursor):
         ON CONFLICT REPLACE
     )
     """)
-    cursor.execute("""
+    db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `donor_has_snp`
     -- -----------------------------------------------------
@@ -72,7 +77,7 @@ def create_db(cursor):
             REFERENCES `snp` (`ID`)
     )
     """)
-    return cursor
+    # return cursor
 
 
 def main():
@@ -80,24 +85,11 @@ def main():
 
     :return:
     """
-    path_db = f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/{sys.argv[1]}.db'
-    try:
-        # Returns a connection object that we will use to interact with the SQLite database held in the file test.db
-        mydb_connection = sqlite3.connect(path_db)
-        # Setting row_factory property of connection object to
-        # sqlite3.Row(sqlite3.Row is an implementation of row_factory)
-        mydb_connection.row_factory = sqlite3.Row
-        # Cursor object allow us to send SQL statements to a SQLite database using cursor.execute()
-        cursor = mydb_connection.cursor()
-        cursor = create_db(cursor)
-        
-    except sqlite3.Error as er:
-        print("Error while connecting to sqlite", er)
-    finally:
-        if mydb_connection:
-            mydb_connection.close()
-            print("The SQLite connection is closed")
+    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long2.db'
+    db = Database(sys.argv[1]) #sys.argv[1]
+    create_db(db)
+    
+    db.close()
 
 
 main()
-print(f'END {sys.argv[1]}')

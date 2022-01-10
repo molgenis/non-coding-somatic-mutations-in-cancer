@@ -4,6 +4,7 @@ import sys
 import io
 import numpy as np
 from multiprocessing import Pool
+import multiprocessing as mp
 
 from db_ob import Database
 
@@ -59,12 +60,12 @@ def main():
     # Read vcf file
     df = read_vcf(sys.argv[2])#(sys.argv[1].strip())
     df_shuffled = df.sample(frac=1)
-    df_splits = np.array_split(df_shuffled, int(sys.argv[4]))
+    df_splits = np.array_split(df_shuffled, mp.cpu_count())
     arg_multi_list = []
     for df_s in df_splits:
         arg_multi_list.append((sys.argv[1], df_s, sys.argv[3]))
 
-    pool = Pool(processes=int(sys.argv[4]))
+    pool = Pool(processes=mp.cpu_count())
     pool.starmap(func=filter_add, iterable=arg_multi_list)
     pool.close()
     pool.join()

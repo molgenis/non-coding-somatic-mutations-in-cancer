@@ -52,9 +52,9 @@ do
     if  [[ ${i} == 1 ]]
     then
         echo "------${i}"
-        echo "python3 ${SCRIPT_PATH}filter_file_dbSNP.py ${DB_PATH} ${DB_SNP_FILE} ALTER ${CPUS}" >> ${FILE}
+        echo "python3 ${SCRIPT_PATH}filter_file_dbSNP.py ${DB_PATH} ${DB_SNP_FILE} ALTER" >> ${FILE}
     else
-        echo "python3 ${SCRIPT_PATH}filter_file_dbSNP.py ${DB_PATH} ${DB_SNP_FILE} EMPTY ${CPUS}" >> ${FILE}
+        echo "python3 ${SCRIPT_PATH}filter_file_dbSNP.py ${DB_PATH} ${DB_SNP_FILE} EMPTY" >> ${FILE}
     fi    
     
     echo "" >> ${FILE}
