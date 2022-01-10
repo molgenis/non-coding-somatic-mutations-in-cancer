@@ -11,12 +11,15 @@ import multiprocessing as mp
 from db_ob import Database
 
 
-def fill_database(df, mydb_connection, cursor):
+def fill_database(df):
     """
 
     :param df:
     :return:
     """
+    db = Database(sys.argv[1]) #sys.argv[1]
+    mydb_connection = db.mydb_connection
+    cursor = db.cursor
     # Loop over set of project_ids and add it to the database
     for project_id in list(set(df['project_id'])):
         print(project_id)
@@ -94,10 +97,11 @@ def fill_database(df, mydb_connection, cursor):
                                 VALUES (%s, %s, %s)""" % (int(last_id_project), int(last_id_donor), int(id_snp)))
                         # Committing the current transactions
                         mydb_connection.commit()
+    db.close()
 
 
 
-def read_file(path, mydb_connection, cursor):
+def read_file(path):
     """
     
     :param path: 
@@ -111,7 +115,7 @@ def read_file(path, mydb_connection, cursor):
     df_splits = np.array_split(df_shuffled, mp.cpu_count())
     arg_multi_list = []
     for df_s in df_splits:
-        arg_multi_list.append((df_s, mydb_connection, cursor))
+        arg_multi_list.append((df_s))
 
     pool = Pool(processes=mp.cpu_count())
     pool.starmap(func=fill_database, iterable=arg_multi_list)
@@ -130,11 +134,12 @@ def read_file(path, mydb_connection, cursor):
 def main():
     # path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/'
     # path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long2.db'
-    db = Database(sys.argv[1]) #sys.argv[1]
-    mydb_connection = db.mydb_connection
-    cursor = db.cursor
-    read_file(sys.argv[2], mydb_connection, cursor)
+    
+    # db = Database(sys.argv[1]) #sys.argv[1]
+    # mydb_connection = db.mydb_connection
+    # cursor = db.cursor
+    read_file(sys.argv[2])
 
-    db.close()
+    # db.close()
 
 main()
