@@ -11,13 +11,14 @@ import multiprocessing as mp
 from db_ob import Database
 
 
-def fill_database(df):
+def fill_database(df, path_db):
     """
 
     :param df:
     :return:
     """
-    db = Database(sys.argv[1]) #sys.argv[1]
+    print('hallo')
+    db = Database(path_db) #sys.argv[1]
     mydb_connection = db.mydb_connection
     cursor = db.cursor
     # Loop over set of project_ids and add it to the database
@@ -116,7 +117,7 @@ def read_file(path):
     df_splits = np.array_split(df_shuffled, mp.cpu_count())
     arg_multi_list = []
     for df_s in df_splits:
-        arg_multi_list.append((df_s))
+        arg_multi_list.append((df_s, sys.argv[1]))
 
     pool = Pool(processes=mp.cpu_count())
     pool.starmap(func=fill_database, iterable=arg_multi_list)
