@@ -28,8 +28,8 @@ do
     echo ${filename}
     echo '------------ fill DB'
     python3 ${PATH_DB}fill_db.py ${DATABASE_GENE} ${filename} ${DB_NAME}
-    # echo '------------ Check genes'
-    # python3 ${PATH_DB}database_checkgene.py ${DATABASE_GENE} ${GENE_FILE}
+    echo '------------ Check genes'
+    python3 ${PATH_DB}database_checkgene.py ${DATABASE_GENE} ${GENE_FILE}
     echo "EIND" ${filename}
 done    
 

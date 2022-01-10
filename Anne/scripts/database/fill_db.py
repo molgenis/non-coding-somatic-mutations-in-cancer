@@ -17,7 +17,6 @@ def fill_database(df, path_db):
     :param df:
     :return:
     """
-    print('hallo')
     db = Database(path_db) #sys.argv[1]
     mydb_connection = db.mydb_connection
     cursor = db.cursor
