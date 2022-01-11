@@ -284,6 +284,6 @@ def main():
             mydb_connection.close()
             print("The SQLite connection is closed")
 
-
-main()
+if __name__ == '__main__':
+    main()
 print('END')

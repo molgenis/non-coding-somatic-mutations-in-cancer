@@ -78,4 +78,5 @@ def main():
 
     # db.close()
 
-main()
+if __name__ == '__main__':
+    main()
