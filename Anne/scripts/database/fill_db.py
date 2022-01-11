@@ -26,7 +26,7 @@ def fill_database(df, db):
         db.cursor.execute("""INSERT INTO project (project_ID) 
                         VALUES ('%s')""" % (str(project_id)))
         # Committing the current transactions
-        db.mydb_connection.commit()
+        # db.mydb_connection.commit()
         # Get the last ID (private key of the project table) used
         last_id_project = db.cursor.lastrowid
         print(f"{last_id_project} - {project_id}")
@@ -38,7 +38,7 @@ def fill_database(df, db):
             db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID)
                             VALUES ('%s', %s)""" % (str(donor_id), int(last_id_project)))
             # Committing the current transactions
-            db.mydb_connection.commit()
+            # db.mydb_connection.commit()
             # Get the last ID (private key of the donor table) used
             last_id_donor = db.cursor.lastrowid
             # Filter dataframe on donor_id
@@ -73,7 +73,7 @@ def fill_database(df, db):
                         INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID)
                         VALUES (%s, %s, %s)""" % (int(last_id_project), int(last_id_donor), int(last_id_snp)))
                     # Committing the current transactions
-                    db.mydb_connection.commit()
+                    # db.mydb_connection.commit()
                 # If the snp already exists insert the link between the donor and the snp by filling in
                 # the donor_has_snp table
                 else:
@@ -95,8 +95,8 @@ def fill_database(df, db):
                             db.cursor.execute("""
                                 INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID)
                                 VALUES (%s, %s, %s)""" % (int(last_id_project), int(last_id_donor), int(id_snp)))
-                        # Committing the current transactions
-                        db.mydb_connection.commit()
+    # Committing the current transactions
+    db.mydb_connection.commit()
     
 
 
