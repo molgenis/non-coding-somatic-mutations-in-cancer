@@ -107,7 +107,7 @@ class Database:
             elif table == 'donor_has_snp':
                 print(DonorSNP(*row).print_values())
 
-    def count_values(self, column, table):
+    def count_values(self, column, table, where):
         """
 
         :param column:
@@ -123,6 +123,18 @@ class Database:
         print(f'---{column}')
         for res in results:
             print(f'{res[0]} - {res[1]}')
+        print(f'FILTER: {where}')
+        self.cursor.execute(f"""
+                            SELECT {column}, COUNT(*)
+                            FROM {table}
+                            WHERE {where}
+                            GROUP BY {column};
+                            """)
+        results = self.cursor.fetchall()
+        for res in results:
+            print(f'{res[0]} - {res[1]}')
+
+        print('\n\n')
 
 
 

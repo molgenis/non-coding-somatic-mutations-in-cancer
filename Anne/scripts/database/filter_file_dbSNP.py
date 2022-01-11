@@ -31,7 +31,7 @@ def filter_add(db_path, df, alter):
     mydb_connection = db.mydb_connection
     cursor = db.cursor
     dbSNP = df[df['ID'].str.contains("rs")]
-    print(dbSNP.head())
+    
     if alter == 'ALTER':
         cursor.execute(f"""
                         ALTER TABLE snp
