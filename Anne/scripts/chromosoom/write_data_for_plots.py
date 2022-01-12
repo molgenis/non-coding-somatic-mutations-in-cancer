@@ -5,7 +5,10 @@ import sys
 import io
 import os
 
-from Database import Database
+
+# Also takes the folder 1 higher, so that I can do the import after
+sys.path.append("..")
+from database.Database import Database
 
 
 

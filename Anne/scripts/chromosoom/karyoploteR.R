@@ -31,8 +31,6 @@ create_data_karyoploteR <- function(path, df, i, last_par, chr, basename_file) {
         df$gene_id <- seq(1, nrow(df), by=1)
         # Make the columns numeric
         df[, c(1,3:4)] <- sapply(df[, c(1,3:4)], as.numeric)
-        # print(sum(is.na(df$Start)))
-        # print(sum(is.na(df$End)))
         # https://www.tutorialspoint.com/how-to-remove-rows-from-data-frame-in-r-that-contains-nan
         # Delete any NA rows
         df <- na.omit(df)
@@ -45,9 +43,8 @@ create_data_karyoploteR <- function(path, df, i, last_par, chr, basename_file) {
 
 add_density <- function(kp, data, r0, r1, label) {
     # plot the SNP density over the genome
-    kp <- kpPlotDensity(kp, data=data, r0=r0, r1=r1, window.size = 100000) #window.size = 0.5e6 100000
+    kp <- kpPlotDensity(kp, data=data, r0=r0, r1=r1, window.size = 100000)
     kpAxis(kp, ymax=kp$latest.plot$computed.values$max.density, r0=r0, r1=r1, cex=0.8)
-    #kpAbline(kp, h=mean(kp$latest.plot$computed.values$density), lty=2, ymax=kp$latest.plot$computed.values$max.density, r0=r0, r1=r1)
     kpAddLabels(kp, labels=label, label.margin=0.04, r0=r0, r1=r1, data.panel = 1, cex=1.2, col = "cornflowerblue")
     return(kp)
 }
@@ -61,7 +58,6 @@ peaks <- function(kp, peaks_file){
     for (index in indexes){
         # https://bioconductor.org/packages/devel/bioc/vignettes/GenomicRanges/inst/doc/GRanges_and_GRangesList_slides.pdf
         write(c(density[index], start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 3);
-        #write("\n", textfile, append=TRUE)
     }
     close(printer)
 }
