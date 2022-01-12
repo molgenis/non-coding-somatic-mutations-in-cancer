@@ -26,13 +26,13 @@ else
 fi
 
 # Make new directory
-mkdir -p /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/cluster/jobs/
+mkdir -p /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/pipeline/jobs/
 
 # Loop over samples
 for i in "${!SAMPLES[@]}"
 do  
     # Path to the jobs
-    JOB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/cluster/jobs/
+    JOB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/pipeline/jobs/
     # Filename of the new jobs
     FILE_NAME_JOB=${JOB_PATH}"${SAMPLES[i]}"_${METHOD_BIG}
     JOB_FILE=${FILE_NAME_JOB}.sh
