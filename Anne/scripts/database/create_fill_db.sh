@@ -20,7 +20,7 @@ DB_NAME='Database_internship_gene_long3'
 DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/${DB_NAME}.db
 GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
 
-python3 ${PATH_DB}database_make.py ${DATABASE_GENE}
+python3 ${PATH_DB}create_db.py ${DATABASE_GENE}
 
 for filename in ${PATH_DATA}U*db.tsv
 do
@@ -29,7 +29,7 @@ do
     echo '------------ fill DB'
     python3 ${PATH_DB}fill_db.py ${DATABASE_GENE} ${filename} ${DB_NAME}
     # echo '------------ Check genes'
-    # python3 ${PATH_DB}database_checkgene.py ${DATABASE_GENE} ${GENE_FILE}
+    # python3 ${PATH_DB}check_gene.py ${DATABASE_GENE} ${GENE_FILE}
     echo "EIND" ${filename}
 done    
 

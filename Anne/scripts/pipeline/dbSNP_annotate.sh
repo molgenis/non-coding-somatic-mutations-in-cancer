@@ -30,7 +30,7 @@ for filename in ${PATH_GENERAL}/*.vcf; do
     # Grab the header
     bcftools view --header-only ${OUTPUT_PATH}${BASENAME} > ${PATH_GENERAL}dbSNP_filter/header_${BASENAME}
     # Filter the vcf file (with dbSNP)
-    python3 ${SCRIPT_PATH}filter_dbSNP.py ${OUTPUT_PATH}${BASENAME} ${PATH_GENERAL}dbSNP_filter/
+    python3 ${SCRIPT_PATH}dbSNP_filter.py ${OUTPUT_PATH}${BASENAME} ${PATH_GENERAL}dbSNP_filter/
     # Merge header and noHeader
     cat ${PATH_GENERAL}dbSNP_filter/header_${BASENAME} ${PATH_GENERAL}dbSNP_filter/noHeader_${BASENAME} >> ${PATH_GENERAL}dbSNP_filter/merge_${BASENAME}
 done
