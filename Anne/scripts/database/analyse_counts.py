@@ -1,9 +1,7 @@
-import sqlite3
-import glob
+#!/usr/bin/env python3
 import pandas as pd
 import sys
-import io
-import os
+
 
 from Database import Database
 #TRUE = 1 and FALSE=0

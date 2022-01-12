@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import pandas as pd
 import io
-import sys
-import os
 
 # https://gist.github.com/dceoy/99d976a2c01e7f0ba1c813778f9db744
 def read_vcf(path):

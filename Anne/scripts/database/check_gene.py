@@ -1,9 +1,7 @@
-import sqlite3
-import glob
+#!/usr/bin/env python3
+
 import pandas as pd
 import sys
-import io
-import os
 import numpy as np
 from multiprocessing import Pool
 import multiprocessing as mp

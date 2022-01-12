@@ -1,9 +1,6 @@
+#!/usr/bin/env python3
 import sqlite3
-import glob
 import pandas as pd
-import sys
-import io
-import os
 
 
 class Project(object):

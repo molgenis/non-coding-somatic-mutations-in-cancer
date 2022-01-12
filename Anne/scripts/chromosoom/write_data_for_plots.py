@@ -1,8 +1,5 @@
-import sqlite3
-import glob
-# import pandas as pd
+#!/usr/bin/env python3
 import sys
-import io
 import os
 
 
@@ -41,7 +38,10 @@ def make_karyoploteR(db, path_files):
 
 def main():
     path_db = "D:/Hanze_Groningen/STAGE/TEST_DEL/test3.db"
-    path_files = 'D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/other/'
+    path_to = 'D:/Hanze_Groningen/STAGE/DIFFERENT CANCERS/'
+    path_files = f'{path_to}other/'
+    if not os.path.exists(path_files):
+        os.makedirs(path_files)
     db = Database(path_db)
     make_karyoploteR(db, path_files)
 
