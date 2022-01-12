@@ -6,7 +6,7 @@ SAMPLES=(S1 S2 S3 S4 S5 S6)
 TISSUE=( '4094  4099  4104' '4109  4113  4114  4118  4119' '4123  4124  4129' '4128  4133  4134' '4139  4138  5041' '5043  5042  5044')
 
 # The choosen align method
-METHOD_BIG=bwa_mem #bowtie,   bwa_aln, bwa_mem
+METHOD_BIG=bowtie #bowtie,   bwa_aln, bwa_mem
 CHROM_CHOOSEN=chr21
 
 # Passes different things to the variable VARIABLE and METH_FILE_BIG, 
