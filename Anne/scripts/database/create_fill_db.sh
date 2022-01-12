@@ -16,7 +16,7 @@ source activate stage
 
 PATH_DB=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/
 PATH_DATA=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/
-DB_NAME='Database_internship_gene_long3'
+DB_NAME='Database_internship_gene_long_NEW'
 DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/${DB_NAME}.db
 GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
 
@@ -27,7 +27,7 @@ do
     # Name of input file
     echo ${filename}
     echo '------------ fill DB'
-    python3 ${PATH_DB}fill_db.py ${DATABASE_GENE} ${filename} ${DB_NAME}
+    python3 ${PATH_DB}fill_db.py ${DATABASE_GENE} ${filename}
     # echo '------------ Check genes'
     # python3 ${PATH_DB}check_gene.py ${DATABASE_GENE} ${GENE_FILE}
     echo "EIND" ${filename}

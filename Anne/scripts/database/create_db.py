@@ -85,7 +85,7 @@ def main():
 
     :return:
     """
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long2.db'
+    # path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long2.db'
     db = Database(sys.argv[1]) #sys.argv[1]
     create_db(db)
     
