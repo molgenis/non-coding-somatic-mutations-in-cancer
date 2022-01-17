@@ -4,7 +4,8 @@ import sys
 import os
 
 # Also takes the folder 1 higher, so that I can do the import after
-sys.path.append("..")
+# sys.path.append("..")
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from vcf_reader import read_vcf
 
 path = sys.argv[1]
