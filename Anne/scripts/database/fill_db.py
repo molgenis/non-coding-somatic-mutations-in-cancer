@@ -26,7 +26,7 @@ def fill_database(df, db):
         # db.mydb_connection.commit()
         # Get the last ID (private key of the project table) used
         last_id_project = db.cursor.lastrowid
-        print(f"{last_id_project} - {project_id}")
+        #print(f"{last_id_project} - {project_id}")
         # Filter dataframe on project_id
         select_project = df.loc[df['project_id'] == project_id]
         # print(f"donors: {len(set(select_project['donor_id']))}")
