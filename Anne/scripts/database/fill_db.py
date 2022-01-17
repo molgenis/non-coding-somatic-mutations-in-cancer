@@ -29,7 +29,7 @@ def fill_database(df, db):
         print(f"{last_id_project} - {project_id}")
         # Filter dataframe on project_id
         select_project = df.loc[df['project_id'] == project_id]
-        print(f"donors: {len(set(select_project['donor_id']))}")
+        # print(f"donors: {len(set(select_project['donor_id']))}")
         # Loop over set of donor_ids in (last) project_id and add it to the database
         for donor_id in list(set(select_project['donor_id'])):
             db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID)
