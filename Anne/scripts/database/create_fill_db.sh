@@ -16,7 +16,7 @@ source activate stage
 
 PATH_DB=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/
 PATH_DATA=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/
-DB_NAME='Database_internship_gene_long_NEW'
+DB_NAME='Database_internship_gene_long_NEW2.0'
 DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/${DB_NAME}.db
 GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
 
@@ -27,9 +27,9 @@ LETTERS3=('M')
 
 # python3 ${PATH_DB}create_db.py ${DATABASE_GENE}
 
-for i in "${LETTERS1[@]}"
+for LETTER in "${LETTERS1[@]}"
 do
-    for filename in ${PATH_DATA}U*db.tsv
+    for filename in ${PATH_DATA}${LETTER}*db.tsv
     do
         # Name of input file
         echo ${filename}
