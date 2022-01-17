@@ -2,11 +2,15 @@
 import pandas as pd
 import io
 
-# https://gist.github.com/dceoy/99d976a2c01e7f0ba1c813778f9db744
+
 def read_vcf(path):
     """
-
-    :param path:
+    Read vcf files.
+    Comes from: https://gist.github.com/dceoy/99d976a2c01e7f0ba1c813778f9db744
+        Author: Daichi Narushima (成島 大智)
+        GitName: dceoy
+        File: read_vcf.py
+    :param path: Path to the file
     :return:
     """
     with open(path, 'r') as f:

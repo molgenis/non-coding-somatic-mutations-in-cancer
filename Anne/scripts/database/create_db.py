@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 import pandas as pd
 import sys
-import numpy as np
-
 
 from Database import Database
 
+
 def create_db(db):
     """
-
-    :param cursor:
+    Create the database
+    :param db:  the database object
     :return:
     """
     # Create tables
@@ -74,7 +73,6 @@ def create_db(db):
             REFERENCES `snp` (`ID`)
     )
     """)
-    # return cursor
 
 
 def main():
@@ -82,11 +80,13 @@ def main():
 
     :return:
     """
-    # path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long2.db'
-    db = Database(sys.argv[1]) #sys.argv[1]
+    # Make Database object
+    db = Database(sys.argv[1])
+    # Call create_db
     create_db(db)
-    
+    # Close database connection
     db.close()
+
 
 if __name__ == '__main__':
     main()

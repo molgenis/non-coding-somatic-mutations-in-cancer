@@ -13,6 +13,7 @@
 
 echo 'file prep'
 
+# Loop over TISSUE_ARR
 for i in "${TISSUE_ARR[@]}"
 do
     # Number or specific tissue of a sample

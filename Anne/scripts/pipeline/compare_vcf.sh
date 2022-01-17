@@ -11,10 +11,6 @@
 #SBATCH --export=NONE
 #SBATCH --get-user-env=L
 
-# Load package
-#ml BCFtools/1.11-GCCcore-7.3.0
-#ml GATK/4.1.4.1-Java-8-LTS
-
 # Loop over rows in file
 while IFS= read -r line; do
     echo "tester: $line"
@@ -22,10 +18,13 @@ while IFS= read -r line; do
     echo ${line##* }
     # Compare two VCF files
     bcftools isec ${line}
+    # Loop over lines that ends with .vcf
     for filename in ${line##* }*.vcf; do
         echo ${filename}
         echo 'COMPARE'
+        # Make .gz file of file
         bcftools view ${filename} -Oz -o ${filename}.gz
+        # Index file
         bcftools index ${filename}.gz
     done
     echo 'END'

@@ -11,19 +11,27 @@
 #SBATCH --export=NONE
 #SBATCH --get-user-env=L
 
+# Make array of chromosomes
 #seq FIRST STEP LAST
 chrom_num=($(seq 1 1 22))
 chrom_num+=("X" "Y")
 
-DB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene.db
+# The name of the database
+DB_NAME='Database_internship_gene_long_NEW2.0'
+# Path where the database is/should be stored
+DB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/${DB_NAME}.db
+# Path where the files should be stored
 DB_FILES=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/files_to_annotate/
+# Path to the scripts
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/
 CPUS=20
 
 
 for i in "${chrom_num[@]}"
 do
+    # Path to the scripts
     JOB_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_git/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/jobs/
+    # File
     DB_SNP_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/files_to_annotate/annotate/chr${i}_ann.vcf
     FILE=${JOB_PATH}chr${i}_create_vcf_and_annotate_dbSNP.sh
     echo $i

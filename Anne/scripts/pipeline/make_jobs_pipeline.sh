@@ -13,13 +13,10 @@ CHROM_CHOOSEN=chr21
 # depending on the variable METHOD_BIG
 # VARIABLE: Scripts names needed
 if [ "${METHOD_BIG}" == "bwa_aln" ]; then
-    # VARIABLE=( job_align_aln job_vcf_aln )
     METH_FILE_BIG=aln #bowtie2, aln, mem
 elif [ "${METHOD_BIG}" == "bwa_mem" ]; then
-    # VARIABLE=( job_align_mem job_vcf_mem ) 
     METH_FILE_BIG=mem #bowtie2, aln, mem   
 elif [ "${METHOD_BIG}" == "bowtie" ]; then
-    # VARIABLE=( job_align_bowtie job_vcf_bowtie )
     METH_FILE_BIG=bowtie2 #bowtie2, aln, mem  
 else
     echo "ERROR"

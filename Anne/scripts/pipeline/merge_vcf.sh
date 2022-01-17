@@ -13,7 +13,7 @@
 
 # Path of the file that will be used
 FILE_PATH=${GENERAL_PATH}${CHROM}_${COMP_TYPE}_comparison_${METHOD}_both.txt
-# 
+# TODO TODO
 MERGE_COM=$(sed '1q;d' ${FILE_PATH})
 echo ${MERGE_COM}
 mkdir -p ${GENERAL_PATH}merge_vcf/${CHROM}/

@@ -5,25 +5,9 @@ import sys
 import os
 
 # Also takes the folder 1 higher, so that I can do the import after
-sys.path.append("..")
+# sys.path.append("..")
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from vcf_reader import read_vcf
-
-
-# # https://gist.github.com/dceoy/99d976a2c01e7f0ba1c813778f9db744
-# def read_vcf(path):
-#     """
-
-#     :param path:
-#     :return:
-#     """
-#     with open(path, 'r') as f:
-#         lines = [l for l in f if not l.startswith('##')]
-#     return pd.read_csv(
-#         io.StringIO(''.join(lines)),
-#         dtype={'#CHROM': str, 'POS': int, 'ID': str, 'REF': str, 'ALT': str,
-#                'QUAL': str, 'FILTER': str, 'INFO': str},
-#         sep='\t'
-#     ).rename(columns={'#CHROM': 'CHROM'})
 
 
 def make_plot_format_vcf(path, basename):
