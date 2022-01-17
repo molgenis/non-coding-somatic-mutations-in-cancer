@@ -20,8 +20,9 @@ DB_NAME='Database_internship_gene_long_NEW'
 DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/${DB_NAME}.db
 GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
 
-LETTERS1=('A' 'D' 'E' 'G' 'H' 'K' 'N' 'O' 'R' 'T' 'U' 'W')
-LETTERS2=('B' 'C' 'L' 'P' 'S')
+#A, D, H, W, M, U, E, G, K, N, O, T, R, S, C, B, P, L
+LETTERS1=('A' 'D' 'H' 'W' 'U' 'G' 'K' 'N' 'O' 'T' 'R')
+LETTERS2=('B' 'C' 'L' 'P' 'S' 'E')
 LETTERS3=('M')
 
 # python3 ${PATH_DB}create_db.py ${DATABASE_GENE}
