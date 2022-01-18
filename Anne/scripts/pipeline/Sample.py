@@ -3,25 +3,6 @@ from itertools import combinations
 from Run import Run
 
 
-# class Run:
-#     """
-#
-#     """
-#
-#     def __init__(self, sample_num, type_sample, name, category):
-#         """
-#         Constructor
-#         :param sample_num:      sample number of the participant
-#         :param type_sample:     sample type (GL, FL, tFL)
-#         :param name:            specific number of the tissue
-#         :param category:        is the tissue tumor tissue or healthy tissue
-#         """
-#         self.sample_num = sample_num
-#         self.type_sample = type_sample
-#         self.name = name
-#         self.category = category
-
-
 class Sample:
     """
 
@@ -51,36 +32,20 @@ class Sample:
         elif row['category'] == 'hc':
             self.hc.append(one_run)
 
-    def hc_info(self, hc, arg_hc, head_path, chrom, type_aln, type_aln2, arg_mutect2_hc):
-        # Add hc to arg (file name/directory name)
-        arg_hc += f'{hc.name}_'
-        # For example, makes SS6005042 -> 5042
-        number_hc = hc.name.replace("SS600", "")
-        # single mutect2. filename and list with parameters for running mutect2 variant calling.
-        self.write_file(f'{head_path}{self.sample_name}/{chrom}/mutect_{type_aln}/{type_aln}_{hc.name}.txt',
-                        [f'{head_path}{self.sample_name}/{number_hc}_vcf/{chrom}/{type_aln}\n',
-                         f'-I {head_path}{self.sample_name}/{number_hc}/{chrom}/{type_aln}/SN_{hc.name}.bam '
-                         f'-normal {type_aln2}_{hc.name}.DR ',
-                         f'\n{head_path}{self.sample_name}/{number_hc}_vcf/{chrom}/{type_aln}/{hc.name}_'])
-        # Add hc to arg_mutect2 (the whole argument to eventually execute Mutect2)
-        arg_mutect2_hc += f'-I {head_path}{self.sample_name}/{number_hc}/{chrom}/{type_aln}/SN_{hc.name}.bam ' \
-                          f'-normal {type_aln2}_{hc.name}.DR '
+    def set_info(self, hc_or_tum, arg_hc_or_tum, head_path, chrom, type_aln, type_aln2, arg_mutect2_hc_or_tumor,
+                 category):
+        """
 
-    def tumor_info(self, tum, arg_tumor, head_path, chrom, type_aln, number_of_hc, number_of_tumors):
-        # Add tumor to arg (file name/directory name)
-        arg_tumor += f'{tum.name}_'
-        # For example, makes SS6005044 -> 5044
-        number_tum = tum.name.replace("SS600", "")
-
-        # single mutect2
-        self.write_file(f'{head_path}{self.sample_name}/{chrom}/mutect_{type_aln}/{type_aln}_{tum.name}.txt',
-                        [f'{head_path}{self.sample_name}/{number_tum}_vcf/{chrom}/{type_aln}\n',
-                         f'-I {head_path}{self.sample_name}/{number_tum}/{chrom}/{type_aln}/SN_{tum.name}.bam ',
-                         f'\n{head_path}{self.sample_name}/{number_tum}_vcf/{chrom}/{type_aln}/{tum.name}_'])
-        # Add tumor to arg_mutect2 (the whole argument to eventually run Mutect2)
-        arg_mutect2_tumor += f'-I {head_path}{self.sample_name}/{number_tum}/{chrom}/{type_aln}/SN_{tum.name}.bam '
-
-    def set_info(self, hc_or_tum, arg_hc_or_tum, head_path, chrom, type_aln, type_aln2, arg_mutect2_hc_or_tumor, category):
+        :param hc_or_tum:
+        :param arg_hc_or_tum:
+        :param head_path:
+        :param chrom:
+        :param type_aln:
+        :param type_aln2:
+        :param arg_mutect2_hc_or_tumor:
+        :param category:
+        :return:
+        """
         # Add hc to arg (file name/directory name)
         arg_hc_or_tum += f'{hc_or_tum.name}_'
         # For example, makes SS6005042 -> 5042
@@ -95,7 +60,7 @@ class Sample:
                              f'\n{head_path}{self.sample_name}/{number_hc_or_tum}_vcf/{chrom}/{type_aln}/{hc_or_tum.name}_'])
             # Add hc to arg_mutect2 (the whole argument to eventually execute Mutect2)
             arg_mutect2_hc_or_tumor += f'-I {head_path}{self.sample_name}/{number_hc_or_tum}/{chrom}/{type_aln}/SN_{hc_or_tum.name}.bam ' \
-                              f'-normal {type_aln2}_{hc_or_tum.name}.DR '
+                                       f'-normal {type_aln2}_{hc_or_tum.name}.DR '
         else:
             # single mutect2
             self.write_file(f'{head_path}{self.sample_name}/{chrom}/mutect_{type_aln}/{type_aln}_{hc_or_tum.name}.txt',
@@ -107,8 +72,8 @@ class Sample:
 
         return arg_hc_or_tum, arg_mutect2_hc_or_tumor, number_hc_or_tum
 
-
-    def get_arguments(self, head_path, chrom, compare_hc_tum, manual_comparison, mutect2_comparison, number_of_tumors=None,
+    def get_arguments(self, head_path, chrom, compare_hc_tum, manual_comparison, mutect2_comparison,
+                      number_of_tumors=None,
                       number_of_hc=None,
                       type_sample='both', type_aln='bowtie', type_aln2='bowtie2'):
         """
@@ -145,30 +110,16 @@ class Sample:
             arg_mutect2_hc = ''
             # Add each hc to the different parameters
             for hc in edited_number_hc:
-                arg_hc, arg_mutect2_hc, number_hc = self.set_info(self, hc, arg_hc, head_path, chrom, type_aln, type_aln2, arg_mutect2_hc, 'hc')
-                # # Add hc to arg (file name/directory name)
-                # arg_hc += f'{hc.name}_'
-                # # For example, makes SS6005042 -> 5042
-                # number_hc = hc.name.replace("SS600", "")
-                # # single mutect2. filename and list with parameters for running mutect2 variant calling.
-                # self.write_file(f'{head_path}{self.sample_name}/{chrom}/mutect_{type_aln}/{type_aln}_{hc.name}.txt',
-                #                 [f'{head_path}{self.sample_name}/{number_hc}_vcf/{chrom}/{type_aln}\n',
-                #                  f'-I {head_path}{self.sample_name}/{number_hc}/{chrom}/{type_aln}/SN_{hc.name}.bam '
-                #                  f'-normal {type_aln2}_{hc.name}.DR ',
-                #                  f'\n{head_path}{self.sample_name}/{number_hc}_vcf/{chrom}/{type_aln}/{hc.name}_'])
-                # # Add hc to arg_mutect2 (the whole argument to eventually execute Mutect2)
-                # arg_mutect2_hc += f'-I {head_path}{self.sample_name}/{number_hc}/{chrom}/{type_aln}/SN_{hc.name}.bam ' \
-                #                   f'-normal {type_aln2}_{hc.name}.DR '
+                arg_hc, arg_mutect2_hc, number_hc = self.set_info(self, hc, arg_hc, head_path, chrom, type_aln,
+                                                                  type_aln2, arg_mutect2_hc, 'hc')
             # Size of combination is set to number_of_tumors
             for edited_number_tumors in combinations(edited_list_tumors, number_of_tumors):
                 arg_tumor = ''
                 arg_mutect2_tumor = ''
                 for tum in edited_number_tumors:
-                    arg_tumor, arg_mutect2_tumor, number_tum = self.set_info(self, tum, arg_tumor, head_path, chrom, type_aln, type_aln2, arg_mutect2_tumor, 'tum')
-                    # # Add tumor to arg (file name/directory name)
-                    # arg_tumor += f'{tum.name}_'
-                    # # For example, makes SS6005044 -> 5044
-                    # number_tum = tum.name.replace("SS600", "")
+                    arg_tumor, arg_mutect2_tumor, number_tum = self.set_info(self, tum, arg_tumor, head_path, chrom,
+                                                                             type_aln, type_aln2, arg_mutect2_tumor,
+                                                                             'tum')
                     if number_of_hc == 1 and number_of_tumors == 1:
                         compare_hc_tum.write(
                             f"{head_path}{self.sample_name}/{number_hc}_vcf/{chrom}/{type_aln}/"
@@ -179,13 +130,6 @@ class Sample:
                         manual_comparison.write(
                             f"{head_path}{self.sample_name}/compare_{number_hc}_{number_tum}/{chrom}/{type_aln}/0001.vcf.gz "
                         )
-                    # # single mutect2
-                    # self.write_file(f'{head_path}{self.sample_name}/{chrom}/mutect_{type_aln}/{type_aln}_{tum.name}.txt',
-                    #                 [f'{head_path}{self.sample_name}/{number_tum}_vcf/{chrom}/{type_aln}\n',
-                    #                  f'-I {head_path}{self.sample_name}/{number_tum}/{chrom}/{type_aln}/SN_{tum.name}.bam ',
-                    #                  f'\n{head_path}{self.sample_name}/{number_tum}_vcf/{chrom}/{type_aln}/{tum.name}_'])
-                    # # Add tumor to arg_mutect2 (the whole argument to eventually run Mutect2)
-                    # arg_mutect2_tumor += f'-I {head_path}{self.sample_name}/{number_tum}/{chrom}/{type_aln}/SN_{tum.name}.bam '
                 # Merge hc and tumor arguments
                 arg = arg_hc + arg_tumor
                 arg_mutect2 = arg_mutect2_hc + arg_mutect2_tumor
@@ -251,9 +195,3 @@ class Sample:
         for arg in list_args:
             file_arguments.write(f'{arg}')
         file_arguments.close()
-
-
-
-
-
-
