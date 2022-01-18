@@ -64,8 +64,10 @@ def arguments_to_file(dict_samples, head_path, chrom, number_of_tumors=None, num
     compare_hc_tum = open(f'{head_path}{chrom}_compare_hc_tumor_{type_aln}_{type_sample}.txt', "w")
     manual_comparison = open(f'{head_path}{chrom}_manual_comparison_{type_aln}_{type_sample}.txt', "w")
     mutect2_comparison = open(f'{head_path}{chrom}_mutect2_comparison_{type_aln}_{type_sample}.txt', "w")
+
     # Loop over keys from dict_sample
     for key in dict_samples:
+        # dict_samples[key] > Sample()
         dict_samples[key].get_arguments(head_path, chrom, compare_hc_tum, manual_comparison, mutect2_comparison,
                                         number_of_tumors, number_of_hc,
                                         type_sample, type_aln,
