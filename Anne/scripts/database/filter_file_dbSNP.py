@@ -9,30 +9,12 @@ from Database import Database
 
 # Also takes the folder 1 higher, so that I can do the import after
 sys.path.append("..")
+# sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from vcf_reader import read_vcf
 
 
-
-# # https://gist.github.com/dceoy/99d976a2c01e7f0ba1c813778f9db744
-# def read_vcf(path):
-#     """
-
-#     :param path:
-#     :return:
-#     """
-#     with open(path, 'r') as f:
-#         lines = [l for l in f if not l.startswith('##')]
-#     return pd.read_csv(
-#         io.StringIO(''.join(lines)),
-#         dtype={'#CHROM': str, 'POS': int, 'ID': str, 'REF': str, 'ALT': str,
-#                'QUAL': str, 'FILTER': str, 'INFO': str},
-#         sep='\t'
-#     ).rename(columns={'#CHROM': 'CHROM'})
-
-def filter_add(db_path, df, alter):
-    db = Database(db_path) #sys.argv[1]
-    mydb_connection = db.mydb_connection
-    cursor = db.cursor
+def filter_add(mydb_connection, cursor, df, alter):
+   
     dbSNP = df[df['ID'].str.contains("rs")]
     
     if alter == 'ALTER':
@@ -53,33 +35,17 @@ def filter_add(db_path, df, alter):
                     AND ref = '%s' AND alt = '%s';""" %
                 (str(row['ID']), str(row['CHROM'].replace('chr', '')), int(row['POS']), 
                 int(row['POS']), str(row['REF']), str(row['ALT'])))
-        mydb_connection.commit()
+    mydb_connection.commit()
 
 
 def main():
-    
-
-    path = "D:/Hanze_Groningen/STAGE/db/bdsnp filter/chr1_ann.vcf"
+    path_ann = "D:/Hanze_Groningen/STAGE/db/bdsnp filter/chr15_ann - kopie.vcf"
+    path_db = "D:/Hanze_Groningen/STAGE/TEST_DEL/Database_internship_gene_long_NEW2.0 - kopie.db"
     # Read vcf file
-    df = read_vcf(sys.argv[2])#(sys.argv[1].strip())
-    df_shuffled = df.sample(frac=1)
-    df_splits = np.array_split(df_shuffled, mp.cpu_count())
-    arg_multi_list = []
-    for df_s in df_splits:
-        arg_multi_list.append((sys.argv[1], df_s, sys.argv[3]))
-
-    pool = Pool(processes=mp.cpu_count())
-    pool.starmap(func=filter_add, iterable=arg_multi_list)
-    pool.close()
-    pool.join()
-
-    # filter_add(df, mydb_connection, cursor, sys.argv[3])
-    # db.count_values('ID_dbSNP', 'snp')
-    # cursor.execute('SELECT * FROM snp')
-    # for x in cursor:
-    #     print(f"{x['ID_dbSNP']}")
-
-    # db.close()
+    df = read_vcf(path_ann) #sys.argv[2])#(sys.argv[1].strip())
+    db = Database(path_db)
+    filter_add(db.mydb_connection, db.cursor, df, '')
+    db.close()
 
 if __name__ == '__main__':
     main()
