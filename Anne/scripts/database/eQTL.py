@@ -4,8 +4,11 @@ import sys
 
 
 from Database import Database
+#TRUE = 1 and FALSE=0
 
-def close_eQTL(cursor, position_gene, start, end, chr, where, count_number, set_snps, count_unique):
+
+def close_eQTL(position_gene, cursor, where, chr, start, end, count_number, set_snps, count_unique):    
+
     # START
     cursor.execute("""
                     SELECT *
@@ -61,20 +64,17 @@ def close_eQTL(cursor, position_gene, start, end, chr, where, count_number, set_
     return count_number, set_snps, count_unique
 
 
-def place_eQTL(position_gene, cursor, where):
-    cursor.execute("""
-                    SELECT *
-                    FROM 'snp'
-                    WHERE eQTL = 1 AND %s
-                    """ % (str(where)))
-    results = cursor.fetchall()
+#'', 100, db.cursor, 'in_transcript', 'snp', where+f'in_transcript = {value}', 'txStart', 'txEnd'
+def place_eQTL(eQTL_path, position_gene, cursor, where):
+    #TODO Nu kunnen genen wel overlappen en dat uiteindelijk het gen wel binnen een ander gen ligt
+    #TODO Het kan nu overlappen, er kan nu twee keer hetzelfde gen mee worden genomen
+    #TODO
+    eQTL_df = pd.read_csv(eQTL_path, sep='\t')
     count_number = 0
     count_unique = 0
     set_snps = set()
-    for res in results:
-        print()
-        count_number, set_snps, count_unique = close_eQTL(cursor, position_gene, int(res['pos_start']), int(res['pos_end']), int(res['chr']), where, count_number, set_snps, count_unique)
-        # print(f"{res['pos_start']} - {res['pos_end']}")
+    # CLOSE FROM GENES
+    for index, row in eQTL_df.iterrows():
+        count_number, set_snps, count_unique = close_eQTL(position_gene, cursor, where, row['SNPChr'], row['SNPPos'], row['SNPPos'], count_number, set_snps, count_unique)
     print('END')
     print(count_number)
-    

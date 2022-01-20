@@ -4,12 +4,12 @@ import sys
 
 
 from Database import Database
-from germline import place_germline
+from germline_eQTL import place_germline
 from gene import place_gene
-from analyse_eQTL import place_eQTL
+from eQTL import place_eQTL
 #TRUE = 1 and FALSE=0
 
-def analyse_dbSNP_non_coding(db, cursor, gene_path, where):
+def analyse_dbSNP_non_coding(db, cursor, gene_path, where, eQTL_path):
     # ##########
     # # dbSNP
     # ##########
@@ -57,7 +57,11 @@ def analyse_dbSNP_non_coding(db, cursor, gene_path, where):
     ##########
     # mutation = eQTL
     db.count_values('eQTL', 'snp', where)
+    print('-------1--------')
     place_germline(100, db.cursor, where, 'eQTL')
+    print('-------2--------')
+    place_eQTL(eQTL_path, 100, cursor, where)
+
     
 
 
@@ -66,10 +70,11 @@ def main():
     # db_path='/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene.db'
     db_path="D:/Hanze_Groningen/STAGE/TEST_DEL/Database_internship_gene_long_NEW2.0 - kopie.db"
     gene_path = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"
+    eQTL_path = "C:/Users/Anne_/Downloads/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt"
     db = Database(db_path) #sys.argv[1]
     
     where = "seq_strategy = 'WGS'"
-    analyse_dbSNP_non_coding(db, db.cursor, gene_path, where)
+    analyse_dbSNP_non_coding(db, db.cursor, gene_path, where, eQTL_path)
     db.close()
     
     
