@@ -9,43 +9,45 @@ import multiprocessing as mp
 from Database import Database
 
 
-def check_gene(gene_df, path_db):
+def check_gene(gene_df, mydb_connection, cursor):
     """
 
     :param path_fgene:
     :return:
     """
     print('check_gene')
-    db = Database(path_db)  # sys.argv[1]
-    mydb_connection = db.mydb_connection
-    cursor = db.cursor
-
+    # Loop over gene_df
     for index, row in gene_df.iterrows():
         print(index)
+        # Update in_transcript
         cursor.execute(
             """UPDATE snp
                 SET in_transcript = TRUE
                 WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
             (str(row['chrom'].replace('chr', '')), int(row['txStart']), int(row['txEnd'])))
         # mydb_connection.commit()
+        # Update in_coding
         cursor.execute(
             """UPDATE snp
                 SET in_coding = TRUE
                 WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
             (str(row['chrom'].replace('chr', '')), int(row['cdsStart']), int(row['cdsEnd'])))
         # mydb_connection.commit()
+        # Get start and end of the exons
         exon_start = row['exonStarts'].rstrip(',').split(',')
         exon_end = row['exonEnds'].rstrip(',').split(',')
-        print(f"COUNT - {row['exonCount']}")
+        # print(f"COUNT - {row['exonCount']}")
+        # Loop over the exons start-end
         for i in range(int(row['exonCount'])):
+            # Update in_exon
             cursor.execute(
                 """UPDATE snp
                     SET in_exon = TRUE
                     WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
                 (str(row['chrom'].replace('chr', '')), int(exon_start[i]), int(exon_end[i])))
             # mydb_connection.commit()
-        mydb_connection.commit()
-    db.close()
+    # Add to database
+    mydb_connection.commit()
 
 
 def main():
@@ -54,21 +56,18 @@ def main():
     # db = Database(sys.argv[1]) #sys.argv[1]
     # mydb_connection = db.mydb_connection
     # cursor = db.cursor
-    path_db = "D:/Hanze_Groningen/STAGE/TEST_DEL/Database_internship_gene_long_NEW2.0.db"
+    # Path of the database
+    path_db = "D:/Hanze_Groningen/STAGE/DATAB/Database_internship_gene_long_NEW2.0 - kopie (3).db"
+    # Path of the genes and there positions
     gene_path = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"
-
+    # Read gene file
     gene_df = pd.read_csv(gene_path, sep='\t')  # sys.argv[2], sep='\t')
-    gene_shuffled = gene_df.sample(frac=1)
-    gene_splits = np.array_split(gene_shuffled, mp.cpu_count())
-    arg_gene = []
-    for df_s in gene_splits:
-        arg_gene.append((df_s, path_db))  # sys.argv[1]))
-    pool = Pool(processes=mp.cpu_count())
-    pool.starmap(func=check_gene, iterable=arg_gene)
-    pool.close()
-    pool.join()
-
-    # db.close()
+    # Database connection
+    db = Database(path_db)  # sys.argv[1]
+    # Call check_gene
+    check_gene(gene_df, db.mydb_connection, db.cursor)
+    # Close connections
+    db.close()
 
 
 if __name__ == '__main__':
