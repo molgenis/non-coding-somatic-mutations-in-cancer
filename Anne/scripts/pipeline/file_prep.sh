@@ -1,21 +1,31 @@
 #!/usr/bin/bash
 
-echo 'file PREP'
+#SBATCH --job-name=file_prep
+#SBATCH --output=file_prep.out
+#SBATCH --error=file_prep.err
+#SBATCH --time=49:59:59
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=96gb
+#SBATCH --nodes=1
+#SBATCH --open-mode=append
+#SBATCH --export=NONE
+#SBATCH --get-user-env=L
 
-for i in "${!array[@]}"
+echo 'file prep'
+
+# Loop over TISSUE_ARR
+for i in "${TISSUE_ARR[@]}"
 do
     # Number or specific tissue of a sample
-    NUMBER="${array[i]}"
+    NUMBER=${i}
     # The entire file number
     FILE_NUM=SS600${NUMBER}
     # The path where the file is located
-    PATH_DIR=${GENERAL_PATH}"${array2[i]}"/
+    PATH_DIR=${GENERAL_PATH}${SAMPLE}/
 
-    echo "BEGIN"
-    echo ${NUMBER}
+    echo "BEGIN ${NUMBER}"
     # Creates a specific folder
     mkdir -p ${PATH_DIR}${NUMBER}/${CHROM}/QC
-    #mkdir -p ${PATH_DIR}${NUMBER}/${CHROM}
 
     cd ${PATH_DIR}${NUMBER}
     # Filters a certain chromosome from the bam file
@@ -32,6 +42,6 @@ do
     # On bam file
     fastqc -f bam -o ${PATH_DIR}${NUMBER}/${CHROM}/QC ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_byName.sorted.bam
 
-    echo "EIND"
+    echo "EIND file prep - ${NUMBER}"
 done
 
