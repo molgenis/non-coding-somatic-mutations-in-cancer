@@ -1,0 +1,136 @@
+# getting singularity working on mac: https://sylabs.io/guides/3.8/admin-guide/installation.html#installation-on-windows-or-mac
+# update container apt-get update && apt-get upgrade
+# sudo apt-get install debootstrap
+# sudo apt-get install debian-archive-keyring
+
+
+Bootstrap: debootstrap
+OSVersion: buster
+MirrorURL: http://deb.debian.org/debian
+Include: vim
+
+%setup
+
+%files
+
+%environment
+
+%runscript
+
+%post
+  # update everything
+  apt --yes update && apt --yes --force-yes upgrade
+  # install tools required for building from source or installation without apt
+  apt --yes install build-essential
+  apt --yes install gdebi-core
+  apt --yes install curl
+  apt --yes install wget
+  # install R: https://docs.rstudio.com/resources/install-r/#optional-install-recommended-packages
+  export R_VERSION=4.1.2
+  curl -O https://cdn.rstudio.com/r/debian-10/pkgs/r-${R_VERSION}_1_amd64.deb
+  gdebi -n r-${R_VERSION}_1_amd64.deb
+  ln -s /opt/R/${R_VERSION}/bin/R /usr/local/bin/R
+  ln -s /opt/R/${R_VERSION}/bin/Rscript /usr/local/bin/Rscript
+
+  # install system libraries we need for R
+  apt --yes install qt5-default
+  apt --yes install libgl1-mesa-dev
+  apt --yes install libsdl2-dev
+  apt --yes install libqtwebkit-dev
+  apt --yes install qtbase5-dev
+  apt --yes install libgmp-dev
+  apt --yes install libmpfr-dev
+  apt --yes install postgresql
+
+  # install openssl
+  apt --yes install libssl-dev #openssl-devel
+  # install libpng
+  apt --yes install libpng-dev
+  # install hdf5
+  apt --yes install libhdf5-dev
+  # install a zip library
+  apt --yes install bzip2
+  # fontconfig we might need later
+  apt --yes install fontconfig
+  # libxml2
+  apt --yes install libxml2-dev
+
+  # install cairo and related libraries
+  apt --yes install libcairo2-dev #cairo-devel
+  apt --yes install libxt-dev
+  apt --yes install libgtk2.0-dev
+  apt --yes install xvfb
+  apt --yes install xauth
+  apt --yes install xfonts-base
+  apt --yes install libblas-dev
+  apt --yes install liblapack-dev
+  apt --yes install libboost-all-dev
+  ########################
+  # install conda #
+  ########################
+  export CONDA_VERSION=Anaconda3-2020.11-Linux-x86_64
+  wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
+  bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
+  chmod +x /opt/anaconda3
+  ln -s /opt/anaconda3/bind/conda /usr/local/bin/conda
+  rm ${CONDA_VERSION}.sh
+  # install python tools
+  /opt/anaconda3/bin/conda config --add channels defaults
+  /opt/anaconda3/bin/conda config --add channels bioconda
+  /opt/anaconda3/bin/conda config --add channels conda-forge
+  /opt/anaconda3/bin/conda init bash
+# TODO install libraries needed for scripts
+
+  # install Java stuff
+  #########################
+  # install java tools    #
+  #########################
+  wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add - # the key for openjdk
+  # we need this package to allow adding of repositories
+  apt --yes install software-properties-common
+  apt --yes update
+  # we need to add a repository for this one
+  add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+  apt --yes update && apt --yes install adoptopenjdk-8-hotspot
+  # openjdk 11 however, is in the standard repos
+  apt --yes install openjdk-11-jdk
+  apt --yes install maven
+  apt --yes install git
+
+  # install tools related to alignment files
+  cd
+  git clone https://github.com/samtools/htslib.git
+  cd ./htslib/
+  git checkout fd0f89554459b78c07303e2c8a42acacd6851b46
+  autoreconf -i
+  ./configure --prefix=/opt/
+  make
+  make install
+  cd
+  rm -r htslib
+#  apt --yes install htslib
+  apt --yes install samtools
+  # install gatk
+  export GATK_VERSION=4.2.4.1
+  wget https://github.com/broadinstitute/gatk/releases/download/${GATK_VERSION}/gatk-${GATK_VERSION}.zip
+  unzip gatk-${GATK_VERSION}.zip
+  mv gatk-${GATK_VERSION} gatk
+  cp -r gatk /opt/
+  ln -s /opt/gatk/gatk /usr/bin/gatk
+  rm -r gatk
+  # install bcftools
+  apt --yes install bcftools
+  apt --yes install bwa
+  apt --yes install bowtie2
+  apt --yes install picard
+
+  # clone the github repository
+  cd
+  #git clone https://github.com/molgenis/non-coding-somatic-mutations-in-cancer.git
+  # set in directory
+  mkdir /opt/anntools/
+  #cp -r ./non-coding-somatic-mutations-in-cancer/Anne/* /opt/anntools/
+  # add to path
+  echo 'export PATH=/opt/anntools/:${PATH}
+' >> /etc/profile
+  #rm -r ./non-coding-somatic-mutations-in-cancer
