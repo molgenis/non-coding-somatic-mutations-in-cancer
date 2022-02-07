@@ -159,11 +159,11 @@ def main():
     site_df = pd.read_csv(site_path, sep=';')
     project_cancer = site_df.set_index('project_ID').to_dict('dict')['cancer']
 
-    donor_info_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/donor.csv' #"E:/STAGE/WGS/donor.tsv"
+    donor_info_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/donor.tsv' #"E:/STAGE/WGS/donor.tsv"
     donor_info_df = pd.read_csv(donor_info_path, sep='\t')
     donor_info = donor_info_df.set_index('icgc_donor_id').to_dict('dict')
 
-    specimen_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/all_specimen.csv' #"E:/STAGE/WGS/all_specimen.tsv"
+    specimen_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/all_specimen.tsv' #"E:/STAGE/WGS/all_specimen.tsv"
     specimen_df = pd.read_csv(specimen_path, sep='\t')
     #SP85685
     print(specimen_df[specimen_df['icgc_specimen_id'] == 'SP85685'])

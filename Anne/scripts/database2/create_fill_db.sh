@@ -14,7 +14,7 @@
 ml Anaconda3/5.3.0
 source activate stage
 
-SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/
+SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/database2/
 PATH_DATA=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/ #todo /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_copy/
 DB_NAME='Database_internship_gene_long_NEW_NEW_UPDATE'
 DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/${DB_NAME}.db
