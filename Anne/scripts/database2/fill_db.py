@@ -34,40 +34,70 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
     # Loop over set of project_ids and add it to the database
     for project_id in list(set(df['project_id'])):
         cancer = project_cancer[project_id]
-        print(project_id)
-        # Fill project table
-        db.cursor.execute("""INSERT INTO project (project_ID, cancer) 
-                        VALUES ('%s', '%s')""" % (str(project_id), str(cancer)))
-        # Get the last ID (private key of the project table) used
-        last_id_project = db.cursor.lastrowid
+        db.cursor.execute(
+                    """SELECT *
+                    FROM project
+                    WHERE project_ID = '%s';""" %
+                    (str(project_id)))
+        check_project = db.cursor.fetchall()
+        # If the SNP does not exist add it to the database
+        if not check_project:
+            print('IF PROJECT')
+            print(project_id)
+            # Fill project table
+            db.cursor.execute("""INSERT INTO project (project_ID, cancer) 
+                            VALUES ('%s', '%s')""" % (str(project_id), str(cancer)))
+            # Get the last ID (private key of the project table) used
+            last_id_project = db.cursor.lastrowid
+        else:
+            print('ELSE PROJECT')
+            for inf_pro in check_project:
+                # Get ID of the snp
+                last_id_project = int(inf_pro['ID'])
         # Filter dataframe on project_id
         select_project = df.loc[df['project_id'] == project_id]
         # Loop over set of donor_ids in (last) project_id and add it to the database
         for donor_id in list(set(select_project['donor_id'])):
             sex, vital_status = process_info_donor(donor_info, donor_id)
-            # Fill donor table
-            db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, age_at_last_followup, disease_status_last_followup)
-                            VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" % 
-                            (str(donor_id), int(last_id_project), str(sex), str(vital_status),
-                            int(donor_info['donor_age_at_diagnosis'][donor_id]), int(donor_info['donor_age_at_last_followup'][donor_id]),
-                            str(donor_info['disease_status_last_followup'][donor_id])))
-            # Get the last ID (private key of the donor table) used
-            last_id_donor = db.cursor.lastrowid
+            db.cursor.execute(
+                        """SELECT *
+                        FROM donor
+                        WHERE donor_ID = '%s';""" %
+                        (str(donor_id)))
+            check_donor = db.cursor.fetchall()
+            # If the SNP does not exist add it to the database
+            if not check_donor:
+                print('IF DONOR')
+                # Fill donor table
+                db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, age_at_last_followup, disease_status_last_followup)
+                                VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" % 
+                                (str(donor_id), int(last_id_project), str(sex), str(vital_status),
+                                int(donor_info['donor_age_at_diagnosis'][donor_id]), int(donor_info['donor_age_at_last_followup'][donor_id]),
+                                str(donor_info['disease_status_last_followup'][donor_id])))
+                # Get the last ID (private key of the donor table) used
+                last_id_donor = db.cursor.lastrowid
+            else:
+                print('ELSE DONOR')
+                for inf_don in check_donor:
+                    # Get ID of the snp
+                    last_id_donor = int(inf_don['ID'])
             # Filter dataframe on donor_id
             select_donor = select_project[select_project['donor_id'] == donor_id]
             # Loop over rows in dataframe (select_donor)
             for index, row in select_donor.iterrows():
                 specimen_id = row['specimen_id']
-                specimen_info = specimen_df[specimen_df['icgc_specimen_id'] == specimen_id]
+                specimen_type = specimen_df[specimen_df['icgc_specimen_id'] == specimen_id]['specimen_type'].values[0]
+                print(specimen_type)
                 db.cursor.execute(
                     """SELECT *
                     FROM tissue
                     WHERE specimen_type = '%s';""" %
-                    (str(specimen_info['specimen_type'])))
+                    (str(specimen_type)))
                 check_specimen = db.cursor.fetchall()
                 for spe in check_specimen:
                         # Get ID of the snp
                         tissue_id = int(spe['ID'])
+                print(tissue_id)
 
 
 
@@ -79,8 +109,8 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
                     ref = '%s' AND alt = '%s' AND genome_version = '%s' 
                     AND platform = '%s' AND seq_strategy = '%s';""" %
                     (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
-                     str(row['ref']), str(row['alt']), str(row['genome_version']),
-                     str(row['platform']), str(row['seq_strategy'])))
+                    str(row['ref']), str(row['alt']), str(row['genome_version']),
+                    str(row['platform']), str(row['seq_strategy'])))
                 check_snp = db.cursor.fetchall()
                 # If the SNP does not exist add it to the database
                 if not check_snp:
@@ -89,9 +119,9 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
                         INSERT INTO snp (chr, pos_start, pos_end, ref, alt, genome_version,
                                     platform, seq_strategy)
                         VALUES ('%s', %s, %s, '%s', '%s', '%s', '%s', '%s')""" %
-                                      (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
-                                       str(row['ref']), str(row['alt']), str(row['genome_version']),
-                                       str(row['platform']), str(row['seq_strategy'])))
+                                    (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
+                                    str(row['ref']), str(row['alt']), str(row['genome_version']),
+                                    str(row['platform']), str(row['seq_strategy'])))
                     # Get the last ID (private ket of the snp table) used
                     last_id_snp = db.cursor.lastrowid
                     # Fill donor_has_snp table
@@ -180,9 +210,29 @@ def main():
     # Make Database object
     db = Database(sys.argv[1])
 
-    fill_tissue(specimen_df, db)    
+    fill_tissue(specimen_df, db)  
+    db.cursor.execute(
+                    """SELECT *
+                    FROM tissue
+                    WHERE specimen_type = '%s';""" %
+                    (str('Normal - blood derived')))
+    check_specimen = db.cursor.fetchall()
+    for x in check_specimen:
+        # Get ID of the snp
+        print(int(x['ID']))  
+        y = int(x['ID'])
+    print(f'y - {y}')
     # Calls read_file
-    #read_file(sys.argv[2], db, project_cancer, donor_info, specimen_df)
+    read_file(sys.argv[2], db, project_cancer, donor_info, specimen_df)
+
+    db.cursor.execute(
+                    """SELECT *
+                    FROM donor;""")
+    y = db.cursor.fetchall()
+    for x in y:
+        # Get ID of the snp
+        print(int(x['ID']))
+
     # Close database connection
     db.close()
 
