@@ -58,16 +58,18 @@ def create_db(db):
         ON CONFLICT REPLACE
     )
     """)
+    print('HAI')
     db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `tissue`
     -- -----------------------------------------------------
-    CREATE TABLE IF NOT EXISTS `donor`(
+    CREATE TABLE IF NOT EXISTS `tissue`(
         `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
         `specimen_type` VARCHAR(100) NOT NULL,
         `type` BOOLEAN DEFAULT(FALSE)
     )
     """)
+    print('HALLO')
     db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `donor_has_snp`
