@@ -146,12 +146,21 @@ def read_file(path, db, project_cancer, donor_info, specimen_df):
 
 def fill_tissue(specimen_df, db):
     for specimen_type in list(set(specimen_df['specimen_type'])):
-        if 'normal' in specimen_type.lower():
-            hc_tumor = 'FALSE'
-        else:
-            hc_tumor = 'TRUE'
-        db.cursor.execute("""INSERT INTO tissue (specimen_type, type) 
-                        VALUES ('%s', '%s')""" % (str(specimen_type), str(hc_tumor)))
+        db.cursor.execute(
+                    """SELECT *
+                    FROM tissue
+                    WHERE specimen_type = '%s';""" %
+                    (str(specimen_type)))
+        check_tissue = db.cursor.fetchall()
+        # If the SNP does not exist add it to the database
+        if not check_tissue:
+            print('ADD')
+            if 'normal' in specimen_type.lower():
+                hc_tumor = 'FALSE'
+            else:
+                hc_tumor = 'TRUE'
+            db.cursor.execute("""INSERT INTO tissue (specimen_type, type) 
+                            VALUES ('%s', '%s')""" % (str(specimen_type), str(hc_tumor)))
 
 
 def main():
@@ -172,7 +181,7 @@ def main():
 
     fill_tissue(specimen_df, db)    
     # Calls read_file
-    read_file(sys.argv[2], db, project_cancer, donor_info, specimen_df)
+    #read_file(sys.argv[2], db, project_cancer, donor_info, specimen_df)
     # Close database connection
     db.close()
 
