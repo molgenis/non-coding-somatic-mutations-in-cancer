@@ -47,7 +47,7 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
             sex, vital_status = process_info_donor(donor_info, donor_id)
             # Fill donor table
             db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, age_at_last_followup, disease_status_last_followup)
-                            VALUES ('%s', %s, '%s', '%s', %s, %s, '%s")""" % 
+                            VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" % 
                             (str(donor_id), int(last_id_project), str(sex), str(vital_status),
                             int(donor_info['donor_age_at_diagnosis'][donor_id]), int(donor_info['donor_age_at_last_followup'][donor_id]),
                             str(donor_info['disease_status_last_followup'][donor_id])))
@@ -161,6 +161,7 @@ def fill_tissue(specimen_df, db):
                 hc_tumor = 'TRUE'
             db.cursor.execute("""INSERT INTO tissue (specimen_type, type) 
                             VALUES ('%s', '%s')""" % (str(specimen_type), str(hc_tumor)))
+    db.mydb_connection.commit()
 
 
 def main():
