@@ -9,15 +9,15 @@ from Database import Database
 def add_columns(cursor, mydb_connection):
     cursor.execute(f"""
                     ALTER TABLE donor_has_snp
-                    ADD `tissue` INT NULL DEFAULT NULL
+                    ADD `tissue` BOOLEAN DEFAULT(FALSE)
                     """)
     cursor.execute(f"""
                     ALTER TABLE donor_has_snp
-                    ADD `tissu_type` INT NULL DEFAULT NULL
+                    ADD `tissu_type` VARCHAR(100) NULL DEFAULT NULL
                     """)
     cursor.execute(f"""
                     ALTER TABLE donor_has_snp
-                    ADD `icgc_specimen_id` VARCHAR(45) NULL DEFAULT NULL,
+                    ADD `icgc_specimen_id` VARCHAR(45) NULL DEFAULT NULL
                     """)
     mydb_connection.commit()
 
@@ -94,7 +94,7 @@ def main():
     # Path of the database
     path_db = "D:/Hanze_Groningen/STAGE/DATAB/Database_internship_gene_long_NEW2.0 - kopie (3).db"
     # Path of the genes and there positions
-    hc_tum_path = "E:/STAGE/WGS/all_specimen.tsv"
+    hc_tum_path = "D:/Hanze_Groningen/STAGE/metadata CANCER/WGS/all_specimen.tsv" #"E:/STAGE/WGS/all_specimen.tsv"
     # Read gene file
     hc_tum_df = pd.read_csv(hc_tum_path, sep='\t')  # sys.argv[2], sep='\t')
     print(len(hc_tum_df))

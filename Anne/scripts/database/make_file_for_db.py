@@ -35,29 +35,28 @@ def make_plot_format_other(path, basename, out_path):
     # Read the data
     df = pd.read_csv(path, sep='\t')
     # List of selected columns
-    select_columns = ['icgc_donor_id', 'project_code', 'icgc_sample_id', 'chromosome', 'chromosome_start',
+    select_columns = ['icgc_donor_id', 'project_code', 'icgc_specimen_id', 'icgc_sample_id', 'chromosome', 'chromosome_start',
                       'chromosome_end', 'assembly_version', 'reference_genome_allele', 'mutated_to_allele',
-                      'total_read_count', 'platform',
-                      'sequencing_strategy']  ##'mutant_allele_read_count', 'gene_affected', 'transcript_affected',
+                      'total_read_count', 'platform',  'sequencing_strategy']  ##'mutant_allele_read_count', 'gene_affected', 'transcript_affected',
     # Select the columns out of the dataframe
     select_df = df[select_columns]
     # Rename columns
-    select_df.rename(columns={'icgc_donor_id': 'donor_id', 'project_code': 'project_id', 'icgc_sample_id': 'tissue_id',
-                              'chromosome': 'CHROM', 'chromosome_start': 'FROM', 'chromosome_end': 'TO',
+    select_df.rename(columns={'icgc_donor_id': 'donor_id', 'project_code': 'project_id', 'icgc_specimen_id': 'specimen_id', 
+                                'icgc_sample_id': 'icgc_sample_id',
+                              'chromosome': 'chr', 'chromosome_start': 'pos_start', 'chromosome_end': 'pos_end',
                               'assembly_version': 'genome_version', 'reference_genome_allele': 'ref',
-                              'mutated_to_allele': 'alt',
-                              'total_read_count': 'depth', 'platform': 'platform',
+                              'mutated_to_allele': 'alt', 'total_read_count': 'depth', 'platform': 'platform',
                               'sequencing_strategy': 'seq_strategy'}, inplace=True)
     # If depth is not entered, fill in with 0. #TODO
     select_df['depth'].fillna(0, inplace=True)
     # Change type or some columns
-    select_df = select_df.astype({'FROM': 'int64', 'TO': 'int64', 'depth': 'int64'})
+    select_df = select_df.astype({'pos_start': 'int64', 'pos_end': 'int64', 'depth': 'int64'})
     # Add chr to the column CHROM. 1 > chr1 etc.
-    select_df['CHROM'] = 'chr' + select_df['CHROM'].astype(str)
+    # select_df['chr'] = 'chr' + select_df['CHROM'].astype(str)
     # Add column ID #TODO
-    select_df["ID"] = ""
+    # select_df["ID"] = ""
     # Save dataframe
-    select_df.to_csv(f'{out_path}{basename}_db3.tsv', sep="\t", index=False)
+    select_df.to_csv(f'{out_path}{basename}_dbNEW.tsv', sep="\t", index=False)
 
 
 def main():

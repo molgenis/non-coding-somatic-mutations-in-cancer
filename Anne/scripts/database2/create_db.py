@@ -18,7 +18,8 @@ def create_db(db):
     -- -----------------------------------------------------
     CREATE TABLE IF NOT EXISTS `project`(
         `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-        `project_ID` VARCHAR(45) NOT NULL  
+        `project_ID` VARCHAR(45) NOT NULL,
+        'cancer' VARCHAR(45) NULL DEFAULT NULL
     )
     """)
     db.cursor.execute("""
@@ -29,6 +30,11 @@ def create_db(db):
         `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
         `donor_ID` VARCHAR(45) NOT NULL,
         `project_ID` INT NOT NULL,
+        `sex` BOOLEAN DEFAULT(FALSE),
+        `vital_status` BOOLEAN DEFAULT(FALSE), 
+        `age_at_diagnosis` INT NULL DEFAULT NULL, 
+        `age_at_last_followup` INT NULL DEFAULT NULL,
+        `disease_status_last_followup` VARCHAR(45) DEFAULT NULL,
         CONSTRAINT `fk_donor_project`
             FOREIGN KEY (`project_ID`)
             REFERENCES `project` (`ID`)
@@ -46,15 +52,20 @@ def create_db(db):
         `ref` VARCHAR(1000) NULL DEFAULT NULL,
         `alt` VARCHAR(1000) NULL DEFAULT NULL,
         `genome_version` VARCHAR(45) NULL DEFAULT NULL,
-        `depth` INT NULL DEFAULT NULL,
-        `in_transcript` BOOLEAN DEFAULT(FALSE),
-        `in_coding` BOOLEAN DEFAULT(FALSE),
-        `in_exon` BOOLEAN DEFAULT(FALSE),
         `platform` VARCHAR(45) NULL DEFAULT NULL,
         `seq_strategy` VARCHAR(45) NULL DEFAULT NULL,
-        `tissue_id` VARCHAR(45) NULL DEFAULT NULL,
         UNIQUE (`chr`, `pos_start`, `pos_end`, `ref`, `alt`, `genome_version`, `platform`, `seq_strategy`) 
         ON CONFLICT REPLACE
+    )
+    """)
+    db.cursor.execute("""
+    -- -----------------------------------------------------
+    -- Table `tissue`
+    -- -----------------------------------------------------
+    CREATE TABLE IF NOT EXISTS `donor`(
+        `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
+        `specimen_type` VARCHAR(100) NOT NULL,
+        `type` BOOLEAN DEFAULT(FALSE)
     )
     """)
     db.cursor.execute("""
@@ -65,11 +76,16 @@ def create_db(db):
         `donor_ID` INT NOT NULL,
         `donor_project_ID` INT NOT NULL,
         `snp_ID` INT NOT NULL,
+        `tissue_ID`  INT NOT NULL,
+        `specimen_id` VARCHAR(45) NOT NULL,
         CONSTRAINT `fk_donor_has_snp_donor1`
             FOREIGN KEY (`donor_ID`, `donor_project_ID`)
             REFERENCES `donor` (`ID`, `project_ID`)
         CONSTRAINT `fk_donor_has_snp_snp1`
             FOREIGN KEY (`snp_ID`)
+            REFERENCES `snp` (`ID`)
+        CONSTRAINT `fk_donor_has_snp_tissue1`
+            FOREIGN KEY (`tissue_ID`)
             REFERENCES `snp` (`ID`)
     )
     """)
