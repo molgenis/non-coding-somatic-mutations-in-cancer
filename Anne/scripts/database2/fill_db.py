@@ -33,6 +33,7 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
     """
     # Loop over set of project_ids and add it to the database
     for project_id in list(set(df['project_id'])):
+        print(project_id)
         cancer = project_cancer[project_id]
         db.cursor.execute(
                     """SELECT *
@@ -42,15 +43,14 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
         check_project = db.cursor.fetchall()
         # If the SNP does not exist add it to the database
         if not check_project:
-            print('IF PROJECT')
-            print(project_id)
+            # print('IF PROJECT')
             # Fill project table
             db.cursor.execute("""INSERT INTO project (project_ID, cancer) 
                             VALUES ('%s', '%s')""" % (str(project_id), str(cancer)))
             # Get the last ID (private key of the project table) used
             last_id_project = db.cursor.lastrowid
         else:
-            print('ELSE PROJECT')
+            # print('ELSE PROJECT')
             for inf_pro in check_project:
                 # Get ID of the snp
                 last_id_project = int(inf_pro['ID'])
@@ -67,7 +67,7 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
             check_donor = db.cursor.fetchall()
             # If the SNP does not exist add it to the database
             if not check_donor:
-                print('IF DONOR')
+                # print('IF DONOR')
                 # Fill donor table
                 db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, age_at_last_followup, disease_status_last_followup)
                                 VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" % 
@@ -77,7 +77,7 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
                 # Get the last ID (private key of the donor table) used
                 last_id_donor = db.cursor.lastrowid
             else:
-                print('ELSE DONOR')
+                # print('ELSE DONOR')
                 for inf_don in check_donor:
                     # Get ID of the snp
                     last_id_donor = int(inf_don['ID'])
@@ -87,7 +87,7 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
             for index, row in select_donor.iterrows():
                 specimen_id = row['specimen_id']
                 specimen_type = specimen_df[specimen_df['icgc_specimen_id'] == specimen_id]['specimen_type'].values[0]
-                print(specimen_type)
+                # print(specimen_type)
                 db.cursor.execute(
                     """SELECT *
                     FROM tissue
@@ -97,7 +97,7 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
                 for spe in check_specimen:
                         # Get ID of the snp
                         tissue_id = int(spe['ID'])
-                print(tissue_id)
+                # print(tissue_id)
 
 
 
@@ -206,32 +206,32 @@ def main():
     specimen_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/all_specimen.tsv' #"E:/STAGE/WGS/all_specimen.tsv"
     specimen_df = pd.read_csv(specimen_path, sep='\t')
     #SP85685
-    print(specimen_df[specimen_df['icgc_specimen_id'] == 'SP85685'])
+    # print(specimen_df[specimen_df['icgc_specimen_id'] == 'SP85685'])
     # Make Database object
     db = Database(sys.argv[1])
 
     fill_tissue(specimen_df, db)  
-    db.cursor.execute(
-                    """SELECT *
-                    FROM tissue
-                    WHERE specimen_type = '%s';""" %
-                    (str('Normal - blood derived')))
-    check_specimen = db.cursor.fetchall()
-    for x in check_specimen:
-        # Get ID of the snp
-        print(int(x['ID']))  
-        y = int(x['ID'])
-    print(f'y - {y}')
+    # db.cursor.execute(
+    #                 """SELECT *
+    #                 FROM tissue
+    #                 WHERE specimen_type = '%s';""" %
+    #                 (str('Normal - blood derived')))
+    # check_specimen = db.cursor.fetchall()
+    # for x in check_specimen:
+    #     # Get ID of the snp
+    #     print(int(x['ID']))  
+    #     y = int(x['ID'])
+    # print(f'y - {y}')
     # Calls read_file
     read_file(sys.argv[2], db, project_cancer, donor_info, specimen_df)
 
-    db.cursor.execute(
-                    """SELECT *
-                    FROM donor;""")
-    y = db.cursor.fetchall()
-    for x in y:
-        # Get ID of the snp
-        print(int(x['ID']))
+    # db.cursor.execute(
+    #                 """SELECT *
+    #                 FROM donor;""")
+    # y = db.cursor.fetchall()
+    # for x in y:
+    #     # Get ID of the snp
+    #     print(int(x['ID']))
 
     # Close database connection
     db.close()
