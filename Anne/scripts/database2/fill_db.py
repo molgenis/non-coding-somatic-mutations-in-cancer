@@ -136,11 +136,13 @@ def read_file(path, db, project_cancer, donor_info, specimen_df):
     """
     # Read file
     df = pd.read_csv(path, sep='\t')
-    df = df.loc[df['seq_strategy'] == 'WGS']
     # Drop all duplicates (only depth and tissue_id may differ from all columns)
     df = df.drop_duplicates() #subset=df.columns.difference(['depth', 'tissue_id'])
-    # Calls fill_database
-    fill_database(df, db, project_cancer, donor_info, specimen_df) #df, db, project_cancer, donor_info, specimen_df
+    df = df.loc[df['seq_strategy'] == 'WGS']
+
+    if len(df) != 0:
+        # Calls fill_database
+        fill_database(df, db, project_cancer, donor_info, specimen_df) #df, db, project_cancer, donor_info, specimen_df
 
 def fill_tissue(specimen_df, db):
     for specimen_type in list(set(specimen_df['specimen_type'])):
@@ -169,8 +171,8 @@ def main():
     db = Database(sys.argv[1])
 
     fill_tissue(specimen_df, db)    
-    # # Calls read_file
-    # read_file(sys.argv[2], db, project_cancer, donor_info, specimen_df)
+    # Calls read_file
+    read_file(sys.argv[2], db, project_cancer, donor_info, specimen_df)
     # Close database connection
     db.close()
 

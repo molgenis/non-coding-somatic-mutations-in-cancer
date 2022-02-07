@@ -72,6 +72,7 @@ def main():
     for filename in glob.glob(path_files):
         # Basename of file
         basename = os.path.basename(filename).split('%2F')[3]
+        print(basename)
         type_file = 'other'
         if type_file == 'vcf':
             print('hoi')
