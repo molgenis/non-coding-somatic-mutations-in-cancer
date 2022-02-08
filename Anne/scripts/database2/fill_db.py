@@ -111,7 +111,6 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
         if not check_donor:
             print(f"{donor_id} - {donor_info['donor_age_at_last_followup'][donor_id]}")
             if math.isnan(donor_info['donor_age_at_last_followup'][donor_id]):
-                print('IF')
                 # Fill donor table
                 db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
                                                         disease_status_last_followup)
@@ -120,8 +119,26 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
                                 donor_info['donor_vital_status'][donor_id],
                                 donor_info['donor_age_at_diagnosis'][donor_id],
                                 donor_info['disease_status_last_followup'][donor_id]))
+            elif math.isnan(donor_info['donor_age_at_diagnosis'][donor_id]):
+                print('ELIF')
+                # Fill donor table
+                db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, 
+                                                        age_at_last_followup, disease_status_last_followup)
+                                    VALUES ('%s', %s, '%s', '%s', %s, '%s')""" %
+                                (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
+                                donor_info['donor_vital_status'][donor_id],
+                                donor_info['donor_age_at_last_followup'][donor_id],
+                                donor_info['disease_status_last_followup'][donor_id]))
+            elif math.isnan(donor_info['donor_age_at_diagnosis'][donor_id]) and math.isnan(donor_info['donor_age_at_last_followup'][donor_id]):
+                print('ELIF2')
+                # Fill donor table
+                db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, 
+                                                        disease_status_last_followup)
+                                    VALUES ('%s', %s, '%s', '%s', '%s')""" %
+                                (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
+                                donor_info['donor_vital_status'][donor_id],
+                                donor_info['disease_status_last_followup'][donor_id]))
             else:
-                print('else')
                 # Fill donor table
                 db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
                                                         age_at_last_followup, disease_status_last_followup)
