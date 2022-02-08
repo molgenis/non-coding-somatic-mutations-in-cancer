@@ -109,7 +109,12 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
         check_donor = db.cursor.fetchall()
         # If the donor does not exist add it to the database
         if not check_donor:
-            print(f"{donor_id} - {donor_info['donor_age_at_last_followup'][donor_id]}")
+            print(f"{donor_id} donor_sex - {donor_info['donor_sex'][donor_id]}")
+            print(f"{donor_id} donor_vital_status - {donor_info['donor_vital_status'][donor_id]}")
+            print(f"{donor_id} donor_age_at_diagnosis - {donor_info['donor_age_at_diagnosis'][donor_id]}")
+            print(f"{donor_id} donor_age_at_last_followup- {donor_info['donor_age_at_last_followup'][donor_id]}")
+            print(f"{donor_id} disease_status_last_followup- {donor_info['disease_status_last_followup'][donor_id]}")
+            print('-----------')
             if math.isnan(donor_info['donor_age_at_diagnosis'][donor_id]) and math.isnan(donor_info['donor_age_at_last_followup'][donor_id]):
                 print('BOTH')
                 # Fill donor table
