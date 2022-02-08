@@ -108,14 +108,14 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
         check_donor = db.cursor.fetchall()
         # If the donor does not exist add it to the database
         if not check_donor:
+            print(f"{donor_id} - {donor_info['disease_status_last_followup'][donor_id]}")
             # Fill donor table
             db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
-                                                    age_at_last_followup, disease_status_last_followup)
-                                VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" %
+                                                    disease_status_last_followup)
+                                VALUES ('%s', %s, '%s', '%s', %s, '%s')""" %
                               (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
                                donor_info['donor_vital_status'][donor_id],
                                donor_info['donor_age_at_diagnosis'][donor_id],
-                               donor_info['donor_age_at_last_followup'][donor_id],
                                donor_info['disease_status_last_followup'][donor_id]))
             # Get the last ID (private key of the donor table) used
             last_id_donor = db.cursor.lastrowid
