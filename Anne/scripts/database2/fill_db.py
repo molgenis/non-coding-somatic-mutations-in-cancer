@@ -276,8 +276,8 @@ def main():
     donor_info_df['donor_vital_status'] = donor_info_df['donor_vital_status'].map(
         {'deceased': 'FALSE', 'alive': 'TRUE'})
     # Replace nan and empty values with NULL
-    donor_info_df.replace(np.nan,'NULL')
-    donor_info_df.replace('','NULL')
+    donor_info_df = donor_info_df.replace(np.nan,'NULL')
+    donor_info_df = donor_info_df.replace('','NULL')
     # Make dictionary of donor_info_df
     donor_info = donor_info_df.set_index('icgc_donor_id').to_dict('dict')
     # Path to file with specimen_type (Normal or tumor tissue)
