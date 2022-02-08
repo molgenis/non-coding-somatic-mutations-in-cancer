@@ -3,6 +3,7 @@ from os import sep
 import pandas as pd
 import sys
 import math # nan
+import numpy as np
 
 from Database import Database
 
@@ -101,6 +102,7 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
     """
     # Loop over set of donor_ids in (last) project_id and add it to the database
     for donor_id in list(set(select_project['donor_id'])):
+        
         db.cursor.execute(
             """SELECT *
                     FROM donor
@@ -109,50 +111,51 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
         check_donor = db.cursor.fetchall()
         # If the donor does not exist add it to the database
         if not check_donor:
+            dct = {k: None if not v else v for k, v in dct.items() }
             print(f"{donor_id} donor_sex - {donor_info['donor_sex'][donor_id]}")
             print(f"{donor_id} donor_vital_status - {donor_info['donor_vital_status'][donor_id]}")
             print(f"{donor_id} donor_age_at_diagnosis - {donor_info['donor_age_at_diagnosis'][donor_id]}")
             print(f"{donor_id} donor_age_at_last_followup- {donor_info['donor_age_at_last_followup'][donor_id]}")
             print(f"{donor_id} disease_status_last_followup- {donor_info['disease_status_last_followup'][donor_id]}")
             print('-----------')
-            if math.isnan(donor_info['donor_age_at_diagnosis'][donor_id]) and math.isnan(donor_info['donor_age_at_last_followup'][donor_id]):
-                print('BOTH')
-                # Fill donor table
-                db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
-                                                        disease_status_last_followup)
-                                    VALUES ('%s', %s, '%s', '%s', %s, '%s')""" %
-                                (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
-                                donor_info['donor_vital_status'][donor_id],
-                                donor_info['donor_age_at_diagnosis'][donor_id],
-                                donor_info['disease_status_last_followup'][donor_id]))
-            elif math.isnan(donor_info['donor_age_at_diagnosis'][donor_id]):
-                print('donor_age_at_diagnosis')
-                # Fill donor table
-                db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, 
-                                                        age_at_last_followup, disease_status_last_followup)
-                                    VALUES ('%s', %s, '%s', '%s', %s, '%s')""" %
-                                (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
-                                donor_info['donor_vital_status'][donor_id],
-                                donor_info['donor_age_at_last_followup'][donor_id],
-                                donor_info['disease_status_last_followup'][donor_id]))
-            elif math.isnan(donor_info['donor_age_at_last_followup'][donor_id]):
-                # Fill donor table
-                db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, 
-                                                        disease_status_last_followup)
-                                    VALUES ('%s', %s, '%s', '%s', '%s')""" %
-                                (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
-                                donor_info['donor_vital_status'][donor_id],
-                                donor_info['disease_status_last_followup'][donor_id]))
-            else:
-                # Fill donor table
-                db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
-                                                        age_at_last_followup, disease_status_last_followup)
-                                    VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" %
-                                (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
-                                donor_info['donor_vital_status'][donor_id],
-                                donor_info['donor_age_at_diagnosis'][donor_id],
-                                donor_info['donor_age_at_last_followup'][donor_id],
-                                donor_info['disease_status_last_followup'][donor_id]))
+            # if math.isnan(donor_info['donor_age_at_diagnosis'][donor_id]) and math.isnan(donor_info['donor_age_at_last_followup'][donor_id]):
+            #     print('BOTH')
+            #     # Fill donor table
+            #     db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
+            #                                             disease_status_last_followup)
+            #                         VALUES ('%s', %s, '%s', '%s', %s, '%s')""" %
+            #                     (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
+            #                     donor_info['donor_vital_status'][donor_id],
+            #                     donor_info['donor_age_at_diagnosis'][donor_id],
+            #                     donor_info['disease_status_last_followup'][donor_id]))
+            # elif math.isnan(donor_info['donor_age_at_diagnosis'][donor_id]):
+            #     print('donor_age_at_diagnosis')
+            #     # Fill donor table
+            #     db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, 
+            #                                             age_at_last_followup, disease_status_last_followup)
+            #                         VALUES ('%s', %s, '%s', '%s', %s, '%s')""" %
+            #                     (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
+            #                     donor_info['donor_vital_status'][donor_id],
+            #                     donor_info['donor_age_at_last_followup'][donor_id],
+            #                     donor_info['disease_status_last_followup'][donor_id]))
+            # elif math.isnan(donor_info['donor_age_at_last_followup'][donor_id]):
+            #     # Fill donor table
+            #     db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, 
+            #                                             disease_status_last_followup)
+            #                         VALUES ('%s', %s, '%s', '%s', '%s')""" %
+            #                     (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
+            #                     donor_info['donor_vital_status'][donor_id],
+            #                     donor_info['disease_status_last_followup'][donor_id]))
+            # else:
+            # Fill donor table
+            db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
+                                                    age_at_last_followup, disease_status_last_followup)
+                                VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" %
+                            (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
+                            donor_info['donor_vital_status'][donor_id],
+                            donor_info['donor_age_at_diagnosis'][donor_id],
+                            donor_info['donor_age_at_last_followup'][donor_id],
+                            donor_info['disease_status_last_followup'][donor_id]))
                 
             # Get the last ID (private key of the donor table) used
             last_id_donor = db.cursor.lastrowid
@@ -268,9 +271,13 @@ def main():
     # Path to file with donor information like age, sex etc.
     donor_info_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/donor.tsv'  # "E:/STAGE/WGS/donor.tsv"
     donor_info_df = pd.read_csv(donor_info_path, sep='\t')
+    # Make of gender (sex) and vital status a boolean
     donor_info_df['donor_sex'] = donor_info_df['donor_sex'].map({'male': 'FALSE', 'female': 'TRUE'})
     donor_info_df['donor_vital_status'] = donor_info_df['donor_vital_status'].map(
         {'deceased': 'FALSE', 'alive': 'TRUE'})
+    # Replace nan and empty values with NULL
+    donor_info_df.replace(np.nan,'NULL')
+    donor_info_df.replace('','NULL')
     # Make dictionary of donor_info_df
     donor_info = donor_info_df.set_index('icgc_donor_id').to_dict('dict')
     # Path to file with specimen_type (Normal or tumor tissue)
