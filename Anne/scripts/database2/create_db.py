@@ -33,12 +33,13 @@ def create_db(db):
         `sex` BOOLEAN DEFAULT(FALSE),
         `vital_status` BOOLEAN DEFAULT(FALSE), 
         `age_at_diagnosis` INT NULL DEFAULT NULL, 
+        `age_at_last_followup` INT NULL DEFAULT NULL,
         `disease_status_last_followup` VARCHAR(45) DEFAULT NULL,
         CONSTRAINT `fk_donor_project`
             FOREIGN KEY (`project_ID`)
             REFERENCES `project` (`ID`)
     )
-    """) #`age_at_last_followup` INT NULL DEFAULT NULL,
+    """)
     db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `snp`
