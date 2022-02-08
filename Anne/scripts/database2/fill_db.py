@@ -111,7 +111,7 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
         check_donor = db.cursor.fetchall()
         # If the donor does not exist add it to the database
         if not check_donor:
-            dct = {k: None if not v else v for k, v in dct.items() }
+            # dct = {k: None if not v else v for k, v in dct.items() }
             print(f"{donor_id} donor_sex - {donor_info['donor_sex'][donor_id]}")
             print(f"{donor_id} donor_vital_status - {donor_info['donor_vital_status'][donor_id]}")
             print(f"{donor_id} donor_age_at_diagnosis - {donor_info['donor_age_at_diagnosis'][donor_id]}")
