@@ -6,32 +6,6 @@ import sys
 from Database import Database
 
 
-def process_info_donor(donor_info, donor_id):
-    """
-    Causes the gender (sex) and status of life (vital_status) to be seen as boolean
-    :param donor_info: Dictionary with info about the donors. Key is column name and
-                       value a dictionary with donor_ids and there info of that column.
-    :param donor_id: ID of the donor
-    :return:
-    """
-    if donor_info['donor_sex'][donor_id] == 'male':
-        sex = str('FALSE')
-    elif donor_info['donor_sex'][donor_id] == 'female':
-        sex = str('TRUE')
-    else:
-        sex = str('FALSE')
-
-    if donor_info['donor_vital_status'][donor_id] == 'deceased':
-        vital_status = str('FALSE')
-    elif donor_info['donor_vital_status'][donor_id] == 'alive':
-        vital_status = str('TRUE')
-    else:
-        vital_status = str('FALSE')
-        
-        
-
-    return sex, vital_status
-
 def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, last_id_donor):
     """
     Fill the database table `snp`, `donor_has_snp` with the info in the df
@@ -55,8 +29,8 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
             (str(specimen_type)))
         check_specimen = db.cursor.fetchall()
         for spe in check_specimen:
-                # Get ID of the tissue
-                tissue_id = int(spe['ID'])
+            # Get ID of the tissue
+            tissue_id = int(spe['ID'])
         # See if an SNP already exists with these values
         db.cursor.execute(
             """SELECT *
@@ -65,8 +39,8 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
             ref = '%s' AND alt = '%s' AND genome_version = '%s' 
             AND platform = '%s' AND seq_strategy = '%s';""" %
             (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
-            str(row['ref']), str(row['alt']), str(row['genome_version']),
-            str(row['platform']), str(row['seq_strategy'])))
+             str(row['ref']), str(row['alt']), str(row['genome_version']),
+             str(row['platform']), str(row['seq_strategy'])))
         check_snp = db.cursor.fetchall()
         # If the SNP does not exist add it to the database
         if not check_snp:
@@ -75,16 +49,17 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
                 INSERT INTO snp (chr, pos_start, pos_end, ref, alt, genome_version,
                             platform, seq_strategy)
                 VALUES ('%s', %s, %s, '%s', '%s', '%s', '%s', '%s')""" %
-                            (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
-                            str(row['ref']), str(row['alt']), str(row['genome_version']),
-                            str(row['platform']), str(row['seq_strategy'])))
+                              (str(row['chr']), int(row['pos_start']), int(row['pos_end']),
+                               str(row['ref']), str(row['alt']), str(row['genome_version']),
+                               str(row['platform']), str(row['seq_strategy'])))
             # Get the last ID (private ket of the snp table) used
             last_id_snp = db.cursor.lastrowid
             # Fill donor_has_snp table
             db.cursor.execute("""
                 INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id)
                 VALUES (%s, %s, %s, %s, '%s')""" %
-                (int(last_id_project), int(last_id_donor), int(last_id_snp), int(tissue_id), str(specimen_id)))
+                              (int(last_id_project), int(last_id_donor), int(last_id_snp), int(tissue_id),
+                               str(specimen_id)))
         # If the snp already exists insert the link between the donor and the snp by filling in
         # the donor_has_snp table
         else:
@@ -96,7 +71,8 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
                 db.cursor.execute(
                     """SELECT *
                     FROM donor_has_snp
-                    WHERE donor_project_ID = %s AND donor_ID = %s AND snp_ID = %s AND tissue_id = %s AND specimen_id = '%s';""" %
+                    WHERE donor_project_ID = %s AND donor_ID = %s AND snp_ID = %s AND tissue_id = %s AND 
+                    specimen_id = '%s';""" %
                     (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id), str(specimen_id))
                 )
                 check_donor_snp = db.cursor.fetchall()
@@ -106,8 +82,9 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
                     # Fill donor_has_snp table
                     db.cursor.execute("""
                         INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id)
-                        VALUES (%s, %s, %s, %s, '%s')""" % 
-                        (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id), str(specimen_id)))
+                        VALUES (%s, %s, %s, %s, '%s')""" %
+                                      (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id),
+                                       str(specimen_id)))
 
 
 def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
@@ -123,22 +100,23 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
     """
     # Loop over set of donor_ids in (last) project_id and add it to the database
     for donor_id in list(set(select_project['donor_id'])):
-        # Calls process_info_donor        
-        # sex, vital_status = process_info_donor(donor_info, donor_id)
         db.cursor.execute(
-                    """SELECT *
+            """SELECT *
                     FROM donor
                     WHERE donor_ID = '%s';""" %
-                    (str(donor_id)))
+            (str(donor_id)))
         check_donor = db.cursor.fetchall()
         # If the donor does not exist add it to the database
         if not check_donor:
             # Fill donor table
-            db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, age_at_last_followup, disease_status_last_followup)
-                            VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" % 
-                            (str(donor_id), int(last_id_project), str(sex), str(vital_status),
-                            donor_info['donor_age_at_diagnosis'][donor_id], donor_info['donor_age_at_last_followup'][donor_id],
-                            str(donor_info['disease_status_last_followup'][donor_id])))
+            db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
+                                                    age_at_last_followup, disease_status_last_followup)
+                                VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" %
+                              (str(donor_id), int(last_id_project), str(donor_info['donor_sex'][donor_id]),
+                               str(donor_info['donor_vital_status'][donor_id]),
+                               donor_info['donor_age_at_diagnosis'][donor_id],
+                               donor_info['donor_age_at_last_followup'][donor_id],
+                               str(donor_info['disease_status_last_followup'][donor_id])))
             # Get the last ID (private key of the donor table) used
             last_id_donor = db.cursor.lastrowid
         else:
@@ -168,10 +146,10 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
         # Selected the kind of cancer of that project(_id)
         cancer = project_cancer[project_id]
         db.cursor.execute(
-                    """SELECT *
+            """SELECT *
                     FROM project
                     WHERE project_ID = '%s';""" %
-                    (str(project_id)))
+            (str(project_id)))
         check_project = db.cursor.fetchall()
         # If the project does not exist add it to the database
         if not check_project:
@@ -192,7 +170,6 @@ def fill_database(df, db, project_cancer, donor_info, specimen_df):
     db.mydb_connection.commit()
 
 
-
 def read_file(path, db, project_cancer, donor_info, specimen_df):
     """
     Read the file and calls fill_database
@@ -207,14 +184,13 @@ def read_file(path, db, project_cancer, donor_info, specimen_df):
     # Read file
     df = pd.read_csv(path, sep='\t')
     # Drop all duplicates
-    df = df.drop_duplicates() 
+    df = df.drop_duplicates()
     # Selects only the SNPs found with WGS
     df = df.loc[df['seq_strategy'] == 'WGS']
     # Checked if df is not empty (Some projects do not contain WGS SNPs)
     if len(df) != 0:
         # Calls fill_database
         fill_database(df, db, project_cancer, donor_info, specimen_df)
-
 
 
 def fill_tissue(specimen_df, db):
@@ -224,13 +200,13 @@ def fill_tissue(specimen_df, db):
     :param db: The database object
     :return:
     """
-     # Loop over set of specimen_type and add it to the database
+    # Loop over set of specimen_type and add it to the database
     for specimen_type in list(set(specimen_df['specimen_type'])):
         db.cursor.execute(
-                    """SELECT *
+            """SELECT *
                     FROM tissue
                     WHERE specimen_type = '%s';""" %
-                    (str(specimen_type)))
+            (str(specimen_type)))
         check_tissue = db.cursor.fetchall()
         # Checked if tissue already exist in the database.
         # If it doesn't exist yet it will be added.
@@ -248,24 +224,25 @@ def fill_tissue(specimen_df, db):
 
 def main():
     # Path to file with project ID and kind of cancer
-    site_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/site.csv' #"E:/STAGE/Site/site.csv"
+    site_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/site.csv'  # "E:/STAGE/Site/site.csv"
     site_df = pd.read_csv(site_path, sep=';')
     # Make dictionary of site_df, and get only the column cancer
     project_cancer = site_df.set_index('project_ID').to_dict('dict')['cancer']
     # Path to file with donor information like age, sex etc.
-    donor_info_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/donor.tsv' #"E:/STAGE/WGS/donor.tsv"
+    donor_info_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/donor.tsv'  # "E:/STAGE/WGS/donor.tsv"
     donor_info_df = pd.read_csv(donor_info_path, sep='\t')
-    donor_info_df['donor_sex'] = donor_info_df['donor_sex'].map({'male': 'FALSE','female': 'TRUE'})
-    donor_info_df['donor_vital_status'] = donor_info_df['donor_vital_status'].map({'deceased': 'FALSE','alive': 'TRUE'})
+    donor_info_df['donor_sex'] = donor_info_df['donor_sex'].map({'male': 'FALSE', 'female': 'TRUE'})
+    donor_info_df['donor_vital_status'] = donor_info_df['donor_vital_status'].map(
+        {'deceased': 'FALSE', 'alive': 'TRUE'})
     # Make dictionary of donor_info_df
     donor_info = donor_info_df.set_index('icgc_donor_id').to_dict('dict')
     # Path to file with specimen_type (Normal or tumor tissue)
-    specimen_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/all_specimen.tsv' #"E:/STAGE/WGS/all_specimen.tsv"
+    specimen_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/all_specimen.tsv'  # "E:/STAGE/WGS/all_specimen.tsv"
     specimen_df = pd.read_csv(specimen_path, sep='\t')
     # Make Database object
     db = Database(sys.argv[1])
     # Calls fill_tissue
-    fill_tissue(specimen_df, db)  
+    fill_tissue(specimen_df, db)
     # Calls read_file
     read_file(sys.argv[2], db, project_cancer, donor_info, specimen_df)
     # Close database connection
