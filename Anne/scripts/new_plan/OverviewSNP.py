@@ -21,7 +21,7 @@ class OverviewSNP:
         SNP_ID = f'{chr}_{pos}_{ref}_{alt}'
         # Call check_homo_hetero
         homo_hetero, total_read_count, mutant_allele_read_count = self.check_homo_hetero(total_read_count,
-                                                                                         mutant_allele_read_count)
+                                                                                         mutant_allele_read_count, project_code) #TODO DELETE
         # Create format structure with values
         snp_format_donor = ':'.join(
             [str(homo_hetero), str(total_read_count), str(mutant_allele_read_count), str(specimen_id),
@@ -49,7 +49,7 @@ class OverviewSNP:
                                      'QUAL': snp.qual, 'FILTER': snp.filter, 'INFO': snp.info, 'FORMAT': snp.format,
                                      donor_id: snp_format_donor}
 
-    def check_homo_hetero(self, total_read_count, mutant_allele_read_count):
+    def check_homo_hetero(self, total_read_count, mutant_allele_read_count, project_code):
         """
 
         """
@@ -65,6 +65,7 @@ class OverviewSNP:
             else:
                 print(f'mutant_allele_read_count {mutant_allele_read_count}')
                 print(f'total_read_count {total_read_count}')
+                print(f'project_code {project_code}')
                 print('-----')
                 homo_hetero = '.'
 
