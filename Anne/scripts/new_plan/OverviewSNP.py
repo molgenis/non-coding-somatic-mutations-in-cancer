@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from SNP import SNP
 
-class OVERVIEW_SNP:
+
+class OverviewSNP:
 
     def __init__(self):
         """
@@ -11,32 +12,28 @@ class OVERVIEW_SNP:
         self.dict_SNP_ID = dict()
         self.all_donors = dict()
 
-        
-
-    def set_snp(self, chr, pos, ref, alt, donor_id, total_read_count, 
-                mutant_allele_read_count, icgc_specimen_id, project_code):
+    def set_snp(self, chr, pos, ref, alt, donor_id, total_read_count,
+                mutant_allele_read_count, specimen_id, project_code):
         """
 
         """
         # Create snp ID
         SNP_ID = f'{chr}_{pos}_{ref}_{alt}'
         # Call check_homo_hetero
-        homo_hetero, total_read_count, mutant_allele_read_count = self.check_homo_hetero(total_read_count, mutant_allele_read_count)
+        homo_hetero, total_read_count, mutant_allele_read_count = self.check_homo_hetero(total_read_count,
+                                                                                         mutant_allele_read_count)
         # Create format structure with values
-        snp_format_donor = ':'.join([str(homo_hetero), str(total_read_count), str(mutant_allele_read_count), str(icgc_specimen_id), str(project_code)]) #[icgc_specimen_id, project_code, homo_hetero, total_read_count, mutant_allele_read_count]
-        # Make a dictionary with the donor ids as keys and the format structure as values, but then for the donors who do not have that snp. 
+        snp_format_donor = ':'.join(
+            [str(homo_hetero), str(total_read_count), str(mutant_allele_read_count), str(specimen_id),
+             str(project_code)])
+        # [specimen_id, project_code, homo_hetero, total_read_count, mutant_allele_read_count]
+        # Make a dictionary with the donor ids as keys and the format structure as values,
+        # but then for the donors who do not have that snp.
         # So they don't have homo_hetero, total_read_count, mutant_allele_read_count.
         if donor_id not in self.all_donors:
-            self.all_donors[donor_id] = ':'.join([str('0/0'), str('.'), str('.'), str(icgc_specimen_id), str(project_code)])
-        
-        # Check if the snp id is not in the dict_SNP_ID. 
-        # If it doesn't exist, create the snp object.
-        # if SNP_ID not in self.dict_SNP_ID:
-        #     snp = SNP(chr, pos, ref, alt)
-        #     self.dict_SNP_ID[SNP_ID] = snp
-        # else:
-        #     snp = self.dict_SNP_ID[SNP_ID]
-        
+            self.all_donors[donor_id] = ':'.join(
+                [str('0/0'), str('.'), str('.'), str(specimen_id), str(project_code)])
+
         # Check if the snp id is in the vcf_dict. 
         if SNP_ID in self.vcf_dict:
             # Check whether the donor_id already exists in vcf_dict[SNP_ID], 
@@ -49,24 +46,24 @@ class OVERVIEW_SNP:
         else:
             snp = SNP(chr, pos, ref, alt)
             self.vcf_dict[SNP_ID] = {'CHROM': snp.chr, 'POS': snp.pos, 'ID': snp.id, 'REF': snp.ref, 'ALT': snp.alt,
-                                    'QUAL': snp.qual, 'FILTER': snp.filter, 'INFO': snp.info, 'FORMAT': snp.format,
-                                    donor_id: snp_format_donor}
+                                     'QUAL': snp.qual, 'FILTER': snp.filter, 'INFO': snp.info, 'FORMAT': snp.format,
+                                     donor_id: snp_format_donor}
 
     def check_homo_hetero(self, total_read_count, mutant_allele_read_count):
         """
 
         """
         # Check if mutant_allele_read_count and total_read_count are empty
-        # If these are not empty divide mutant_allele_read_count by total_read_count 
+        # If these are not empty divide mutant_allele_read_count by total_read_count
         # and determine if they are homozygous or heterozygous.
         if mutant_allele_read_count != '' and total_read_count != '':
-            if int(mutant_allele_read_count)/int(total_read_count) >= 0.9:
+            if int(mutant_allele_read_count) / int(total_read_count) >= 0.9:
                 homo_hetero = '1/1'
             else:
                 homo_hetero = '0/1'
-        # If mutant_allele_read_count and total_read_count are empty, 
-        # change both variables with a '.'. 
-        # Make homo_hetero a '.' for now. # TODO TODO 
+        # If mutant_allele_read_count and total_read_count are empty,
+        # change both variables with a '.'.
+        # Make homo_hetero a '.' for now. # TODO TODO
         else:
             if mutant_allele_read_count == '':
                 mutant_allele_read_count = '.'
@@ -77,27 +74,12 @@ class OVERVIEW_SNP:
 
     def get_vcf_dict(self):
         """
+
         """
         return self.vcf_dict
 
     def get_all_donors(self):
         """
+
         """
         return self.all_donors
-
-
-    
-        
-
-
-    
-        
-
-    
-
-
-
-
-
-
-

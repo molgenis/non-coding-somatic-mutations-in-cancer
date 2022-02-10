@@ -13,16 +13,9 @@ class SNP:
         self.alt = alt
         self.qual = '.'
         self.filter = '.'
-        self.info = '.'
-        # self.SNP_ID = f'{chr}_{pos}_{ref}_{alt}'
-        # self.donor_id = donor_id
-        # self.total_read_count = total_read_count
-        # self.mutant_allele_read_count = mutant_allele_read_count
-        # self.homo_hetero = self.check_homo_hetero(total_read_count, mutant_allele_read_count)
-        # self.icgc_specimen_id = icgc_specimen_id
-        # self.project_code = project_code
-        
-        # GT = homo_hetero, TC = total_read_count, MC = mutant_allele_read_count, SP = icgc_specimen_id, PRC = project_code
+        self.info = '.'        
+        # GT = homo_hetero, TC = total_read_count, MC = mutant_allele_read_count,
+        # SP = specimen_id, PRC = project_code
         self.format = 'GT:TC:MC:SP:PRC'
 
 
