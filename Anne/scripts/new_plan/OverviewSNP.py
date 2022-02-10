@@ -57,10 +57,17 @@ class OverviewSNP:
         # If these are not empty divide mutant_allele_read_count by total_read_count
         # and determine if they are homozygous or heterozygous.
         if mutant_allele_read_count != '' and total_read_count != '':
-            if int(mutant_allele_read_count) / int(total_read_count) >= 0.9:
-                homo_hetero = '1/1'
+            if int(mutant_allele_read_count) != 0 or int(total_read_count) != 0:
+                if int(mutant_allele_read_count) / int(total_read_count) >= 0.9:
+                    homo_hetero = '1/1'
+                else:
+                    homo_hetero = '0/1'
             else:
-                homo_hetero = '0/1'
+                print(f'mutant_allele_read_count {mutant_allele_read_count}')
+                print(f'total_read_count {total_read_count}')
+                print('-----')
+                homo_hetero = '.'
+
         # If mutant_allele_read_count and total_read_count are empty,
         # change both variables with a '.'.
         # Make homo_hetero a '.' for now. # TODO TODO
