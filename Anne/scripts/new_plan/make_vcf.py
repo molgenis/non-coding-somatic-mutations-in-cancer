@@ -89,9 +89,9 @@ def make_vcf_file(overview, name_vcf):
 
 def main():
     # Path to the file
-    path_file = "D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
+    path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/allfiles.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
     # File name vcf file
-    name_vcf = "D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
+    name_vcf = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/all_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
     # Open and unzip file
     project_file = gzip.open(path_file, 'rt')
     # Calls read_file
