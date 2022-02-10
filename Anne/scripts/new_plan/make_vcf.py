@@ -1,8 +1,12 @@
 import gzip
+import pandas as pd
 from OverviewSNP import OverviewSNP
 
 
 def read_file(project_file):
+    """
+
+    """
     # Headers of the files
     header = project_file.readline().strip().split("\t")
 
@@ -33,13 +37,19 @@ def read_file(project_file):
 
 
 def check_dict(vcf_dict, all_donors):
+    """
+
+    """
     # Check whether all snps contain the same number of donors
     for key, value in vcf_dict.items():
-        if len(value) != (len(all_donors) + 9):
+        if len(value) != (len(all_donors)):
             print(f'--------------{key}')
 
 
 def add_donors(overview):
+    """
+
+    """
     print(overview.get_vcf_dict())
     print(len(overview.get_all_donors()))
     # Get vcf_dict (key: SNP_ID, value: dict --> (key: vcf columns or donor_id,
@@ -62,11 +72,35 @@ def add_donors(overview):
     return overview
 
 
+def make_vcf_file(overview, name_vcf):
+    """
+
+    """
+    # Get vcf_dict (key: SNP_ID, value: dict --> (key: vcf columns or donor_id,
+    #                                              value: information out of columns or format structure of donor))
+    vcf_dict = overview.get_vcf_dict()
+    # Make dataframe with as row the values out vcf_dict
+    df = pd.DataFrame.from_dict(list(vcf_dict.values()), orient='columns').sort_values(
+        ["CHROM", "POS"]).reset_index().drop('index', axis=1)
+    # Write file to csv and gzip that file
+    df.to_csv(name_vcf, sep='\t', index=False, encoding='utf-8', 
+                compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+
+
 def main():
     # Path to the file
     path_file = "D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
+    # File name vcf file
+    name_vcf = "D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
     # Open and unzip file
     project_file = gzip.open(path_file, 'rt')
+    # Calls read_file
     overview = read_file(project_file)
+    # Calls add_donors
     overview = add_donors(overview)
-    # print(overview.get_vcf_dict())
+    # Calls make_vcf_file
+    make_vcf_file(overview, name_vcf)
+
+
+if __name__ == '__main__':
+    main()

@@ -10,7 +10,7 @@ class OverviewSNP:
         """
         self.vcf_dict = dict()
         self.dict_SNP_ID = dict()
-        self.all_donors = dict()
+        self.all_donors = dict({'CHROM':'', 'POS':'', 'ID':'', 'REF':'', 'ALT':'', 'QUAL':'', 'FILTER':'', 'INFO':'', 'FORMAT':'',})
 
     def set_snp(self, chr, pos, ref, alt, donor_id, total_read_count,
                 mutant_allele_read_count, specimen_id, project_code):
