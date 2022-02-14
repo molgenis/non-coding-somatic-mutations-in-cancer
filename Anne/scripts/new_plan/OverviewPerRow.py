@@ -10,7 +10,7 @@ class OverviewPerRow:
         """
         self.vcf_dict = dict()
         self.dict_SNP_ID = dict()
-        self.all_donors = dict({'CHROM':'', 'POS':'', 'ID':'', 'REF':'', 'ALT':'', 'QUAL':'', 'FILTER':'', 'INFO':'', 'FORMAT':'',})
+        self.all_donors = dict({'SNP_ID': '', 'CHROM':'', 'POS':'', 'ID':'', 'REF':'', 'ALT':'', 'QUAL':'', 'FILTER':'', 'INFO':'', 'FORMAT':'',})
 
     def set_snp(self, chr, pos, ref, alt, donor_id, total_read_count,
                 mutant_allele_read_count, specimen_id, project_code):
@@ -44,7 +44,7 @@ class OverviewPerRow:
         # standard columns of a vcf file as keys but also the donors with their format structure.
         else:
             snp = SNP(chr, pos, ref, alt, project_code)
-            self.vcf_dict[SNP_ID] = {'CHROM': snp.chr, 'POS': snp.pos, 'ID': snp.id, 'REF': snp.ref, 'ALT': snp.alt,
+            self.vcf_dict[SNP_ID] = {'SNP_ID':SNP_ID, 'CHROM': snp.chr, 'POS': snp.pos, 'ID': snp.id, 'REF': snp.ref, 'ALT': snp.alt,
                                      'QUAL': snp.qual, 'FILTER': snp.filter, 'INFO': snp.info, 'FORMAT': snp.format,
                                      donor_id: snp_format_donor}
 
