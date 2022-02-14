@@ -13,10 +13,10 @@ class SNP:
         self.alt = alt
         self.qual = '.'
         self.filter = '.'
-        self.info = f'project_code={project_code}'      
+        self.info = '.'      
         # GT = homo_hetero, TC = total_read_count, MC = mutant_allele_read_count,
         # SP = specimen_id, PRC = project_code
-        self.format = 'GT:TC:MC:SP'
+        self.format = 'GT:TC:MC:SP:PRC'
 
 
     
