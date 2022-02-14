@@ -33,17 +33,18 @@ def read_file(project_file, name_vcf):
             total_read_count = elems[19]
             mutant_allele_read_count = elems[20]
             if project_code_old != project_code:
+                print(project_code)
                 project_code_old = project_code
                 # Make overview object
                 overview = OverviewPerRow()
-                # Call set_snp (function in the file: OVERVIEW_SNP)
-                overview.set_snp(chr, pos, ref, alt, donor_id, total_read_count,
-                                mutant_allele_read_count, specimen_id, project_code)
+            # Call set_snp (function in the file: OVERVIEW_SNP)
+            overview.set_snp(chr, pos, ref, alt, donor_id, total_read_count,
+                            mutant_allele_read_count, specimen_id, project_code)
 
-                # Calls add_donors
-                overview = add_donors(overview)
-                # Calls make_vcf_file
-                make_vcf_file(overview, name_vcf, project_code)
+            # Calls add_donors
+            overview = add_donors(overview)
+            # Calls make_vcf_file
+            make_vcf_file(overview, name_vcf, project_code)
     # return overview
 
 def check_dict(vcf_dict, all_donors):
@@ -60,8 +61,8 @@ def add_donors(overview):
     """
 
     """
-    print(overview.get_vcf_dict())
-    print(len(overview.get_all_donors()))
+    # print(overview.get_vcf_dict())
+    # print(len(overview.get_all_donors()))
     # Get vcf_dict (key: SNP_ID, value: dict --> (key: vcf columns or donor_id,
     #                                              value: information out of columns or format structure of donor))
     vcf_dict = overview.get_vcf_dict()
