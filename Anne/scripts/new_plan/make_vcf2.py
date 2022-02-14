@@ -96,7 +96,7 @@ def make_vcf_file(overview, name_vcf, project_code):
     df = pd.DataFrame.from_dict(list(vcf_dict.values()), orient='columns').sort_values(
         ["CHROM", "POS"]).reset_index().drop('index', axis=1)
     # Write file to csv and gzip that file
-    df.to_csv(f'{name_vcf}{project_code}_vcf.tsv.gz', sep='\t', index=False, encoding='utf-8', 
+    df.to_csv(f'{name_vcf}vcf_{project_code}.tsv.gz', sep='\t', index=False, encoding='utf-8', 
                 compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 
