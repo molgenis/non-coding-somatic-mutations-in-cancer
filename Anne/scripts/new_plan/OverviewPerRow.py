@@ -24,14 +24,15 @@ class OverviewPerRow:
                                                                                          mutant_allele_read_count, project_code) #TODO DELETE
         # Create format structure with values
         snp_format_donor = ':'.join(
-            [str(homo_hetero), str(total_read_count), str(mutant_allele_read_count), str(specimen_id)])
+            [str(homo_hetero), str(total_read_count), str(mutant_allele_read_count), str(specimen_id),
+            str(project_code)])
         # [specimen_id, project_code, homo_hetero, total_read_count, mutant_allele_read_count]
         # Make a dictionary with the donor ids as keys and the format structure as values,
         # but then for the donors who do not have that snp.
         # So they don't have homo_hetero, total_read_count, mutant_allele_read_count.
         if donor_id not in self.all_donors:
             self.all_donors[donor_id] = ':'.join(
-                [str('.'), str('.'), str('.'), str(specimen_id)])
+                [str('.'), str('.'), str('.'), str(specimen_id), str(project_code)])
 
         # Check if the snp id is in the vcf_dict. 
         if SNP_ID in self.vcf_dict:
