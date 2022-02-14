@@ -42,6 +42,7 @@ def read_file(project_file, name_vcf):
                 project_code_old = project_code
                 # Make overview object
                 overview = OverviewPerRow()
+                print(overview.dict_SNP_ID)
             # Call set_snp (function in the file: OVERVIEW_SNP)
             overview.set_snp(chr, pos, ref, alt, donor_id, total_read_count,
                             mutant_allele_read_count, specimen_id, project_code)
