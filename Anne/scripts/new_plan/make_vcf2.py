@@ -34,6 +34,11 @@ def read_file(project_file, name_vcf):
             mutant_allele_read_count = elems[20]
             if project_code_old != project_code:
                 print(project_code)
+                if project_code_old != '':
+                    # Calls add_donors
+                    overview = add_donors(overview)
+                    # Calls make_vcf_file
+                    make_vcf_file(overview, name_vcf, project_code_old)
                 project_code_old = project_code
                 # Make overview object
                 overview = OverviewPerRow()
@@ -41,10 +46,7 @@ def read_file(project_file, name_vcf):
             overview.set_snp(chr, pos, ref, alt, donor_id, total_read_count,
                             mutant_allele_read_count, specimen_id, project_code)
 
-            # Calls add_donors
-            overview = add_donors(overview)
-            # Calls make_vcf_file
-            make_vcf_file(overview, name_vcf, project_code)
+            
     # return overview
 
 def check_dict(vcf_dict, all_donors):
