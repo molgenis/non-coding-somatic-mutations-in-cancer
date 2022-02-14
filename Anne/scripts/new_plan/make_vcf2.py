@@ -1,6 +1,7 @@
 import gzip
 import pandas as pd
 from OverviewPerRow import OverviewPerRow
+import os
 
 def read_file(project_file, name_vcf):
     """
@@ -11,10 +12,10 @@ def read_file(project_file, name_vcf):
     # donor_id_old = ''
     # Headers of the files
     header = project_file.readline().strip().split("\t")
-
     
     # Loop over the lines
     for line in project_file:
+        # print(num)
         # Strip the line
         line = line.strip()
         # Split the line on tabs
@@ -32,7 +33,10 @@ def read_file(project_file, name_vcf):
             alt = elems[16]
             total_read_count = elems[19]
             mutant_allele_read_count = elems[20]
+            SNP_ID = f'{chr}_{pos}_{ref}_{alt}'
             if project_code_old != project_code:
+                donors_set = set()
+                snp_set = set()
                 print(project_code)
                 if project_code_old != '':
                     # Calls add_donors
@@ -43,10 +47,21 @@ def read_file(project_file, name_vcf):
                 # Make overview object
                 overview = OverviewPerRow()
                 print(overview.dict_SNP_ID)
+            donors_set.add(donor_id)
+            snp_set.add(SNP_ID)
+            if (len(list(donor_id)) % 100) == 0:
+                print(f'donor: {len(list(donor_id))}')
+            if (len(list(snp_set)) % 100) == 0:
+                print(f'SNP: {len(list(snp_set))}')
             # Call set_snp (function in the file: OVERVIEW_SNP)
             overview.set_snp(chr, pos, ref, alt, donor_id, total_read_count,
                             mutant_allele_read_count, specimen_id, project_code)
 
+                    
+     # Calls add_donors
+    overview = add_donors(overview)
+    # Calls make_vcf_file
+    make_vcf_file(overview, name_vcf, project_code_old)
             
     # return overview
 
@@ -95,25 +110,24 @@ def make_vcf_file(overview, name_vcf, project_code):
     vcf_dict = overview.get_vcf_dict()
     # Make dataframe with as row the values out vcf_dict
     df = pd.DataFrame.from_dict(list(vcf_dict.values()), orient='columns').sort_values(
-        ["CHROM", "POS"]).reset_index().drop('index', axis=1)
+        ["#CHROM", "POS"]).reset_index().drop('index', axis=1)
     # Write file to csv and gzip that file
     df.to_csv(f'{name_vcf}vcf_{project_code}.tsv.gz', sep='\t', index=False, encoding='utf-8', 
                 compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
     # delete df, make it empty
     del df 
 
-
-
-
-
-
 def main():
     # Path to the file
-    path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/allfiles.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
+    path_file = "D:/Hanze_Groningen/STAGE/NEW PLAN/B.tsv.gz" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/allfiles.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
     # File name vcf file
-    name_vcf = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/" #all_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
+    name_vcf = "D:/Hanze_Groningen/STAGE/NEW PLAN/00" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/" #all_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
     # Open and unzip file
     project_file = gzip.open(path_file, 'rt')
+
+    # cmd = 'grep -c ".*" D:/Hanze_Groningen/STAGE/NEW PLAN/ALL_AML.tsv.gz' #f'zcat {path_file} | wc -l'
+    # number_lines = os.system(cmd)
+    # print(number_lines)
     # Calls read_file
     read_file(project_file, name_vcf)
     
