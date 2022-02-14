@@ -2,7 +2,7 @@
 from SNP import SNP
 
 
-class OverviewSNP:
+class OverviewPerRow:
 
     def __init__(self):
         """
@@ -24,15 +24,14 @@ class OverviewSNP:
                                                                                          mutant_allele_read_count, project_code) #TODO DELETE
         # Create format structure with values
         snp_format_donor = ':'.join(
-            [str(homo_hetero), str(total_read_count), str(mutant_allele_read_count), str(specimen_id),
-             str(project_code)])
+            [str(homo_hetero), str(total_read_count), str(mutant_allele_read_count), str(specimen_id)])
         # [specimen_id, project_code, homo_hetero, total_read_count, mutant_allele_read_count]
         # Make a dictionary with the donor ids as keys and the format structure as values,
         # but then for the donors who do not have that snp.
         # So they don't have homo_hetero, total_read_count, mutant_allele_read_count.
         if donor_id not in self.all_donors:
             self.all_donors[donor_id] = ':'.join(
-                [str('.'), str('.'), str('.'), str(specimen_id), str(project_code)])
+                [str('.'), str('.'), str('.'), str(specimen_id)])
 
         # Check if the snp id is in the vcf_dict. 
         if SNP_ID in self.vcf_dict:
@@ -44,7 +43,7 @@ class OverviewSNP:
         # And add value to vcf_dict[SNP_ID]. vcf_dict[SNP_ID] is a dictionary that consists of the 
         # standard columns of a vcf file as keys but also the donors with their format structure.
         else:
-            snp = SNP(chr, pos, ref, alt)
+            snp = SNP(chr, pos, ref, alt, project_code)
             self.vcf_dict[SNP_ID] = {'CHROM': snp.chr, 'POS': snp.pos, 'ID': snp.id, 'REF': snp.ref, 'ALT': snp.alt,
                                      'QUAL': snp.qual, 'FILTER': snp.filter, 'INFO': snp.info, 'FORMAT': snp.format,
                                      donor_id: snp_format_donor}
