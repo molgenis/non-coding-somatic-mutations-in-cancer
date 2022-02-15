@@ -69,7 +69,7 @@ def main():
     # The path to the data
     path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/'
     # The path where the new data should be stored
-    out_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/'
+    out_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_data_db/'
     # download?fn=%2Fcurrent%2FProjects%2FALL-US%2Fsimple_somatic_mutation.open.ALL-US.tsv.gz
     path_files = f"{path}download*.tsv.gz"
     # Loop over all files in path that ends with .tsv
