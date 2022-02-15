@@ -193,7 +193,7 @@ def read_file(path, db, project_cancer, donor_info, specimen_df):
     :return: 
     """
     # Read file
-    df = pd.read_csv(path, sep='\t')
+    df = pd.read_csv(path, sep='\t', compression='gzip')
     # Drop all duplicates
     df = df.drop_duplicates()
     # Selects only the SNPs found with WGS
