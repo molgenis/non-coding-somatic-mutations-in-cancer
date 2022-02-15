@@ -57,7 +57,8 @@ def make_plot_format_other(path, basename, out_path):
     # select_df["ID"] = ""
 
     # replace field that's entirely space (or empty) with NULL
-    select_df = select_df.replace(r'^\s*$', 'NULL', regex=True)
+    select_df = select_df['total_read_count'].replace(r'^\s*$', 'NULL', regex=True)
+    select_df = select_df['mutant_allele_read_count'].replace(r'^\s*$', 'NULL', regex=True)
     # Save dataframe
     select_df.to_csv(f'{out_path}{basename}_db_NEW.tsv', sep="\t", index=False)
 
