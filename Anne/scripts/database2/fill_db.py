@@ -59,7 +59,7 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
             # Fill donor_has_snp table
             db.cursor.execute("""
                 INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id, total_read_count, mutant_allele_read_count)
-                VALUES (%s, %s, %s, %s, '%s')""" %
+                VALUES (%s, %s, %s, %s, '%s', %s, %s)""" %
                               (int(last_id_project), int(last_id_donor), int(last_id_snp), int(tissue_id),
                                str(specimen_id), row['total_read_count'], row['mutant_allele_read_count']))
         # If the snp already exists insert the link between the donor and the snp by filling in
@@ -86,7 +86,7 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
                     db.cursor.execute("""
                         INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id, 
                                                     total_read_count, mutant_allele_read_count)
-                        VALUES (%s, %s, %s, %s, '%s')""" %
+                        VALUES (%s, %s, %s, %s, '%s', %s, %s)""" %
                                       (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id),
                                        str(specimen_id), row['total_read_count'], row['mutant_allele_read_count']))
 

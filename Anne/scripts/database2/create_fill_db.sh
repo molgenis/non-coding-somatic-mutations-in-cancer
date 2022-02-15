@@ -38,15 +38,15 @@ do
     for filename in ${PATH_DATA}${LETTER}*_db_NEW.tsv
     do
         # DB_NAME="${filename}
-        DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/${filename}.db
-        python3 ${SCRIPT_PATH}create_db.py ${DATABASE_GENE}
+        DATABASE_SNP=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/"$(b=${filename##*/}; echo ${b%%.*})".db
+        python3 ${SCRIPT_PATH}create_db.py ${DATABASE_SNP}
         # Name of input file
-        echo ${filename}
+        echo "$(b=${filename##*/}; echo ${b%%.*})"
         echo '------------ fill DB'
-        python3 ${SCRIPT_PATH}fill_db.py ${DATABASE_GENE} ${filename}
+        python3 ${SCRIPT_PATH}fill_db.py ${DATABASE_SNP} ${filename}
         # echo '------------ Check genes'
         # python3 ${SCRIPT_PATH}check_gene.py ${DATABASE_GENE} ${GENE_FILE}
-        echo "EIND" ${filename}
+        echo "EIND" "$(b=${filename##*/}; echo ${b%%.*})"
     done
 done    
 
