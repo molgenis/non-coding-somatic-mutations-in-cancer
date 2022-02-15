@@ -60,7 +60,7 @@ def make_plot_format_other(path, basename, out_path):
     # select_df = select_df['total_read_count'].replace(r'^\s*$', 'NULL', regex=True)
     # select_df = select_df['mutant_allele_read_count'].replace(r'^\s*$', 'NULL', regex=True)
     # Save dataframe
-    select_df.to_csv(f'{out_path}{basename}_db_NEW.tsv', sep="\t", index=False, encoding='utf-8', 
+    select_df.to_csv(f'{out_path}{basename}_db_NEW.tsv.gz', sep="\t", index=False, encoding='utf-8', 
                 compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 
