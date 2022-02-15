@@ -33,7 +33,7 @@ def make_plot_format_other(path, basename, out_path):
     :return:
     """
     # Read the data
-    df = pd.read_csv(path, sep='\t')
+    df = pd.read_csv(path, sep='\t', compression='gzip')
     # List of selected columns
     select_columns = ['icgc_donor_id', 'project_code', 'icgc_specimen_id', 'icgc_sample_id', 'chromosome', 'chromosome_start',
                       'chromosome_end', 'assembly_version', 'reference_genome_allele', 'mutated_to_allele',
@@ -70,7 +70,8 @@ def main():
     path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/'
     # The path where the new data should be stored
     out_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/'
-    path_files = f"{path}*.tsv"
+    # download?fn=%2Fcurrent%2FProjects%2FALL-US%2Fsimple_somatic_mutation.open.ALL-US.tsv.gz
+    path_files = f"{path}download*.tsv.gz"
     # Loop over all files in path that ends with .tsv
     for filename in glob.glob(path_files):
         # Basename of file
