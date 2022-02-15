@@ -37,7 +37,7 @@ def make_plot_format_other(path, basename, out_path):
     # List of selected columns
     select_columns = ['icgc_donor_id', 'project_code', 'icgc_specimen_id', 'icgc_sample_id', 'chromosome', 'chromosome_start',
                       'chromosome_end', 'assembly_version', 'reference_genome_allele', 'mutated_to_allele',
-                      'total_read_count', 'platform',  'sequencing_strategy']  ##'mutant_allele_read_count', 'gene_affected', 'transcript_affected',
+                      'total_read_count', 'platform',  'sequencing_strategy', 'mutant_allele_read_count']  ##'mutant_allele_read_count', 'gene_affected', 'transcript_affected',
     # Select the columns out of the dataframe
     select_df = df[select_columns]
     # Rename columns
@@ -45,18 +45,21 @@ def make_plot_format_other(path, basename, out_path):
                                 'icgc_sample_id': 'icgc_sample_id',
                               'chromosome': 'chr', 'chromosome_start': 'pos_start', 'chromosome_end': 'pos_end',
                               'assembly_version': 'genome_version', 'reference_genome_allele': 'ref',
-                              'mutated_to_allele': 'alt', 'total_read_count': 'depth', 'platform': 'platform',
-                              'sequencing_strategy': 'seq_strategy'}, inplace=True)
+                              'mutated_to_allele': 'alt', 'total_read_count': 'total_read_count', 'platform': 'platform',
+                              'sequencing_strategy': 'seq_strategy', 'mutant_allele_read_count':'mutant_allele_read_count'}, inplace=True)
     # If depth is not entered, fill in with 0. #TODO
-    select_df['depth'].fillna(0, inplace=True)
+    # select_df['depth'].fillna(0, inplace=True)
     # Change type or some columns
-    select_df = select_df.astype({'pos_start': 'int64', 'pos_end': 'int64', 'depth': 'int64'})
+    select_df = select_df.astype({'pos_start': 'int64', 'pos_end': 'int64'}) #'depth': 'int64'
     # Add chr to the column CHROM. 1 > chr1 etc.
     # select_df['chr'] = 'chr' + select_df['CHROM'].astype(str)
     # Add column ID #TODO
     # select_df["ID"] = ""
+
+    # replace field that's entirely space (or empty) with NULL
+    select_df = select_df.replace(r'^\s*$', 'NULL', regex=True)
     # Save dataframe
-    select_df.to_csv(f'{out_path}{basename}_dbNEW.tsv', sep="\t", index=False)
+    select_df.to_csv(f'{out_path}{basename}_db_NEW.tsv', sep="\t", index=False)
 
 
 def main():

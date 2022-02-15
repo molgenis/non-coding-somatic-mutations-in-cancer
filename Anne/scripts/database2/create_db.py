@@ -80,6 +80,8 @@ def create_db(db):
         `snp_ID` INT NOT NULL,
         `tissue_ID`  INT NOT NULL,
         `specimen_id` VARCHAR(45) NOT NULL,
+        `total_read_count` INT NULL DEFAULT NULL,
+        `mutant_allele_read_count` INT NULL DEFAULT NULL,
         CONSTRAINT `fk_donor_has_snp_donor1`
             FOREIGN KEY (`donor_ID`, `donor_project_ID`)
             REFERENCES `donor` (`ID`, `project_ID`)

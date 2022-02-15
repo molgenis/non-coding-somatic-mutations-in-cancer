@@ -58,10 +58,10 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
             last_id_snp = db.cursor.lastrowid
             # Fill donor_has_snp table
             db.cursor.execute("""
-                INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id)
+                INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id, total_read_count, mutant_allele_read_count)
                 VALUES (%s, %s, %s, %s, '%s')""" %
                               (int(last_id_project), int(last_id_donor), int(last_id_snp), int(tissue_id),
-                               str(specimen_id)))
+                               str(specimen_id), row['total_read_count'], row['mutant_allele_read_count']))
         # If the snp already exists insert the link between the donor and the snp by filling in
         # the donor_has_snp table
         else:
@@ -74,8 +74,9 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
                     """SELECT *
                     FROM donor_has_snp
                     WHERE donor_project_ID = %s AND donor_ID = %s AND snp_ID = %s AND tissue_id = %s AND 
-                    specimen_id = '%s';""" %
-                    (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id), str(specimen_id))
+                    specimen_id = '%s' AND total_read_count = %s AND mutant_allele_read_count = %s;""" %
+                    (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id), str(specimen_id), 
+                    row['total_read_count'], row['mutant_allele_read_count'])
                 )
                 check_donor_snp = db.cursor.fetchall()
                 # If the combination donor and snp does not yet exist, fill in the table donor_has_snp
@@ -83,10 +84,11 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
                 if not check_donor_snp:
                     # Fill donor_has_snp table
                     db.cursor.execute("""
-                        INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id)
+                        INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id, 
+                                                    total_read_count, mutant_allele_read_count)
                         VALUES (%s, %s, %s, %s, '%s')""" %
                                       (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id),
-                                       str(specimen_id)))
+                                       str(specimen_id), row['total_read_count'], row['mutant_allele_read_count']))
 
 
 def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):

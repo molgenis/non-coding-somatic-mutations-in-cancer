@@ -16,7 +16,7 @@ source activate stage
 
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/database2/
 PATH_DATA=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/ #todo /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_copy/
-DB_NAME='Database_internship_UPDATE'
+DB_NAME='Database_internship_UPDATE2.0'
 DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/${DB_NAME}.db
 GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
 
@@ -34,7 +34,7 @@ python3 ${SCRIPT_PATH}create_db.py ${DATABASE_GENE}
 
 for LETTER in "${LETTERS1[@]}"
 do
-    for filename in ${PATH_DATA}${LETTER}*dbNEW.tsv
+    for filename in ${PATH_DATA}${LETTER}*_db_NEW.tsv
     do
         # Name of input file
         echo ${filename}
