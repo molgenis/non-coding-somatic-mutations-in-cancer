@@ -22,7 +22,7 @@ GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_dat
 
 #A, D, H, W, M, U, E, G, K, N, O, T, R, S, C, B, P, L
 # LETTERS1=('UT')
-LETTERS1=('A')
+LETTERS1=('AL')
 # LETTERS1=('A' 'D' 'H' 'W' 'U' 'G' 'K' 'N' 'O' 'T' 'R')
 # LETTERS2=('B' 'C')
 # LETTERS3=('L')
@@ -35,7 +35,7 @@ LETTERS1=('A')
 
 for LETTER in "${LETTERS1[@]}"
 do
-    for filename in ${PATH_DATA}${LETTER}*_db_NEW.tsv
+    for filename in ${PATH_DATA}${LETTER}*_db_NEW.tsv.gz
     do
         # DB_NAME="${filename}
         DATABASE_SNP=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/"$(b=${filename##*/}; echo ${b%%.*})".db

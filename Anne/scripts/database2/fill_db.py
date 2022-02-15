@@ -198,6 +198,7 @@ def read_file(path, db, project_cancer, donor_info, specimen_df):
     df = df.drop_duplicates()
     # Selects only the SNPs found with WGS
     df = df.loc[df['seq_strategy'] == 'WGS']
+    df[['total_read_count', 'mutant_allele_read_count']] = df[['total_read_count', 'mutant_allele_read_count']].fillna('NULL')
     # Checked if df is not empty (Some projects do not contain WGS SNPs)
     if len(df) != 0:
         # Calls fill_database
