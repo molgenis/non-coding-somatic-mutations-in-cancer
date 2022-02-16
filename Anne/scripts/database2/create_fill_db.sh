@@ -16,13 +16,13 @@ source activate stage
 
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/database2/
 PATH_DATA=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_data_db/ #todo /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_copy/
-# DB_NAME='Database_internship_UPDATE2.0'
-# DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/${DB_NAME}.db
+DB_NAME='Database_internship_UPDATE2.0'
+DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/${DB_NAME}.db
 GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
 
 #A, D, H, W, M, U, E, G, K, N, O, T, R, S, C, B, P, L
 # LETTERS1=('UT')
-LETTERS1=('AL')
+LETTERS1=('O')
 # LETTERS1=('A' 'D' 'H' 'W' 'U' 'G' 'K' 'N' 'O' 'T' 'R')
 # LETTERS2=('B' 'C')
 # LETTERS3=('L')
@@ -38,8 +38,8 @@ do
     for filename in ${PATH_DATA}${LETTER}*_db_NEW.tsv.gz
     do
         # DB_NAME="${filename}
-        DATABASE_SNP=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/"$(b=${filename##*/}; echo ${b%%.*})".db
-        python3 ${SCRIPT_PATH}create_db.py ${DATABASE_SNP}
+        # DATABASE_SNP=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/"$(b=${filename##*/}; echo ${b%%.*})".db
+        # python3 ${SCRIPT_PATH}create_db.py ${DATABASE_SNP}
         # Name of input file
         echo "$(b=${filename##*/}; echo ${b%%.*})"
         echo '------------ fill DB'
