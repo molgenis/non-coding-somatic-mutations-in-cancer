@@ -7,6 +7,8 @@ Created on 12 feb. 2022
 # external imports
 import argparse
 # internal imports
+import datetime
+
 import JobCluster
 
 
@@ -151,13 +153,14 @@ def test_run():
         is_test = True
     )
     # use a couple of functions
-    query_handler.show_tables()
-    query_handler.get_studies()
-    query_handler.get_columns('project')
-    query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf',
-                                    [{'study_id' : 1, 'study_name' : 'ALL-US'},
-                                    {'study_id' : 2, 'study_name' : 'AML-US'}])
-    #query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf')
+    #query_handler.show_tables()
+    #query_handler.get_studies()
+    #query_handler.get_columns('project')
+    #query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf',
+    #                               [{'study_id' : 1, 'study_name' : 'ALL-US'},
+    #                               {'study_id' : 2, 'study_name' : 'AML-US'}])
+
+    query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf')
 
 if __name__ == '__main__':
     '''

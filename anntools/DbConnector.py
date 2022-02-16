@@ -7,6 +7,7 @@ Created on 12 feb. 2022
 # own imports
 import TypeConverter
 import Constants
+import itertools
 
 # external exports
 import sqlite3
@@ -40,7 +41,9 @@ class DbConnector:
         get the the studies in the database, with the internal and external IDs
         :return:
         '''
-        studies_table = self.sanitize_string(Constants.NAME_TABLE_STUDIES)
+        # get the correct table name
+        study_table_name = Constants.NAME_TABLE_STUDIES
+        studies_table = DbConnector.sanitize_string(study_table_name)
         # create a query
         query = ''.join(['SELECT * FROM ', studies_table])
         # we will have an entry for each study
@@ -77,7 +80,7 @@ class DbConnector:
         return rows
 
     @staticmethod
-    def sanitize_string(self, string):
+    def sanitize_string(string):
         '''
         remove illegal characters
         :param string:
@@ -115,6 +118,7 @@ class DbConnector:
         vcf_geno = TypeConverter.TypeConverter.tuples_to_vcfdata(snp_genodata)
         # TODO finish rest of method
         print('get_study_data is not finished')
+        print(vcf_info)
 
 
 
@@ -184,9 +188,42 @@ class DbConnector:
         # finish the query
         query = ''.join([query_start, query_in_parameters, ')'])
         # execute the query
-        self.cursor.execute(query, tuple(snp_ids))
-        # fetch the result
-        rows = self.cursor.fetchall()
+        rows = None
+        # check the size of the query
+        if len(snp_ids) > 999:
+            # we need to do this multple times then
+            list_results = []
+            # we will start at zero
+            start = 0
+            end = 0
+            while end < len(snp_ids):
+                # check how far to go
+                end = start + 999
+                # of course we won't end in a exactly the right sizes of slices
+                if end > len(snp_ids):
+                    # we will grab to the end of the list, instead of start + 1000
+                    end = start + len(snp_ids)
+                # get the relevant ids
+                ids_interation = snp_ids[start:end]
+                # use these for our query
+                query_in_parameters = ','.join('?' * len(ids_interation))
+                # finish the query
+                query = ''.join([query_start, query_in_parameters, ')'])
+                self.cursor.execute(query, tuple(ids_interation))
+                # fetch the result
+                rows_portion = self.cursor.fetchall()
+                # add to the list of queries
+                list_results.append(rows_portion)
+                # the new starts is the old start
+                start = end + 1
+            # merge all of the lists of lists, into one list
+            rows  = [j for i in list_results for j in i]
+            print(rows)
+
+        else:
+            self.cursor.execute(query, tuple(snp_ids))
+            # fetch the result
+            rows = self.cursor.fetchall()
         return rows
 
     def get_snp_genodata(self, study_id):
