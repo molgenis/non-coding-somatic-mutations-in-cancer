@@ -11,9 +11,7 @@ import scipy.sparse
 from scipy.sparse import csr_matrix
 
 
-def set_donor_snp(project_file):
-    set_donor = set()
-    set_snp = set()
+def set_donor_snp(project_file, set_donor, set_snp):
     header = project_file.readline().strip().split("\t")
     # Loop over the lines
     for line in project_file:
@@ -32,7 +30,7 @@ def set_donor_snp(project_file):
             alt = elems[16]
             snp_id = f'{chr}_{pos}_{ref}_{alt}'
             set_snp.add(snp_id)
-    return list(set_donor), list(set_snp)
+    return set_donor, set_snp
 
 def check_homo_hetero(total_read_count, mutant_allele_read_count):
     # Check if mutant_allele_read_count and total_read_count are empty
@@ -61,7 +59,6 @@ def check_homo_hetero(total_read_count, mutant_allele_read_count):
 
 def create_table(sparseMatrix, project_file, list_donor, list_snp):
     print('check')
-    project_code_old = ''
     header = project_file.readline().strip().split("\t")
     
     # Loop over the lines
@@ -121,50 +118,24 @@ def main():
     
     grouped = cancer_types.groupby(['cancer'])
     for cancer, projects in grouped:
+        name_vcf = f'{out_path}{cancer}.vcf.gz'
         print(cancer)
+        set_donor = set()
+        set_snp = set()
         for project in projects['project_ID']:
-            file = glob.glob(f"{path}download*{project}.tsv.gz")
-            print(file)
-
-        
-    
-    # # The path to the data
-    # path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/'
-    # # The path where the new data should be stored
-    # out_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/'
-    # # download?fn=%2Fcurrent%2FProjects%2FALL-US%2Fsimple_somatic_mutation.open.ALL-US.tsv.gz
-    # path_files = f"{path}download*.tsv.gz"
-    # # Loop over all files in path that ends with .tsv
-    # for filename in glob.glob(path_files):
-    #     # Basename of file
-    #     basename = os.path.basename(filename).split('%2F')[3]
-    #     print(basename)
-
-
-    #     # Path to the file
-    #     path_file = filename #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/allfiles.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
-    #     # File name vcf file
-    #     name_vcf = f'{out_path}{basename}.vcf.gz'#"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz" # "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/" #all_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
-    #     # Open and unzip file
-    #     project_file = gzip.open(path_file, 'rt')
-
-    #     # cmd = 'grep -c ".*" D:/Hanze_Groningen/STAGE/NEW PLAN/ALL_AML.tsv.gz' #f'zcat {path_file} | wc -l'
-    #     # number_lines = os.system(cmd)
-    #     # print(number_lines)
-    #     # Calls read_file
-    #     list_donor, list_snp= set_donor_snp(project_file)
-    #     print(len(list_donor))
-    #     print(len(list_snp))
-    #     # Creating a len(list_snp) * len(list_donor) sparse matrix
-    #     sparseMatrix = csr_matrix((len(list_snp), len(list_donor)), 
-    #                             dtype = np.int8).toarray()
-        
-    #     # Print the sparse matrix
-    #     print(sparseMatrix)
-    #     project_file = gzip.open(path_file, 'rt')
-    #     sparseMatrix = create_table(sparseMatrix, project_file, list_donor, list_snp)
-    #     create_vcf(sparseMatrix, list_donor, list_snp, name_vcf)
-    
+            file = glob.glob(f"{path}download*.{project}.tsv.gz")
+            # Open and unzip file
+            project_file = gzip.open(file[0], 'rt')
+            set_donor, set_snp = set_donor_snp(project_file, set_donor, set_snp)
+        # Creating a len(list(set_snp)) * len(list(set_donor)) sparse matrix
+        sparseMatrix = csr_matrix((len(list(set_snp)), len(list(set_donor))), 
+                                dtype = np.int8).toarray()
+        for project in projects['project_ID']:
+            file = glob.glob(f"{path}download*.{project}.tsv.gz")
+            # Open and unzip file
+            project_file = gzip.open(file[0], 'rt')
+            sparseMatrix = create_table(sparseMatrix, project_file, list(set_donor), list(set_snp))
+            create_vcf(sparseMatrix, list(set_donor), list(set_snp), name_vcf)
 
 
 if __name__ == '__main__':
