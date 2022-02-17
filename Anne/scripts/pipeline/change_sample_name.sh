@@ -29,6 +29,7 @@ do
     change_sample_name() {
         samtools view -H ${2}${1}.bam  | sed "s/SM:[^\t]*/SM:${1}/g" | samtools reheader - ${2}${1}.bam > ${2}SN_${FILE_NUM}.bam
         samtools index ${2}SN_${FILE_NUM}.bam
+        rm ${2}${1}.bam
     }
 
     #source /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/make_vcf.sh
