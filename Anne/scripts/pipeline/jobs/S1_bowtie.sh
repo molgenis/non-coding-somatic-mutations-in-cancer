@@ -35,6 +35,7 @@ GENOOM=${PATH_GENOOM}${CHROM}.fa
 if [ ! -f ${GENOOM} ]; then
     gunzip -c ${GENOOM}.gz > ${GENOOM}
 fi
+sleep 13
 echo 'test'
 
 
@@ -77,7 +78,7 @@ ml Anaconda3/5.3.0
 source activate stage
 
 # RUN: file_prep.sh
-source ${SCRIPT_PATH}file_prep.sh
+# source ${SCRIPT_PATH}file_prep.sh
 
 # echo ${METHOD}
 # # RUN: align.sh
@@ -112,8 +113,8 @@ source ${SCRIPT_PATH}file_prep.sh
 
 
 # rm ${PATH_GENOOM}${CHROM}.bed
-# rm ${PATH_GENOOM}${CHROM}.dict
-# rm ${GENOOM}
+rm ${PATH_GENOOM}${CHROM}.dict
+rm ${GENOOM}
 # rm ${GENOOM}.amb
 # rm ${GENOOM}.ann
 # rm ${GENOOM}.fai
