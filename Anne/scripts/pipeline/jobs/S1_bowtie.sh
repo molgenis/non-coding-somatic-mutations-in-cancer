@@ -32,7 +32,14 @@ else
 fi
 
 GENOOM=${PATH_GENOOM}${CHROM}.fa
-gunzip -c ${PATH_GENOOM}${CHROM}.fa.gz > ${PATH_GENOOM}${CHROM}.fa
+if [ ! -f ${GENOOM} ]; then
+    gunzip -c ${GENOOM}.gz > ${GENOOM}
+fi
+# dict file
+gatk CreateSequenceDictionary -R ${GENOOM}
+# index file
+samtools faidx ${GENOOM}
+
 
 ml SAMtools/1.9-foss-2018b
 # When file doesn't exist.
@@ -106,6 +113,14 @@ source ${SCRIPT_PATH}file_prep.sh
 # echo 'dbSNP_annotate'
 # source ${SCRIPT_PATH}dbSNP_annotate.sh
 
+
+# rm ${PATH_GENOOM}${CHROM}.bed
+# rm ${PATH_GENOOM}${CHROM}.dict
+# rm ${GENOOM}
+# rm ${GENOOM}.amb
+# rm ${GENOOM}.ann
+# rm ${GENOOM}.fai
+# rm ${GENOOM}.pac
 
 
 echo 'THE END END END END'
