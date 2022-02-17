@@ -93,13 +93,13 @@ def create_table(sparseMatrix, project_file, list_donor, list_snp):
     return sparseMatrix
 
 def create_vcf(sparseMatrix, list_donor, list_snp, name_vcf):
-    print('-----')
+    # print('-----')
     df = pd.DataFrame(data=sparseMatrix, columns=list_donor)
     df['snp_id'] = list_snp
     df[['#CHROM', 'POS', 'REF', 'ALT']] = df['snp_id'].str.split('_', expand=True)
     df[['ID', 'QUAL', 'FILTER', 'INFO', 'FORMAT']] = '.'
     order_vcf = ['#CHROM', 'POS', 'ID', 'REF', 'ALT', 'QUAL', 'FILTER', 'INFO', 'FORMAT'] + list_donor
-    print(order_vcf[:14])
+    # print(order_vcf[:14])
     df = df[order_vcf]
     # print(df)
     df.to_csv(name_vcf, sep="\t", index=False, encoding='utf-8', 
@@ -131,6 +131,7 @@ def main():
         sparseMatrix = csr_matrix((len(list(set_snp)), len(list(set_donor))), 
                                 dtype = np.int8).toarray()
         for project in projects['project_ID']:
+            print(project)
             file = glob.glob(f"{path}download*.{project}.tsv.gz")
             # Open and unzip file
             project_file = gzip.open(file[0], 'rt')

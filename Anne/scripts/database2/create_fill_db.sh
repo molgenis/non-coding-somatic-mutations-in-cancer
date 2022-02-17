@@ -17,12 +17,13 @@ source activate stage
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/database2/
 PATH_DATA=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_data_db/ #todo /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_copy/
 DB_NAME='00Database_internship_UPDATE2.0.db' #'Database_internship_UPDATE2.0'
-DATABASE_GENE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/${DB_NAME}.db
+DATABASE_SNP=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/${DB_NAME}.db
 GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
 
 #A, D, H, W, M, U, E, G, K, N, O, T, R, S, C, B, P, L
 # LETTERS1=('UT')
-LETTERS1=('O')
+# GEDAAN: 'O' 'A' 'D' 'H' 'W' 'U' 'G' 'K' 'N')
+LETTERS1=('A' 'D' 'H' 'W' 'U' 'G' 'K' 'N')
 # LETTERS1=('A' 'D' 'H' 'W' 'U' 'G' 'K' 'N' 'O' 'T' 'R')
 # LETTERS2=('B' 'C')
 # LETTERS3=('L')
@@ -31,7 +32,7 @@ LETTERS1=('O')
 # LETTERS6=('E')
 # LETTERS7=('M')
 
-# python3 ${SCRIPT_PATH}create_db.py ${DATABASE_GENE}
+python3 ${SCRIPT_PATH}create_db.py ${DATABASE_SNP}
 
 for LETTER in "${LETTERS1[@]}"
 do
