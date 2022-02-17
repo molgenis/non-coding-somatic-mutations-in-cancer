@@ -29,18 +29,18 @@ do
 
     cd ${PATH_DIR}${NUMBER}
     # Filters a certain chromosome from the bam file
-    samtools view -h ${PATH_DIR}${FILE_NUM}.sorted.bam ${CHROM} > ${PATH_DIR}${FILE_NUM}_${CHROM}.sam
-    samtools view -bS ${PATH_DIR}${FILE_NUM}_${CHROM}.sam > ${PATH_DIR}${FILE_NUM}_${CHROM}.bam
+    samtools view -h ${PATH_DIR}${FILE_NUM}.sorted.bam.gz ${CHROM} > ${PATH_DIR}${FILE_NUM}_${CHROM}.sam.gz
+    samtools view -bS ${PATH_DIR}${FILE_NUM}_${CHROM}.sam.gz > ${PATH_DIR}${FILE_NUM}_${CHROM}.bam.gz
     # BAM files must be resorted so that they are ordered by read ID instead of location in the reference
-    samtools sort -n ${PATH_DIR}${FILE_NUM}_${CHROM}.bam -o ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_byName.sorted.bam
+    samtools sort -n ${PATH_DIR}${FILE_NUM}_${CHROM}.bam.gz -o ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_byName.sorted.bam.gz
     # Extract the FASTQ reads into two paired read files
     cd ${PATH_DIR}${NUMBER}
-    samtools fastq -@ 8 ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_byName.sorted.bam -1 ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq -2 ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq -0 /dev/null -s /dev/null -n
+    samtools fastq -@ 8 ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_byName.sorted.bam.gz -1 ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq.gz -2 ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq.gz -0 /dev/null -s /dev/null -n
     # Runs FastQC to see the quality of the reads of the file.
     # On fastq files
-    fastqc -f fastq -o ${PATH_DIR}${NUMBER}/${CHROM}/QC ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq
+    fastqc -f fastq -o ${PATH_DIR}${NUMBER}/${CHROM}/QC ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq.gz ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq.gz
     # On bam file
-    fastqc -f bam -o ${PATH_DIR}${NUMBER}/${CHROM}/QC ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_byName.sorted.bam
+    fastqc -f bam -o ${PATH_DIR}${NUMBER}/${CHROM}/QC ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_byName.sorted.bam.gz
 
     echo "EIND file prep - ${NUMBER}"
 done

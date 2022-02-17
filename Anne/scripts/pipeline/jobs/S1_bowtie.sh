@@ -32,6 +32,7 @@ else
 fi
 
 GENOOM=${PATH_GENOOM}${CHROM}.fa
+gunzip -c ${PATH_GENOOM}${CHROM}.fa.gz > ${PATH_GENOOM}${CHROM}.fa
 
 ml SAMtools/1.9-foss-2018b
 # When file doesn't exist.
@@ -44,7 +45,7 @@ if [ ! -f ${PATH_GENOOM}${CHROM}.dict ]; then
 fi
 
 # Array of tissue numbers
-TISSUE_ARR=(4094 4099 4104)
+TISSUE_ARR=(4094) # 4099 4104)
 # Sample numbers
 SAMPLE=S1
 
@@ -72,38 +73,38 @@ ml Anaconda3/5.3.0
 source activate stage
 
 # RUN: file_prep.sh
-#source ${SCRIPT_PATH}file_prep.sh
+source ${SCRIPT_PATH}file_prep.sh
 
-echo ${METHOD}
-# RUN: align.sh
-echo 'align.sh'
-source ${SCRIPT_PATH}align.sh
-mkdir -p ${GENERAL_PATH}${SAMPLE}/${CHROM}/mutect_${METHOD}/
-# RUN: make_file_vc.py
-echo 'make_file_vc.py'
-python3 ${SCRIPT_PATH}make_file_vc.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
-# RUN: change_sample_name.sh
-echo 'change_sample_name'
-source ${SCRIPT_PATH}change_sample_name.sh
-# RUN: variant_calling_arguments.sh
-# mutect2
-echo 'variant_calling_arguments.sh'
-source ${SCRIPT_PATH}variant_calling_arguments.sh
-# RUN: compare_vcf.sh
-echo 'compare_vcf.sh'
-source ${SCRIPT_PATH}compare_vcf.sh
-# RUN: merge_vcf.sh
-# Merge files
-COMP_TYPE=mutect2 # manual, mutect2
-echo 'merge_vcf1'
-source ${SCRIPT_PATH}merge_vcf.sh
-COMP_TYPE=manual # manual, mutect2
-echo 'vmerge_vcf2'
-source ${SCRIPT_PATH}merge_vcf.sh
-# RUN: dbSNP_annotate.sh
-# filteren van dbSNP (annoteren)
-echo 'dbSNP_annotate'
-source ${SCRIPT_PATH}dbSNP_annotate.sh
+# echo ${METHOD}
+# # RUN: align.sh
+# echo 'align.sh'
+# source ${SCRIPT_PATH}align.sh
+# mkdir -p ${GENERAL_PATH}${SAMPLE}/${CHROM}/mutect_${METHOD}/
+# # RUN: make_file_vc.py
+# echo 'make_file_vc.py'
+# python3 ${SCRIPT_PATH}make_file_vc.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
+# # RUN: change_sample_name.sh
+# echo 'change_sample_name'
+# source ${SCRIPT_PATH}change_sample_name.sh
+# # RUN: variant_calling_arguments.sh
+# # mutect2
+# echo 'variant_calling_arguments.sh'
+# source ${SCRIPT_PATH}variant_calling_arguments.sh
+# # RUN: compare_vcf.sh
+# echo 'compare_vcf.sh'
+# source ${SCRIPT_PATH}compare_vcf.sh
+# # RUN: merge_vcf.sh
+# # Merge files
+# COMP_TYPE=mutect2 # manual, mutect2
+# echo 'merge_vcf1'
+# source ${SCRIPT_PATH}merge_vcf.sh
+# COMP_TYPE=manual # manual, mutect2
+# echo 'vmerge_vcf2'
+# source ${SCRIPT_PATH}merge_vcf.sh
+# # RUN: dbSNP_annotate.sh
+# # filteren van dbSNP (annoteren)
+# echo 'dbSNP_annotate'
+# source ${SCRIPT_PATH}dbSNP_annotate.sh
 
 
 
