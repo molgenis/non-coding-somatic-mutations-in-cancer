@@ -35,10 +35,7 @@ GENOOM=${PATH_GENOOM}${CHROM}.fa
 if [ ! -f ${GENOOM} ]; then
     gunzip -c ${GENOOM}.gz > ${GENOOM}
 fi
-# dict file
-gatk CreateSequenceDictionary -R ${GENOOM}
-# index file
-samtools faidx ${GENOOM}
+echo 'test'
 
 
 ml SAMtools/1.9-foss-2018b
