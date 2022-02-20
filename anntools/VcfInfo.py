@@ -5,7 +5,6 @@ Created on 12 feb. 2022
 '''
 
 import deprecation
-import pandas
 
 class VcfInfo:
     '''
@@ -17,7 +16,6 @@ class VcfInfo:
         '''
         Constructor
         '''
-        self.snps = None
         self.info = None
 
 
@@ -58,12 +56,3 @@ class VcfInfo:
             'INFO' : infos}
         self.info = data
 
-    @deprecation.deprecated(details="now using numpy for efficiency sake")
-    def set_data_pandas(self, info_panda):
-        '''
-
-        '''
-        # copy a dataframe
-        data = info_panda
-        self.info = info_panda
-        self.snps = info_panda.index.values()

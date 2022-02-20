@@ -7,7 +7,6 @@ Created on 12 feb. 2022
 # own imports
 import TypeConverter
 import Constants
-import itertools
 
 # external exports
 import sqlite3
@@ -113,9 +112,9 @@ class DbConnector:
         # convert to a VcfInfo object
         vcf_info = TypeConverter.TypeConverter.tuples_to_vcfinfo(snp_metadatas)
         # now get the genotype data
-        snp_genodata = self.get_snp_genodata(study_id)
+        snp_genodata = self.get_snp_genodata(snp_ids, donor_ids)
         # turn into VcfMatrix object
-        vcf_geno = TypeConverter.TypeConverter.tuples_to_vcfdata(snp_genodata)
+        vcf_geno = TypeConverter.TypeConverter.tuples_to_vcfdata(snp_genodata, snp_ids, donor_ids)
         # TODO finish rest of method
         print('get_study_data is not finished')
         print(vcf_info)
@@ -216,9 +215,9 @@ class DbConnector:
                 list_results.append(rows_portion)
                 # the new starts is the old start
                 start = end + 1
+
             # merge all of the lists of lists, into one list
-            rows  = [j for i in list_results for j in i]
-            print(rows)
+            rows = [j for i in list_results for j in i]
 
         else:
             self.cursor.execute(query, tuple(snp_ids))
@@ -226,10 +225,99 @@ class DbConnector:
             rows = self.cursor.fetchall()
         return rows
 
-    def get_snp_genodata(self, study_id):
-        # TODO implement
-        print('get_snp_genodata not implemented')
-        return None
+    def get_snp_genodata(self, snp_ids, donor_ids):
+        # init the start of the query
+        query_start = 'SELECT dhs.snp_ID, dhs.donor_ID, dhs.mutant_allele_read_count, dhs.total_read_count FROM donor_has_snp dhs WHERE dhs.snp_ID IN ('
+        # add the donor ID questions
+        query_in_parameters = ','.join('?' * len(snp_ids))
+        # finish the query
+        query = ''.join([query_start, query_in_parameters, ') AND donor_ID IN ('])
+        # execute the query
+        rows = None
+        # check the size of the query
+        if len(snp_ids) > 999:
+            # we need to do this multple times then
+            list_results = []
+            # we will start at zero
+            start = 0
+            end = 0
+            while end < len(snp_ids):
+                # init because we can split a second time
+                rows_portion = None
+                # check how far to go
+                end = start + 999
+                # of course we won't end in a exactly the right sizes of slices
+                if end > len(snp_ids):
+                    # we will grab to the end of the list, instead of start + 1000
+                    end = start + len(snp_ids)
+                # get the relevant ids
+                ids_interation = snp_ids[start:end]
+                # use these for our query
+                query_in_parameters = ','.join('?' * len(ids_interation))
+                # finish the query
+                query_first_part = ''.join([query_start, query_in_parameters, ') AND donor_ID IN ('])
+                # check if we also need to subset the donors
+                if len(donor_ids) > 999:
+                    rows_portion = self.split_query(query_first_part, ids_interation, donor_ids)
+                else:
+                    # build the rest of the query
+                    query_in_parameters_2 = ','.join('?' * len(donor_ids))
+                    # finish the query
+                    query = ''.join([query_first_part, query_in_parameters_2, ')'])
+                    self.cursor.execute(query, tuple(ids_interation + donor_ids))
+                    # fetch the result
+                    rows_portion = self.cursor.fetchall()
+
+                # add to the list of queries
+                list_results.append(rows_portion)
+                # the new starts is the old start
+                start = end + 1
+            # merge all of the lists of lists, into one list
+            rows = [j for i in list_results for j in i]
+        else:
+            # we don't need to split by snps, but we could still need to split the donors
+            if len(donor_ids) > 999:
+                rows = self.split_query(query, donor_ids, snp_ids)
+            else:
+                # build the rest of the query
+                query_in_parameters_2 = ','.join('?' * len(donor_ids))
+                # finish the query
+                query = ''.join([query, query_in_parameters_2, ')'])
+                self.cursor.execute(query, tuple(snp_ids + donor_ids))
+                # fetch the result
+                rows = self.cursor.fetchall()
+
+        return rows
+
+    def split_query(self, query_start, ids, query_start_ids):
+        # we need to do this multiple times then
+        list_results = []
+        # we will start at zero
+        start = 0
+        end = 0
+        while end < len(ids):
+            # check how far to go
+            end = start + 999
+            # of course we won't end in a exactly the right sizes of slices
+            if end > len(ids):
+                # we will grab to the end of the list, instead of start + 1000
+                end = start + len(ids)
+            # get the relevant ids
+            ids_interation = ids[start:end]
+            # use these for our query
+            query_in_parameters = ','.join('?' * len(ids_interation))
+            # finish the query
+            query = ''.join([query_start, query_in_parameters, ')'])
+            self.cursor.execute(query, tuple(query_start_ids, ids_interation))
+            # fetch the result
+            rows_portion = self.cursor.fetchall()
+            # add to the list of queries
+            list_results.append(rows_portion)
+            # the new starts is the old start
+            start = end + 1
+        rows = [j for i in list_results for j in i]
+        return rows
+
 
     def create_temporary_donor_table(self, study_id):
         '''

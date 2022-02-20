@@ -137,8 +137,9 @@ def test_run():
     :return: NONE
     '''
 
+    # '/Users/royoelen/Desktop/Database_internship_UPDATE'
     # create a dictionary that looks like what the argparse would look like
-    setup = {'db_location' : '/Users/royoelen/Desktop/Database_internship_UPDATE',
+    setup = {'db_location' : '/Users/royoelen/Desktop/00Database_internship_UPDATE2.0',
              'output_location' : '/Users/royoelen/Desktop/',
              'study' : 'bla',
              'num_threads' : 2,
@@ -154,13 +155,17 @@ def test_run():
     )
     # use a couple of functions
     #query_handler.show_tables()
+    print(query_handler.get_columns('donor_has_snp'))
     #query_handler.get_studies()
     #query_handler.get_columns('project')
-    #query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf',
-    #                               [{'study_id' : 1, 'study_name' : 'ALL-US'},
-    #                               {'study_id' : 2, 'study_name' : 'AML-US'}])
+    query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf',
+                                   [
+                                        {'study_id' : 1, 'study_name' : 'ALL-US'}
+                                   #    ,
+                                   #     {'study_id' : 2, 'study_name' : 'AML-US'}
+                                   ])
 
-    query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf')
+    #query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf')
 
 if __name__ == '__main__':
     '''

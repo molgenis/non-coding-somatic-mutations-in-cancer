@@ -10,19 +10,14 @@ class VcfMatrix:
     '''
 
 
-    def __init__(self, params):
+    def __init__(self, participants=None, snps=None, matrix=None):
         '''
         Constructor
         '''
-        self.participants = None
-        self.snps = None
-        self.matrix = None
+        self.participants = participants
+        self.snps = snps
+        self.matrix = matrix
 
 
-    def set_data_pandas(self, matrix_panda):
-        '''
 
-        '''
-        # copy a dataframe
-        self.matrix = matrix_panda
-        self.snps = matrix_panda.index.values()
+
