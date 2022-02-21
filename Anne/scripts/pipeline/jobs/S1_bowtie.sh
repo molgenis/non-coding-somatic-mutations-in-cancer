@@ -80,7 +80,7 @@ source activate stage
 echo ${METHOD}
 # RUN: align.sh
 echo 'align.sh'
-#source ${SCRIPT_PATH}align.sh
+source ${SCRIPT_PATH}align.sh
 mkdir -p ${GENERAL_PATH}${SAMPLE}/${CHROM}/mutect_${METHOD}/
 # RUN: make_file_vc.py
 echo 'make_file_vc.py'
