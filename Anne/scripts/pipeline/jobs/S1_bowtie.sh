@@ -75,7 +75,7 @@ ml Anaconda3/5.3.0
 source activate stage
 
 # RUN: file_prep.sh
-#source ${SCRIPT_PATH}file_prep.sh
+source ${SCRIPT_PATH}file_prep.sh
 
 echo ${METHOD}
 # RUN: align.sh
