@@ -98,8 +98,6 @@ def create_table(sparseMatrix, project_file, list_donor, list_snp):
                     # print(homo_hetero)
                     sparseMatrix[snp_index, donor_index] = homo_hetero
                 # if project_code_old != project_code:
-            else:
-                print('-')
             snp_id_old = snp_id
             donor_id_old = donor_id
     return sparseMatrix
