@@ -110,14 +110,14 @@ class Sample:
             arg_mutect2_hc = ''
             # Add each hc to the different parameters
             for hc in edited_number_hc:
-                arg_hc, arg_mutect2_hc, number_hc = self.set_info(self, hc, arg_hc, head_path, chrom, type_aln,
+                arg_hc, arg_mutect2_hc, number_hc = self.set_info(hc, arg_hc, head_path, chrom, type_aln,
                                                                   type_aln2, arg_mutect2_hc, 'hc')
             # Size of combination is set to number_of_tumors
             for edited_number_tumors in combinations(edited_list_tumors, number_of_tumors):
                 arg_tumor = ''
                 arg_mutect2_tumor = ''
                 for tum in edited_number_tumors:
-                    arg_tumor, arg_mutect2_tumor, number_tum = self.set_info(self, tum, arg_tumor, head_path, chrom,
+                    arg_tumor, arg_mutect2_tumor, number_tum = self.set_info(tum, arg_tumor, head_path, chrom,
                                                                              type_aln, type_aln2, arg_mutect2_tumor,
                                                                              'tum')
                     if number_of_hc == 1 and number_of_tumors == 1:
