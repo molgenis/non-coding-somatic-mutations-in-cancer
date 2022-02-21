@@ -2,6 +2,7 @@
 
 # bam --> VCF
 mutect2_vcf() {
+    ml GATK/4.1.4.1-Java-8-LTS
     # Mutect2:            Mutect2 is designed to call somatic variants only
     # FilterMutectCalls:  Filter somatic SNVs and indels called by Mutect2
     # Do this now in 4 different ways, so that you can check later whether there is much difference.
