@@ -47,7 +47,7 @@ if [ ! -f ${PATH_GENOOM}${CHROM}.dict ]; then
 fi
 
 # Array of tissue numbers
-TISSUE_ARR=(4094) # 4099 4104)
+TISSUE_ARR=(4099) #(4094 4099 4104)
 # Sample numbers
 SAMPLE=S1
 

@@ -50,6 +50,7 @@ do
         # Marking and removing duplicates
         java -jar /apps/software/picard/2.20.5-Java-11-LTS/picard.jar  MarkDuplicates I= ${1}.RG.bam O= ${1}.DR.bam M=${1}_output_metrics.txt REMOVE_DUPLICATES=True VALIDATION_STRINGENCY=LENIENT &> ${1}_logFile.log
         rm ${1}.RG.bam
+        rm ${1}.RG.bam.bai
         # Index bam file
         samtools index ${1}.DR.bam
     }
