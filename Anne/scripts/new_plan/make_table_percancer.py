@@ -62,7 +62,9 @@ def create_table(sparseMatrix, project_file, list_donor, list_snp):
     header = project_file.readline().strip().split("\t")
     
     # Loop over the lines
-    for line in project_file:
+    for num, line in enumerate(project_file):
+        if (num %1000) == 0:
+            print(num)
         # print(num)
         # Strip the line
         line = line.strip()
@@ -127,6 +129,8 @@ def main():
             # Open and unzip file
             project_file = gzip.open(file[0], 'rt')
             set_donor, set_snp = set_donor_snp(project_file, set_donor, set_snp)
+        print(f'len donor: {len(set_donor)}')
+        print(f'len snp: {len(set_snp)}')
         # Creating a len(list(set_snp)) * len(list(set_donor)) sparse matrix
         sparseMatrix = csr_matrix((len(list(set_snp)), len(list(set_donor))), 
                                 dtype = np.int8).toarray()
@@ -136,7 +140,7 @@ def main():
             # Open and unzip file
             project_file = gzip.open(file[0], 'rt')
             sparseMatrix = create_table(sparseMatrix, project_file, list(set_donor), list(set_snp))
-            create_vcf(sparseMatrix, list(set_donor), list(set_snp), name_vcf)
+        create_vcf(sparseMatrix, list(set_donor), list(set_snp), name_vcf)
 
 
 if __name__ == '__main__':
