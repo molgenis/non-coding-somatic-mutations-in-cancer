@@ -14,7 +14,9 @@ from scipy.sparse import csr_matrix
 def set_donor_snp(project_file, set_donor, set_snp):
     header = project_file.readline().strip().split("\t")
     # Loop over the lines
-    for line in project_file:
+    for num, line in enumerate(project_file):
+        if (num %100000) == 0:
+            print(num)
         # print(num)
         # Strip the line
         line = line.strip()
@@ -60,11 +62,14 @@ def check_homo_hetero(total_read_count, mutant_allele_read_count):
 def create_table(sparseMatrix, project_file, list_donor, list_snp):
     print('check')
     header = project_file.readline().strip().split("\t")
+    snp_id_old = ''
+    donor_id_old = ''
     
     # Loop over the lines
     for num, line in enumerate(project_file):
-        if (num %1000) == 0:
+        if (num %100000) == 0:
             print(num)
+        
         # print(num)
         # Strip the line
         line = line.strip()
@@ -82,16 +87,21 @@ def create_table(sparseMatrix, project_file, list_donor, list_snp):
             ref = elems[15]
             alt = elems[16]
             snp_id = f'{chr}_{pos}_{ref}_{alt}'
-            snp_index = list_snp.index(snp_id)
-            # print(f'{snp_id} - {snp_index}')
+            if (snp_id_old != snp_id) and (donor_id_old != donor_id):
+                snp_index = list_snp.index(snp_id)
+                # print(f'{snp_id} - {snp_index}')
 
-            total_read_count = elems[19]
-            mutant_allele_read_count = elems[20]
-            homo_hetero = check_homo_hetero(total_read_count, mutant_allele_read_count)
-            if homo_hetero != '.':
-                # print(homo_hetero)
-                sparseMatrix[snp_index, donor_index] = homo_hetero
-            # if project_code_old != project_code:
+                total_read_count = elems[19]
+                mutant_allele_read_count = elems[20]
+                homo_hetero = check_homo_hetero(total_read_count, mutant_allele_read_count)
+                if homo_hetero != '.':
+                    # print(homo_hetero)
+                    sparseMatrix[snp_index, donor_index] = homo_hetero
+                # if project_code_old != project_code:
+            else:
+                print('-')
+            snp_id_old = snp_id
+            donor_id_old = donor_id
     return sparseMatrix
 
 def create_vcf(sparseMatrix, list_donor, list_snp, name_vcf):
