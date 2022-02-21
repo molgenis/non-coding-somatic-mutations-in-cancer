@@ -27,6 +27,7 @@ do
     echo $NUMBER
     # Function that changed the sample names
     change_sample_name() {
+        ml SAMtools/1.9-foss-2018b
         samtools view -H ${2}${1}.bam  | sed "s/SM:[^\t]*/SM:${1}/g" | samtools reheader - ${2}${1}.bam > ${2}SN_${FILE_NUM}.bam
         samtools index ${2}SN_${FILE_NUM}.bam
         rm ${2}${1}.bam
