@@ -84,10 +84,10 @@ echo 'align.sh'
 mkdir -p ${GENERAL_PATH}${SAMPLE}/${CHROM}/mutect_${METHOD}/
 # RUN: make_file_vc.py
 echo 'make_file_vc.py'
-python3 ${SCRIPT_PATH}make_file_vc.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
+#python3 ${SCRIPT_PATH}make_file_vc.py ${GENERAL_PATH} ${NUMBER_OF_TUMORS_py} ${NUMBER_OF_HC_py} ${TYPE_SAMPLE_py} ${METHOD} ${METH_FILE} ${CHROM}
 # # RUN: change_sample_name.sh
-# echo 'change_sample_name'
-# source ${SCRIPT_PATH}change_sample_name.sh
+echo 'change_sample_name'
+source ${SCRIPT_PATH}change_sample_name.sh
 # # RUN: variant_calling_arguments.sh
 # # mutect2
 # echo 'variant_calling_arguments.sh'

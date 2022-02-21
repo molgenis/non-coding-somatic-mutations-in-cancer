@@ -45,6 +45,7 @@ do
         # ml picard/2.20.5-Java-11-LTS
         java -jar /apps/software/picard/2.20.5-Java-11-LTS/picard.jar  AddOrReplaceReadGroups INPUT= ${1}_sort.bam OUTPUT= ${1}.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
         rm ${1}_sort.bam
+        rm ${1}_sort.bam.bai
         # Index bam file
         samtools index ${1}.RG.bam
         # Marking and removing duplicates
