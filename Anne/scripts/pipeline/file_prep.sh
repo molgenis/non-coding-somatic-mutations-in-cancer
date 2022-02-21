@@ -28,6 +28,7 @@ do
     mkdir -p ${PATH_DIR}${NUMBER}/${CHROM}/QC
 
     cd ${PATH_DIR}${NUMBER}
+    ml SAMtools/1.9-foss-2018b
     # Filters a certain chromosome from the bam file
     # When file doesn't exist.
     if [ ! -f ${PATH_DIR}${FILE_NUM}.sorted.bam ]; then
