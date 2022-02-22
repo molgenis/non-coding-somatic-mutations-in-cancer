@@ -7,6 +7,9 @@ Created on 12 feb. 2022
 # own imports
 import TypeConverter
 import Constants
+import VcfInfo
+import VcfMatrix
+import VcfPortion
 
 # external exports
 import sqlite3
@@ -115,9 +118,14 @@ class DbConnector:
         snp_genodata = self.get_snp_genodata(snp_ids, donor_ids)
         # turn into VcfMatrix object
         vcf_geno = TypeConverter.TypeConverter.tuples_to_vcfdata(snp_genodata, snp_ids, donor_ids)
-        # TODO finish rest of method
-        print('get_study_data is not finished')
-        print(vcf_info)
+        # turn into a VcfPortion object
+        vcf_portion = VcfPortion.VcfPortion(vcf_geno, vcf_info)
+        # for memory sake, let's remove some variables
+        del(snp_metadatas)
+        del(snp_genodata)
+        # return the result
+        return vcf_portion
+
 
 
 
@@ -225,7 +233,7 @@ class DbConnector:
             rows = self.cursor.fetchall()
         return rows
 
-    def get_snp_genodata(self, snp_ids, donor_ids):
+    def get_snp_genodata(self, snp_ids, donor_ids, max_snp_id_length=499, max_donor_id_length=499):
         # init the start of the query
         query_start = 'SELECT dhs.snp_ID, dhs.donor_ID, dhs.mutant_allele_read_count, dhs.total_read_count FROM donor_has_snp dhs WHERE dhs.snp_ID IN ('
         # add the donor ID questions
@@ -245,7 +253,7 @@ class DbConnector:
                 # init because we can split a second time
                 rows_portion = None
                 # check how far to go
-                end = start + 999
+                end = start + max_snp_id_length
                 # of course we won't end in a exactly the right sizes of slices
                 if end > len(snp_ids):
                     # we will grab to the end of the list, instead of start + 1000
@@ -257,8 +265,8 @@ class DbConnector:
                 # finish the query
                 query_first_part = ''.join([query_start, query_in_parameters, ') AND donor_ID IN ('])
                 # check if we also need to subset the donors
-                if len(donor_ids) > 999:
-                    rows_portion = self.split_query(query_first_part, ids_interation, donor_ids)
+                if len(donor_ids) > max_donor_id_length:
+                    rows_portion = self.split_query(query_first_part, ids_interation, donor_ids, max_donor_id_length)
                 else:
                     # build the rest of the query
                     query_in_parameters_2 = ','.join('?' * len(donor_ids))
@@ -276,8 +284,8 @@ class DbConnector:
             rows = [j for i in list_results for j in i]
         else:
             # we don't need to split by snps, but we could still need to split the donors
-            if len(donor_ids) > 999:
-                rows = self.split_query(query, donor_ids, snp_ids)
+            if len(donor_ids) > max_donor_id_length:
+                rows = self.split_query(query, donor_ids, snp_ids, max_donor_id_length)
             else:
                 # build the rest of the query
                 query_in_parameters_2 = ','.join('?' * len(donor_ids))
@@ -289,7 +297,7 @@ class DbConnector:
 
         return rows
 
-    def split_query(self, query_start, ids, query_start_ids):
+    def split_query(self, query_start, ids, query_start_ids, max_id_length=499):
         # we need to do this multiple times then
         list_results = []
         # we will start at zero
@@ -297,7 +305,7 @@ class DbConnector:
         end = 0
         while end < len(ids):
             # check how far to go
-            end = start + 999
+            end = start + max_id_length
             # of course we won't end in a exactly the right sizes of slices
             if end > len(ids):
                 # we will grab to the end of the list, instead of start + 1000

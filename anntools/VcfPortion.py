@@ -15,28 +15,18 @@ class VcfPortion(object):
     '''
 
 
-    def __init__(self, genotype_matrix, vcf_info):
+    def __init__(self, vcf_matrix=None, vcf_info=None):
         '''
         Constructor
         '''
-        self.genotype_matrix = None
-        self.vcf_info = None
+        self.vcf_matrix = vcf_matrix
+        self.vcf_info = vcf_info
 
+
+    def __str__(self):
+        message = ''.join([ 'VcfPortion object\n' , 'VcfInfo\n' , str(self.vcf_info) , '\n' , 'VcfFmatrix\n' + str(self.vcf_matrix) , '\n'])
+        return message
 
     def get_snps_by_ids(self, identifiers):
-        # subset the info portion
-        subset_info_portion = self.vcf_info[self.vcf_info['ID'].isin(identifiers)]
-        # create a new info portion
-        subset_vcf_info = VcfInfo()
-        subset_vcf_info.set_data_panda(subset_info_portion)
-
-        # subset the matrix portion
-        subset_matrix_portion = self.vcf_info[self.vcf_info['ID'].isin(identifiers)]
-        # create a new matrix
-        subset_vcf_matrix = VcfMatrix()
-        subset_vcf_matrix.set_data_pandas(subset_matrix_portion)
-
-        # create the object
-        vcfPortion = VcfPortion(subset_vcf_matrix, subset_vcf_info)
-        # TODO finish 
         print('get_snps_by_ids not yet implemented')
+        return None

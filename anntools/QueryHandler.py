@@ -37,6 +37,16 @@ class QueryHandler:
         self.study_cache = {}
         self.setup_job_manager()
 
+    # override of the default 'to_string'
+    def __str__(self):
+        '''
+        get a string representation of the object
+        :return: a string representation of the object
+        '''
+        message =   'QueryHandler instance\n' + 'db = ' + self.db_location + '\n' + 'output = ' + self.output_location + '\n' + 'study = ' + self.study + '\n' + 'test : ' + str(self.is_test)
+        return(message)
+
+
     def setup_job_manager(self):
         '''
         set up the cluster of database connections
@@ -155,14 +165,14 @@ def test_run():
     )
     # use a couple of functions
     #query_handler.show_tables()
-    print(query_handler.get_columns('donor_has_snp'))
+    #print(query_handler.get_columns('donor_has_snp'))
     #query_handler.get_studies()
     #query_handler.get_columns('project')
     query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf',
                                    [
                                         {'study_id' : 1, 'study_name' : 'ALL-US'}
-                                   #    ,
-                                   #     {'study_id' : 2, 'study_name' : 'AML-US'}
+                                       ,
+                                        {'study_id' : 2, 'study_name' : 'AML-US'}
                                    ])
 
     #query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf')

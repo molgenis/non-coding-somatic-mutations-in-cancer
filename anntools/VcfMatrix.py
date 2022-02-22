@@ -18,6 +18,13 @@ class VcfMatrix:
         self.snps = snps
         self.matrix = matrix
 
-
+    # override to be more informative
+    def __str__(self):
+        '''
+        get a string representation of the object
+        :return: a string representation of the object
+        '''
+        message = ''.join(['genotype matrix across ' , str(len(self.participants)), ' participants and ' , str(len(self.snps)) + ' snps\n'])
+        return message
 
 

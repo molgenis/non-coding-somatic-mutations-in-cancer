@@ -5,19 +5,45 @@ Created on 12 feb. 2022
 '''
 
 import deprecation
-
+import numpy
 class VcfInfo:
     '''
     classdocs
     '''
 
 
-    def __init__(self):
+    def __init__(self, chromosomes=None, positions=None, identifiers=None, references=None, alts=None, qualts=None, filters=None, infos=None):
         '''
-        Constructor
+        #TODO documentations here
+        :param chromosomes:
+        :param positions:
+        :param identifiers:
+        :param references:
+        :param alts:
+        :param qualts:
+        :param filters:
+        :param infos:
         '''
-        self.info = None
+        data = {
+            '#CHROM' : chromosomes,
+            'POS' : positions,
+            'ID' : identifiers,
+            'REF' : references,
+            'ALT' : alts,
+            'QUAL' : qualts,
+            'FILTER' : filters,
+            'INFO' : infos}
+        self.info = data
 
+    # override to be more informative
+    def __str__(self):
+        '''
+        get a string representation of the object
+        :return: a string representation of the object
+        '''
+        message = ''.join(['instance of VcfInfo across ' , str(len(self.info['ID'][0])) , ' genotypes, at ' , str(len(numpy.unique(self.info['#CHROM']))) , ' chromosomes, and ' , str(len(numpy.unique(self.info['POS']))) , ' positions\n'])
+        print(str(self.info['ID']))
+        return message
 
     def set_data_columns(self, chromosomes, positions, identifiers, references, alts, qualts, filters, infos):
         '''

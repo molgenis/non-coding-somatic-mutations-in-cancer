@@ -51,10 +51,14 @@ class TypeConverter:
         # TODO make this not depend on the order
         snp_IDs, snp_chrs, snp_pos_starts, snp_pos_ends, snp_refs, snp_alts = zip(*list_of_tuples)
         # make identifiers and other columns that are currently empty
-        identifiers = numpy.empty([1, len(list_of_tuples)],dtype='U')
+        identifiers = numpy.empty([1, len(list_of_tuples)],dtype='<U12')
         qualts = numpy.empty([1, len(list_of_tuples)])
         filters = numpy.empty([1, len(list_of_tuples)])
         infos = numpy.empty([1, len(list_of_tuples)])
+        # dirty workaround
+        #ids = list()
+        #snp_refs = numpy.empty([1, len(list_of_tuples)])
+        #snp_alts = numpy.empty([1, len(list_of_tuples)])
         # fill everything
         for i in range(0, len(list_of_tuples), 1):
             qualts[0][i] = None
@@ -63,14 +67,19 @@ class TypeConverter:
             qualts[0][i] = None
             snp_chr = str(snp_chrs[i])
             snp_pos = str(snp_pos_starts[i])
-            identifiers[0][i] = ':'.join([snp_chr, snp_pos])
+            ident = ':'.join([snp_chr, snp_pos])
+            identifiers[0][i] = ident
+            #ids.append(ident)
 
         # convert to numpy where needed
         snp_chrs = numpy.array(snp_chrs)
         snp_pos_starts = numpy.array(snp_pos_starts)
+        # ref/alt as well
+        snp_refs = numpy.array(snp_refs)
+        snp_alts = numpy.array(snp_alts)
         # create a new VcfInfo
-        vcf_info = VcfInfo.VcfInfo()
-        vcf_info.set_data_columns(snp_chrs,snp_pos_starts,identifiers, snp_refs,snp_alts,qualts,filters,infos)
+        #vcf_info = VcfInfo.VcfInfo(snp_chrs, snp_pos_starts, numpy.array(ids), snp_refs, snp_alts, None, None, None)
+        vcf_info = VcfInfo.VcfInfo(snp_chrs, snp_pos_starts, identifiers, snp_refs, snp_alts, None, None, None)
         return vcf_info
 
 
@@ -89,12 +98,11 @@ class TypeConverter:
         # empty the matrix
         gt_matrix[:] = numpy.NaN
         # we'll use this opportunity to also determine the order of the donors and genes
-        sorted_donor_ids = numpy.empty((1, nr_donor_ids))
-        sorted_snp_ids = numpy.empty((1, nr_snp_ids))
+        sorted_donor_ids = numpy.empty(nr_donor_ids)
+        sorted_snp_ids = numpy.empty(nr_snp_ids)
 
         # query_start = 'SELECT dhs.snp_ID, dhs.donor_ID, dhs.mutant_allele_read_count, dhs.total_read_count
         for tuple_entry in list_of_tuples:
-            print(tuple_entry)
             # get the snp ID entry in the tuple
             #snp_id = tuple_entry['snp_ID']
             snp_id = tuple_entry[0]
@@ -132,9 +140,9 @@ class TypeConverter:
                 elif dosage >= higher:
                     gt_matrix[snp_pos][donor_pos] = 2
             # we know that in this location, there IDs are present, so let's save them
-            sorted_snp_ids[0][snp_pos] = snp_id
-            sorted_donor_ids[0][donor_pos] = donor_id
+            sorted_snp_ids[snp_pos] = snp_id
+            sorted_donor_ids[donor_pos] = donor_id
         # now turn it into a VcfMatrix object
-        vcf_matrix = VcfMatrix(sorted_donor_ids, sorted_snp_ids, gt_matrix)
+        vcf_matrix = VcfMatrix.VcfMatrix(sorted_donor_ids, sorted_snp_ids, gt_matrix)
 
         return vcf_matrix

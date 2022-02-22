@@ -100,7 +100,7 @@ class JobCluster:
             db_connector = DbConnector.DbConnector(self.database_loc)
         # get the results for the study
         study_result = db_connector.get_study_data(study_id)
-
+        print(study_result)
         FileWriter.FileWriter.write_vcf(study_result, full_output_loc)
 
 
@@ -146,6 +146,49 @@ class JobCluster:
         # now wait for jobs to be done
         for job in jobs:
             job.join()
+        # merge everything
+        self.merge_files(file_names)
+
+    def studies_to_vcf_pooled(self, base_output_loc, studies=[], threads=multiprocessing.cpu_count()-1):
+        '''
+        convert the data in the database of a set of studies to a VCF file
+        :param base_output_loc: the base output loc of the resulting VCF
+        :param studies: a lisft of the internal IDs of the studies you want to write to VCF
+        :return: NONE
+        '''
+        # try the default first
+        studies_to_use = studies
+        # if there are no studies, we'll just do all
+        if len(studies_to_use) < 1:
+            studies_to_use = self.get_studies()
+        # we will use a number of copies of the database
+        copy_number = 1
+        # let's get those jobs then
+        jobs = []
+        file_names = []
+        # make a pool
+        pool = multiprocessing.Pool(threads=threads)
+        for study in studies_to_use:
+            # build the output location
+            random_string = JobCluster.get_random_string(15)
+            # paste the output together
+            output_file_location = ''.join([base_output_loc, '/', random_string, '.vcf.tmp'])
+            file_names.append(output_file_location)
+
+            # get a database file to use
+            database_copy_location = ''.join([self.database_loc, '_', str(copy_number), '.db'])
+            # increment the counter
+            copy_number = copy_number + 1
+            # reset the count if required
+            if copy_number > self.num_threads:
+                copy_number = 1
+
+            # add to the pool
+            pool.apply_async(self.database_to_vcf, args=(study['study_id'], output_file_location,database_copy_location,))
+
+        # now wait for pool to empty
+        pool.close()
+        pool.join()
         # merge everything
         self.merge_files(file_names)
 
