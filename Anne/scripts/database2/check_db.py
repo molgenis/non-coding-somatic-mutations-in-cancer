@@ -26,7 +26,7 @@ def main():
     donors = db.cursor.fetchall()
     for don in donors:
         donorset.add(don['donor_ID'])
-    print(f'len proj: {len(donorset)}')
+    print(f'len donor: {len(donorset)}')
 
 if __name__ == '__main__':
     main()

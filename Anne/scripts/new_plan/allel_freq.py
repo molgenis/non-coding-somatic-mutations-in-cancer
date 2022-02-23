@@ -5,7 +5,7 @@ import glob
 
 
 
-def calculate_all_freq(df, all_freq_path):
+def calculate_all_freq(df, all_freq_path, all_freq_vcf):
     format_index = list(df.columns).index('FORMAT') + 1
     all_freq_df = df.iloc[:, :format_index] 
     select_df = df.iloc[:, format_index:]    
@@ -22,17 +22,23 @@ def calculate_all_freq(df, all_freq_path):
     #     print(f"{col} - {set(all_freq_df[col])}")
     all_freq_df.to_csv(all_freq_path, sep="\t", index=False, encoding='utf-8', 
                 compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+    df['INFO'] = 'AF=' + all_freq_df['alle_freq'].astype(str) + ':AFN=' + all_freq_df['alle_freq_nan'].astype(str) 
+    df.to_csv(all_freq_vcf, sep="\t", index=False, encoding='utf-8', 
+                compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+
     
 
 def main():    
-    # File name vcf file
-    name_vcf = "D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz" # "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/" #all_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
-    all_freq_path = "D:/Hanze_Groningen/STAGE/NEW PLAN/all_freq.tsv.gz"
-    df = pd.read_csv(name_vcf, sep='\t', compression='gzip')
-    calculate_all_freq(df, all_freq_path)
-
-    
-    
+    path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/'
+    path_files = f"{path}*.vcf.gz"
+    # Loop over all files in path that ends with .tsv
+    for filename in glob.glob(path_files):
+        # Get the base name of the specified path
+        basename = os.path.basename(filename)    
+        all_freq_path = f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/allel_freq/af_{basename}'
+        all_freq_vcf = f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/vcf_allel_freq/vcf_af_{basename}'
+        df = pd.read_csv(filename, sep='\t', compression='gzip')
+        calculate_all_freq(df, all_freq_path, all_freq_vcf)
 
 
 if __name__ == '__main__':
