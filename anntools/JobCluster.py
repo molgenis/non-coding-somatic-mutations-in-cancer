@@ -6,14 +6,14 @@ Created on 12 feb. 2022
 
 # external imports
 import multiprocessing
-import time
 import random
 import string
 # internal imports
-import DbConnector
-import TypeConverter
-import FileWriter
+from multiprocessing import Pool
 
+import DbConnector
+import FileWriter
+import TypeConverter
 
 
 class JobCluster:
@@ -22,18 +22,19 @@ class JobCluster:
     '''
 
 
-    def __init__(self, database_loc, n_copies=1, is_test=False):
+    def __init__(self, database_loc, num_threads=1, num_db_copies=1, is_test=False):
         '''
         constructor
         :param database_loc: base path of the database (before '.db')
         :param n_copies: the number of copies of the databaase are available
         :param is_test: convenience key to make testing easier
         '''
-        self.num_threads = None
+        self.num_threads = num_threads
+        self.num_db_copies = num_db_copies
         self.base_connection = None
         self.is_test = is_test
         self.database_loc = database_loc
-        self.setup_cluster(database_loc, n_copies)
+        self.setup_cluster(database_loc, num_db_copies)
 
     def setup_cluster(self, database_loc, n_copies):
         '''
@@ -93,6 +94,7 @@ class JobCluster:
         :return:
         '''
         # connect to the database
+        print(''.join(['starting study', str(study_id)]))
         db_connector = None
         if alternate_database_loc is not None:
             db_connector = DbConnector.DbConnector(alternate_database_loc)
@@ -102,6 +104,26 @@ class JobCluster:
         study_result = db_connector.get_study_data(study_id)
         print(study_result)
         FileWriter.FileWriter.write_vcf(study_result, full_output_loc)
+        return True
+
+    @staticmethod
+    def get_study_data_static(study_id, full_output_loc, database_loc):
+        # connect to the database
+        print(''.join(['starting study', str(study_id)]))
+        db_connector = DbConnector.DbConnector(database_loc)
+        # get the results for the study
+        study_result = db_connector.get_study_data(study_id)
+        return study_result
+
+    @staticmethod
+    def database_to_vcf_static(study_id, full_output_loc, database_loc):
+        # get the study data
+        study_result = JobCluster.get_study_data_static(study_id, full_output_loc, database_loc)
+        # harmonize the object so that info and db are in the same order
+        study_result.harmonize()
+        # start writing to vcf files
+        TypeConverter.TypeConverter.vcf_portion_to_file(study_result, full_output_loc)
+
 
 
     def studies_to_vcf(self, base_output_loc, studies=[]):
@@ -161,37 +183,34 @@ class JobCluster:
         # if there are no studies, we'll just do all
         if len(studies_to_use) < 1:
             studies_to_use = self.get_studies()
+
+        print(studies_to_use)
         # we will use a number of copies of the database
         copy_number = 1
-        # let's get those jobs then
-        jobs = []
-        file_names = []
         # make a pool
-        pool = multiprocessing.Pool(threads=threads)
+        pool = Pool(processes=threads)
+        # check each study
         for study in studies_to_use:
             # build the output location
             random_string = JobCluster.get_random_string(15)
             # paste the output together
             output_file_location = ''.join([base_output_loc, '/', random_string, '.vcf.tmp'])
-            file_names.append(output_file_location)
 
             # get a database file to use
             database_copy_location = ''.join([self.database_loc, '_', str(copy_number), '.db'])
             # increment the counter
             copy_number = copy_number + 1
             # reset the count if required
-            if copy_number > self.num_threads:
+            if copy_number > self.num_db_copies:
                 copy_number = 1
 
             # add to the pool
-            pool.apply_async(self.database_to_vcf, args=(study['study_id'], output_file_location,database_copy_location,))
+            pool.apply_async(JobCluster.database_to_vcf_static, args=(study['study_id'], output_file_location, database_copy_location,))
+            #pool.apply(JobCluster.database_to_vcf_static, args=(study['study_id'], output_file_location, database_copy_location))
 
-        # now wait for pool to empty
+
         pool.close()
         pool.join()
-        # merge everything
-        self.merge_files(file_names)
-
 
     def merge_files(self, file_names):
         '''

@@ -6,8 +6,7 @@ Created on 12 feb. 2022
 
 import VcfInfo
 import VcfMatrix
-import pandas
-
+import numpy
 
 class VcfPortion(object):
     '''
@@ -30,3 +29,34 @@ class VcfPortion(object):
     def get_snps_by_ids(self, identifiers):
         print('get_snps_by_ids not yet implemented')
         return None
+
+    def harmonize(self):
+        '''
+        harmonize the object as such that the VcfInfo and the VcfMatrix only contain snps in both objects, and that the order is the same in both
+        :return:
+        '''
+        # get the SNPs we definitely have data for
+        snps_info = self.vcf_info.snp_ids
+        snps_geno = self.vcf_matrix.snps
+        snps_info = set(snps_info)
+        snps_geno = set(snps_geno)
+        snps_common = snps_info.intersection(snps_geno)
+        # sort these
+        snps_common = sorted(snps_common)
+        # initialize positions of the SNPs
+        info_locs = numpy.empty((len(snps_common)))
+        matrix_locs = numpy.empty((len(snps_common)))
+        # empty the matrix
+        info_locs[:] = numpy.NaN
+        matrix_locs[:] = numpy.NaN
+        # now do this from beginning to end
+        for i in range(0,len(snps_common), 1):
+            # this is the SNP
+            snp = snps_common[i]
+            # this is the location in the info
+            info_loc = numpy.argmax(self.vcf_info.get_info()['ID'])
+            # this is the genotype loc
+            geno_loc = numpy.argmax(self.vcf_matrix.snps == snp)
+            # set these locations in the location array
+            info_locs[i] = info_loc
+            matrix_locs[i] = geno_loc
