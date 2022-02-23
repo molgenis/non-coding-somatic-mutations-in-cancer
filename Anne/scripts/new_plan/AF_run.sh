@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=2tables
-#SBATCH --output=2tables.out
-#SBATCH --error=2tables.err
+#SBATCH --job-name=AF
+#SBATCH --output=AF.out
+#SBATCH --error=AF.err
 #SBATCH --time=80:59:59
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=116gb
