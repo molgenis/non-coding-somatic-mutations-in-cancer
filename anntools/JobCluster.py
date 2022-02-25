@@ -205,8 +205,8 @@ class JobCluster:
                 copy_number = 1
 
             # add to the pool
-            pool.apply_async(JobCluster.database_to_vcf_static, args=(study['study_id'], output_file_location, database_copy_location,))
-            #pool.apply(JobCluster.database_to_vcf_static, args=(study['study_id'], output_file_location, database_copy_location))
+            #pool.apply_async(JobCluster.database_to_vcf_static, args=(study['study_id'], output_file_location, database_copy_location,))
+            pool.apply(JobCluster.database_to_vcf_static, args=(study['study_id'], output_file_location, database_copy_location))
 
 
         pool.close()

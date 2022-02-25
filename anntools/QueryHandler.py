@@ -17,7 +17,7 @@ class QueryHandler:
     handle requests from the database to other formats
     '''
 
-    def __init__(self, db_location, output_location, study, num_threads, cache_loc, is_test=False):
+    def __init__(self, db_location, output_location, study, num_threads, num_db_copies, cache_loc, is_test=False):
         '''
         contructor
         :param db_location: location of the database file
@@ -31,6 +31,7 @@ class QueryHandler:
         self.output_location = output_location
         self.study = study
         self.num_threads = num_threads
+        self.num_db_copies = num_db_copies
         self.cache_loc = cache_loc
         self.job_manager = None
         self.is_test = is_test
@@ -102,7 +103,7 @@ class QueryHandler:
         :param studies: the studies to generate VCF files for
         :return: NONE a resulting vcf file is made at the required location
         '''
-        self.job_manager.studies_to_vcf(base_output_loc, studies)
+        self.job_manager.studies_to_vcf_pooled(base_output_loc, studies)
 
 
 
@@ -121,6 +122,7 @@ def construct_query_handler():
         output_location=args.output_location,
         study = args.study,
         num_threads = args.num_threads,
+        num_db_copies= args.num_db_copies,
         cache = args.cache_loc
     )
 
@@ -137,7 +139,7 @@ def parse_args():
     parser.add_argument('-s', '--study', type = str, help = 'name of the study to fetch (string), default=*', default = '*')
     parser.add_argument('-t', '--num-threads', type = int, help = 'number of threads to use (numeric), default=1', default=1)
     parser.add_argument('-c', '--cache-loc', type = str, help = 'location for caching temporary files (string), default=~/', default='~/')
-    parser.parse_args()
+    parser.add_argument('-d', '--num-dbs', type = int, help = 'number of copies of the database to use (numeric), default=1', default=1)
     return parser
 
 
@@ -153,6 +155,7 @@ def test_run():
              'output_location' : '/Users/royoelen/Desktop/',
              'study' : 'bla',
              'num_threads' : 2,
+             'num_db_copies' : 8,
              'cache_loc' : '/Users/royoelen/Desktop/'}
     # create the object
     query_handler = QueryHandler(
@@ -160,6 +163,7 @@ def test_run():
         output_location=setup['output_location'],
         study = setup['study'],
         num_threads = setup['num_threads'],
+        num_db_copies= setup['num_db_copies'],
         cache_loc = setup['cache_loc'],
         is_test = True
     )
@@ -171,8 +175,8 @@ def test_run():
     query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf',
                                    [
                                         {'study_id' : 1, 'study_name' : 'ALL-US'}
-                                       ,
-                                        {'study_id' : 2, 'study_name' : 'AML-US'}
+                                   #    ,
+                                   #     {'study_id' : 2, 'study_name' : 'AML-US'}
                                    ])
 
     #query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf')

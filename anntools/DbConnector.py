@@ -100,10 +100,12 @@ class DbConnector:
         '''
         # get the donors for this study
         donors = self.get_donors_from_study(study_id)
-        # get just the raw participant id
-        donor_ids = []
+        # save the internal and
+        donor_mapping = {}
         for entry in donors:
-            donor_ids.append(entry[0])
+            donor_mapping[entry[0]] = entry[1]
+        # get just the raw participant id
+        donor_ids = list(donor_mapping.keys())
         # get the SNP metadata
         snp_id_tuples = self.get_snp_ids_for_donor_ids(donor_ids)
         snp_ids = []
@@ -118,6 +120,9 @@ class DbConnector:
         snp_genodata = self.get_snp_genodata(snp_ids, donor_ids)
         # turn into VcfMatrix object
         vcf_geno = TypeConverter.TypeConverter.tuples_to_vcfdata(snp_genodata, snp_ids, donor_ids)
+        # set alternate donor IDs
+        vcf_geno.set_donor_name_mapping(donor_mapping)
+
         # turn into a VcfPortion object
         vcf_portion = VcfPortion.VcfPortion(vcf_geno, vcf_info)
         # for memory sake, let's remove some variables
