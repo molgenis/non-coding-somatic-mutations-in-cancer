@@ -25,7 +25,7 @@ def read_vcf(path):
             dtype={'#CHROM': str, 'POS': int, 'ID': str, 'REF': str, 'ALT': str,
                    'QUAL': str, 'FILTER': str, 'INFO': str},
             sep='\t'
-        ).rename(columns={'#CHROM': 'CHROM'})
+        )#.rename(columns={'#CHROM': 'CHROM'})
     else:
         return []
 
