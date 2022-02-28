@@ -21,8 +21,8 @@ DATABASE_SNP=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_
 GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
 
 #A, D, H, W, M, U, E, G, K, N, O, T, R, S, C, B, P, L
-# GEDAAN: 'O' 'A' 'D' 'H' 'W' 'U' 'G' 'K' 'N' 'T'
-LETTERS1=('R')
+# GEDAAN: 'O' 'A' 'D' 'H' 'W' 'U' 'G' 'K' 'N' 'T' 'R' 'B'
+LETTERS1=('C')
 # LETTERS1=('A' 'D' 'H' 'W' 'U' 'G' 'K' 'N' 'O' 'T' 'R')
 # LETTERS2=('B' 'C')
 # LETTERS3=('L')
