@@ -19,12 +19,15 @@ def read_vcf(path):
     """
     with gzip.open(path, 'rt', encoding='utf-8') as f:
         lines = [l for l in f if not l.startswith('##')]
-    return pd.read_csv(
-        io.StringIO(''.join(lines)),
-        dtype={'#CHROM': str, 'POS': int, 'ID': str, 'REF': str, 'ALT': str,
-               'QUAL': str, 'FILTER': str, 'INFO': str},
-        sep='\t'
-    ).rename(columns={'#CHROM': 'CHROM'})
+    if len(lines) != 0:
+        return pd.read_csv(
+            io.StringIO(''.join(lines)),
+            dtype={'#CHROM': str, 'POS': int, 'ID': str, 'REF': str, 'ALT': str,
+                   'QUAL': str, 'FILTER': str, 'INFO': str},
+            sep='\t'
+        ).rename(columns={'#CHROM': 'CHROM'})
+    else:
+        return []
 
 
 
@@ -36,10 +39,13 @@ def main():
     # cmd = f"cat {path_file} | grep '^##' | sed 's/=/\,/g' | sed 's/#//g' > {path}header.txt"
     # os.system(cmd)
     vcf_file = read_vcf(path_file)
-    vcf_file.rename(columns={'NORMAL': f'NORMAL_{basename}', 'TUMOR': f'TUMOR_{basename}'}, inplace=True)
-    # print(vcf_file)
-    vcf_file.to_csv(f'{sys.argv[2]}nohead.vcf', sep="\t", index=False, encoding='utf-8')
-                #compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+    if len(vcf_file) != 0:
+        vcf_file.rename(columns={'NORMAL': f'NORMAL_{basename}', 'TUMOR': f'TUMOR_{basename}'}, inplace=True)
+        # print(vcf_file)
+        vcf_file.to_csv(f'{sys.argv[2]}nohead.vcf', sep="\t", index=False, encoding='utf-8')
+                    #compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+    else:
+        print('NOOOO')
     
 
 
