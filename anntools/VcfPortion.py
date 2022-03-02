@@ -7,6 +7,7 @@ Created on 12 feb. 2022
 import VcfInfo
 import VcfMatrix
 import numpy
+import math
 
 class VcfPortion(object):
     '''
@@ -20,6 +21,7 @@ class VcfPortion(object):
         '''
         self.vcf_matrix = vcf_matrix
         self.vcf_info = vcf_info
+        self.is_sorted = False
 
 
     def __str__(self):
@@ -65,8 +67,45 @@ class VcfPortion(object):
         # now set the order in the info
         self.vcf_info.set_order(info_locs)
         # and set that order in the genotype matrix
-        self.vcf_matrix.set_order(geno_loc)
+        self.vcf_matrix.set_order(matrix_locs)
         print(''.join(['harmonised ', str(self)]))
+        # set the hormonized tag
+        self.is_sorted = True
+
+    def get_donors(self, names=False):
+        # fetch the participants
+        donor_ids = self.vcf_matrix.get_participants()
+        # return them if we don't need to get the names
+        if names is False or names is None:
+            return(donor_ids)
+        else:
+            donor_names = self.get_donor_names(donor_ids)
+            return donor_names
 
     def get_donor_names(self, donor_ids):
-        return self.get_donor_names(donor_ids)
+        return self.vcf_matrix.get_donor_names(donor_ids)
+
+    def subset_self(self, nr_horizontal_slices=2, nr_vertical_slices=2):
+        # get the number of snps, the horizontal slice
+        nr_snps = self.vcf_info.snp_ids.size
+        # get the number of donors, the vertical slice
+        nr_donors =  self.vcf_matrix.participants.size
+        # calculate the total number of slices
+        total_nr_slices = nr_horizontal_slices * nr_vertical_slices
+        # reserve that amount of space
+        slices = [None] * total_nr_slices
+        # calculate the size of the slizes
+        snp_slice_size = math.ceil(nr_snps / nr_horizontal_slices)
+        donor_slice_size = math.ceil(nr_donors / nr_vertical_slices)
+
+
+    def get_slice(self, vertical_start, vertical_stop, horizontal_start, horizontal_stop):
+        # we need to make sure that the positions are correct
+        if self.is_sorted is False:
+            self.harmonize()
+        # grab the donors
+        donor_slice_ids = self.vcf_matrix.get_participants()[horizontal_start : horizontal_stop]
+        # grab the SNPs
+        snp_slice_ids = self.vcf_matrix.snps[vertical_start : vertical_stop]
+        # grab the matrix
+        matrix_slice = self.vcf_matrix.matrix[vertical_start : vertical_stop][horizontal_start : horizontal_stop]

@@ -5,7 +5,7 @@ Created on 12 feb. 2022
 '''
 
 import operator
-
+import numpy
 
 class VcfMatrix:
     '''
@@ -32,10 +32,8 @@ class VcfMatrix:
         message = 'banaan'
         return message
 
-
     def get_snps(self):
         return self.snps
-
 
     def get_participants(self):
         return self.participants
@@ -44,8 +42,18 @@ class VcfMatrix:
         return self.matrix
 
     def set_order(self, order):
-        # set the new order of the matrix
-        self.matrix = self.matrix[order]
+        # create a new matrix
+        matrix_copy = numpy.empty((len(order), self.participants.size), dtype='float64')
+        # empty the matrix
+        matrix_copy[:] = numpy.NaN
+        # start filling
+        for index_old in range(0, len(order), 1):
+            # get the new index
+            index_new = order[index_old]
+            matrix_copy[index_old] = self.matrix[index_new]
+        # replace the old matrix
+        self.matrix = None
+        self.matrix = matrix_copy
         # set the SNP order
         self.snps = self.snps[order]
 
@@ -55,3 +63,15 @@ class VcfMatrix:
 
     def get_donor_names(self, donor_ids):
         return operator.itemgetter(donor_ids)(self.donor_name_mapping)
+
+
+    def get_donor_names(self, donor_ids):
+        # initialize
+        donor_names = []
+        # check each donor id
+        for donor_id in donor_ids:
+            # add the correct donor name
+            donor_name = self.donor_name_mapping[donor_id]
+            # add to the list
+            donor_names.append(donor_name)
+        return donor_names

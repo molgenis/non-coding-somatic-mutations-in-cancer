@@ -172,7 +172,7 @@ def test_run():
     #print(query_handler.get_columns('donor_has_snp'))
     #query_handler.get_studies()
     #query_handler.get_columns('project')
-    query_handler.studies_to_vcf('/Users/royoelen/Desktop/test.vcf',
+    query_handler.studies_to_vcf('/Users/royoelen/Desktop/anntools/',
                                    [
                                         {'study_id' : 1, 'study_name' : 'ALL-US'}
                                    #    ,

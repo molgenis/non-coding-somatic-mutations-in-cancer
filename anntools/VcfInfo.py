@@ -110,3 +110,14 @@ class VcfInfo:
         # set the snp order as well
         self.snp_ids = self.snp_ids[order]
 
+    def get_info(self, variable_name=None, fill_nons=True):
+        # if no parameters were given, we supply the entire data
+        if variable_name is None:
+            return self.info
+        # if everything is okay, return the variable
+        elif self.info[variable_name] is not None:
+            return self.info[variable_name]
+        elif self.info[variable_name] is None and fill_nons is True:
+            return numpy.empty(self.snp_ids.size, dtype='S0')
+        else:
+            return None
