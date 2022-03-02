@@ -13,11 +13,13 @@ def calculate_all_freq(df, all_freq_path, all_freq_vcf):
     all_freq_df['0'] = select_df.eq(1).sum(axis=1)
     all_freq_df['1'] = select_df.eq(2).sum(axis=1)
     all_freq_df['2'] = select_df.eq(3).sum(axis=1)
-    all_freq_df['sum'] = (all_freq_df['0'] * 0) + (all_freq_df['1'] * 1) + (all_freq_df['2'] * 2)
+    all_freq_df['sum_alt'] = (all_freq_df['0'] * 0) + (all_freq_df['1'] * 1) + (all_freq_df['2'] * 2)
     all_freq_df['donors'] = all_freq_df.loc[:,['0', '1', '2']].sum(axis = 1)
-    all_freq_df['alle_freq'] = all_freq_df['sum'] / all_freq_df['donors']
+    all_freq_df['alle_freq_alt'] = all_freq_df['sum'] / (all_freq_df['donors'] * 2)
+    all_freq_df['alle_freq_ref'] = 1 - all_freq_df['alle_freq_alt']
     all_freq_df['donors_nan'] = all_freq_df.loc[:,['NA', '0', '1', '2']].sum(axis = 1)
-    all_freq_df['alle_freq_nan'] = all_freq_df['sum'] / all_freq_df['donors_nan']
+    all_freq_df['alle_freq_nan_alt'] = all_freq_df['sum'] / (all_freq_df['donors_nan'] * 2)
+    all_freq_df['alle_freq_nan_ref'] = 1 - all_freq_df['alle_freq_nan_alt']
     # for col in ['NA', '0', '1', '2', 'sum', 'donors', 'alle_freq']:
     #     print(f"{col} - {set(all_freq_df[col])}")
     all_freq_df.to_csv(all_freq_path, sep="\t", index=False, encoding='utf-8', 
