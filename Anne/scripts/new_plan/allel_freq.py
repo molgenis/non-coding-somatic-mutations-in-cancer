@@ -24,7 +24,7 @@ def calculate_all_freq(df, all_freq_path, all_freq_vcf):
     #     print(f"{col} - {set(all_freq_df[col])}")
     all_freq_df.to_csv(all_freq_path, sep="\t", index=False, encoding='utf-8', 
                 compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
-    df['INFO'] = 'AF=' + all_freq_df['alle_freq'].astype(str) + ':AFN=' + all_freq_df['alle_freq_nan'].astype(str) 
+    df['INFO'] = 'AF=' + all_freq_df['alle_freq_alt'].astype(str) + ':AFN=' + all_freq_df['alle_freq_nan_alt'].astype(str) 
     df.to_csv(all_freq_vcf, sep="\t", index=False, encoding='utf-8', 
                 compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
