@@ -3,6 +3,7 @@ import time
 import pandas as pd
 from multiprocessing import Pool, Queue
 import multiprocessing as mp
+import math 
 # Python program to create
 # sparse matrix using csr_matrix()
   
@@ -10,37 +11,6 @@ import multiprocessing as mp
 import numpy as np
 import scipy.sparse
 from scipy.sparse import csr_matrix
-
-
-# def steps_snp(db, key, i_start, i, donor_dict, donor_list,
-#                 sparseMatrix, step_index):
-#     # SNP
-#     db.cursor.execute("""
-#                     SELECT ID
-#                     FROM 'snp'
-#                     WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s
-#                     """ %
-#         (str(key), int(i_start), int(i)))
-#     snps = db.cursor.fetchall()
-#     snp_list = list()
-#     for snp in snps:
-#         snp_list.append(snp['ID'])
-    
-#     # donor_has_snp
-#     for ID_snp in snp_list:
-#         db.cursor.execute("""
-#                         SELECT donor_ID
-#                         FROM donor_has_snp
-#                         WHERE snp_ID = '%s'
-#                     """ %
-#         (int(ID_snp)))
-#         donor_had_snps = db.cursor.fetchall()
-#         for d_h_s in donor_had_snps:
-#             donor_ID = donor_dict[d_h_s['donor_ID']]
-#             donor_index = donor_list.index(donor_ID)
-#             sparseMatrix[donor_index, step_index] += 1
-            
-#     return sparseMatrix, donor_index
 
 
 def get_projects(db):
@@ -72,6 +42,7 @@ def get_donors(db, project_dict):
 
 
 def get_snps(db, key, i_start, i):
+    print('GET SNPS')
     # SNP
     db.cursor.execute("""
                     SELECT ID
@@ -87,13 +58,19 @@ def get_snps(db, key, i_start, i):
 
 
 
-def get_number_snps_region(db, snp_list, donor_dict, donor_list, step_index, sparseMatrix, count):
-    print(len(snp_list))
+
+def get_number_snps_region(snp_list, donor_dict, donor_list, step_index, sparseMatrix, 
+                        step_list, donor_cancer_list, name_file):
+    print('yo')
+    # Path of the database
+    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    # Database connection
+    db = Database(path_db)
+    print('yoooooooo')
     # donor_has_snp
-    # TODO multiprocessen
-    for ID_snp in snp_list:
-        count += 1
-        print(count)
+    for index, ID_snp in enumerate(snp_list):
+        if index % 100 == 0:
+            print(index)
         db.cursor.execute("""
                         SELECT donor_ID
                         FROM donor_has_snp
@@ -105,14 +82,40 @@ def get_number_snps_region(db, snp_list, donor_dict, donor_list, step_index, spa
             donor_ID = donor_dict[d_h_s['donor_ID']]
             donor_index = donor_list.index(donor_ID)
             sparseMatrix[donor_index, step_index] += 1
-            
-    return count, sparseMatrix, donor_index
+
+        if index == 300:
+            df = pd.DataFrame(data=sparseMatrix, columns=step_list)
+            df['donor_id'] = donor_list
+            df['cancer'] = donor_cancer_list
+            df.set_index('donor_id')
+            df.to_csv(name_file, sep="\t", index=True, encoding='utf-8', 
+                        compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+    
+    # return sparseMatrix
+
+def multi_pro(snp_list, donor_dict, donor_list, step_index, sparseMatrix, step_list, donor_cancer_list, key):
+    print('MULTI')
+    print(f'len: {len(snp_list)}')
+    print(f'len set: {len(set(snp_list))}')
+    cpus = mp.cpu_count()
+    # round up
+    n = math.ceil(len(snp_list) / cpus)
+    print(f'CPUS {cpus}')
+    print(n)
+    arg_multi_list = []
+    for i in range(0, len(snp_list), n):
+        name_file = f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/chr{key}_{i}.tsv.gz' #f'D:/Hanze_Groningen/STAGE/NEW PLAN/chr{key}_{i}.tsv.gz' #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/
+        arg_multi_list.append((snp_list[i: i+n], donor_dict, donor_list, step_index, sparseMatrix, step_list, donor_cancer_list, name_file))
+
+    pool = Pool(processes=cpus)
+    pool.starmap(func=get_number_snps_region, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
 
 
 def make_table(db, chr_length, steps, donor_list, donor_dict, donor_cancer_list):
     for key, value in chr_length.items():
-        count = 0 #TODO REMOVE
-        name_file = 'D:/Hanze_Groningen/STAGE/NEW PLAN/chr{key}.tsv.gz'
+        # name_file = f'D:/Hanze_Groningen/STAGE/NEW PLAN/chr{key}.tsv.gz'
         i_start=0
         step_list = []
         for i in range(0,value,steps):
@@ -132,33 +135,30 @@ def make_table(db, chr_length, steps, donor_list, donor_dict, donor_cancer_list)
                 snp_list = get_snps(db, key, i_start, i)
                 # TODO multprocessing
                 # https://stackoverflow.com/questions/47900922/split-list-into-n-lists-and-assign-each-list-to-a-worker-in-multithreading
-                q = Queue(snp_list)
-                cpu = mp.cpu_count()-2
-                for i in range(cpu):
-                    pool = Pool(processes=cpu)
-                    pool.starmap(func=make_table, iterable=(q,))
+                
+                multi_pro(snp_list, donor_dict, donor_list, step_index, sparseMatrix, step_list, donor_cancer_list, key)
 
-                # pool = Pool(processes=cpu)
-                # pool.starmap(func=make_table, iterable=arg_multi_list)
-                count, sparseMatrix, donor_index = get_number_snps_region(db, snp_list, donor_dict, donor_list, step_index, sparseMatrix, count)
+                
+                # get_number_snps_region(db, snp_list, donor_dict, donor_list, step_index, sparseMatrix)
                 # sparseMatrix, donor_index = steps_snp(db, key, i_start, i, donor_dict, donor_list, sparseMatrix, step_index)
             if value == (i + (value % steps)):
                 print('YOOOOOOOOOOOO')
                 last_i = (i + (value % steps))
                 print(f'---- {i_start} - {i + 1} - {last_i}')
                 snp_list = get_snps(db, key, (i+1), last_i)
-                count, sparseMatrix, donor_index = get_number_snps_region(db, snp_list, donor_dict, donor_list, step_index, sparseMatrix, count)
+                multi_pro(snp_list, donor_dict, donor_list, step_index, sparseMatrix, step_list, donor_cancer_list, key)
+                # get_number_snps_region(db, snp_list, donor_dict, donor_list, step_index, sparseMatrix)
                 # sparseMatrix, donor_index = steps_snp(db, key, (i + 1), last_i, donor_dict, donor_list, sparseMatrix, step_index)
 
             i_start = (i + 1)
 
 
-        df = pd.DataFrame(data=sparseMatrix, columns=step_list)
-        df['donor_id'] = donor_index
-        df['cancer'] = donor_cancer_list
-        df.set_index('donor_id')
-        df.to_csv(name_file, sep="\t", index=True, encoding='utf-8', 
-                    compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+        # df = pd.DataFrame(data=sparseMatrix, columns=step_list)
+        # df['donor_id'] = donor_list
+        # df['cancer'] = donor_cancer_list
+        # df.set_index('donor_id')
+        # df.to_csv(name_file, sep="\t", index=True, encoding='utf-8', 
+        #             compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 
 
@@ -168,14 +168,14 @@ def main():
     # The steps for the region
     steps= 10000000
     #https://en.wikipedia.org/wiki/Human_genome
-    chr_length = {'1':45000680}#{'1':248956422, '2':242193529} #, '3':198295559, '4':190214555,
+    chr_length = {'1':248956422}#{'1':248956422, '2':242193529} #, '3':198295559, '4':190214555,
                 # '5':181538259, '6':170805979, '7':159345973, '8':145138636,
                 # '9':138394717, '10':133797422, '11':135086622, '12':133275309,
                 # '13':114364328, '14':107043718, '15':101991189, '16':90338345,
                 # '17':83257441, '18':80373285, '19':58617616, '20':64444167,
                 # '21':46709983, '22':50818468, 'X':156040895, 'Y':57227415} #{'17':83257441, '18':80373285, '19':58617616, '20':64444167}
     # Path of the database
-    path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"
+    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
     db = Database(path_db)
     project_dict = get_projects(db)
