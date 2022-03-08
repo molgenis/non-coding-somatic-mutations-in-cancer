@@ -83,13 +83,13 @@ def get_number_snps_region(snp_list, donor_dict, donor_list, step_index, sparseM
             donor_index = donor_list.index(donor_ID)
             sparseMatrix[donor_index, step_index] += 1
 
-        if index == 300:
-            df = pd.DataFrame(data=sparseMatrix, columns=step_list)
-            df['donor_id'] = donor_list
-            df['cancer'] = donor_cancer_list
-            df.set_index('donor_id')
-            df.to_csv(name_file, sep="\t", index=True, encoding='utf-8', 
-                        compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+        # if index == 300:
+    df = pd.DataFrame(data=sparseMatrix, columns=step_list)
+    df['donor_id'] = donor_list
+    df['cancer'] = donor_cancer_list
+    df.set_index('donor_id')
+    df.to_csv(name_file, sep="\t", index=True, encoding='utf-8', 
+                compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
     
     # return sparseMatrix
 
