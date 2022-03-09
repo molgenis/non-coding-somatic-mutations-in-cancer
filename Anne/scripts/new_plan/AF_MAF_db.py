@@ -89,6 +89,14 @@ def get_snps(db):
 
 
 def cal_AF(db):
+    db.cursor.execute("""
+                    SELECT COUNT(DISTINCT ID)
+                    FROM donor
+                """ )
+    count_donor = db.cursor.fetchall()
+    for don in count_donor:
+        c_donors = don[0]
+    print('DONOR', c_donors)
     # max_id = get_snps(db)
     # for id in range(1, max_id):
     #     print()
@@ -107,68 +115,90 @@ def cal_AF(db):
     #     print(f"{res[0]}-{res[1]}")
     #https://stackoverflow.com/questions/30649873/how-do-i-count-distinct-combinations-of-column-values
 
-    db.cursor.execute("""
-                    SELECT *
-                    FROM donor_has_snp
-                    WHERE snp_ID = %s AND GT = %s;
-                """ %
-    (int(259183), 1))
-    results = db.cursor.fetchall()
-    for res in results:
-        print(f"{res['GT']} - {res['snp_ID']} - {res['donor_ID']}")
+    for ID in range(1, 10000):
+        print(ID)
+        # db.cursor.execute("""
+        #                 SELECT *
+        #                 FROM donor_has_snp
+        #                 WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2);
+        #             """ %
+        # (int(ID)))
+        # results = db.cursor.fetchall()
+        # for res in results:
+        #     print(f"{res['GT']} - {res['snp_ID']} - {res['donor_ID']}")
 
-    print('######################')
-
-    db.cursor.execute("""
-                    SELECT GT, snp_ID, COUNT(*) as used_count
-                    FROM donor_has_snp
-                    WHERE snp_ID = %s
-                    GROUP BY GT, snp_ID
-                    ORDER BY snp_ID;
-                """ %
-    (int(259183)))
-    results = db.cursor.fetchall()
-
-    for res in results:
-        print('---------------')
-        print(f"{res['GT']} - {res['snp_ID']} - {res['used_count']}")
-        if isinstance(res['GT'], type(None)):
-            GT = 'NULL'
-        else:
-            GT = res['GT']
-        # COUNT donors
-        print('DONOR')
+        # print('######################')
+        # # COUNT GT (but not if none/null)
         db.cursor.execute("""
-                        SELECT snp_ID, donor_ID, COUNT(*) as donor_c
+                        SELECT GT, snp_ID, COUNT(*) as used_count
                         FROM donor_has_snp
-                        WHERE snp_ID = %s AND GT = %s
-                        GROUP BY snp_ID
+                        WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2)
+                        GROUP BY GT, snp_ID
                         ORDER BY snp_ID;
                     """ %
-        (int(res['snp_ID']), GT))
-        count_donor = db.cursor.fetchall()
-        for cd in count_donor:
-            print(f"{cd['snp_ID']} - {cd['donor_c']}")
-        print('UNIEK')
-        db.cursor.execute("""
-                        SELECT COUNT(DISTINCT donor_ID)
-                        FROM donor_has_snp 
-                        WHERE snp_ID = %s AND GT = %s;
-                    """ %
-        (int(res['snp_ID']), GT))
-        count_donor = db.cursor.fetchall()
-        for cd in count_donor:
-            print(f'{cd[0]} - {cd}')
-        print('NIET UNIEK')
-        db.cursor.execute("""
-                        SELECT COUNT(donor_ID)
-                        FROM donor_has_snp
-                        WHERE snp_ID = %s AND GT = %s;
-                    """ %
-        (int(res['snp_ID']), GT))
-        count_donor = db.cursor.fetchall()
-        for cd in count_donor:
-            print(f'{cd[0]} - {cd}')
+        (int(ID)))
+        results = db.cursor.fetchall()
+        dict_count = dict()
+        donor_count = 0
+        donor_count_uniek = 0
+        for res in results:
+            if res['GT'] in dict_count:
+                dict_count[res['GT']] = dict_count[res['GT']] + 1
+            else:
+                dict_count[res['GT']] = 1
+            # print('---------------')
+            # print(f"{res['GT']} - {res['snp_ID']} - {res['used_count']}")
+            # if isinstance(res['GT'], type(None)):
+            #     GT = 'NULL'
+            # else:
+            #     GT = res['GT']
+            # COUNT donors
+            # print('UNIEK')
+            db.cursor.execute("""
+                            SELECT COUNT(donor_ID)
+                            FROM donor_has_snp 
+                            WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2);
+                        """ %
+            (int(res['snp_ID'])))
+            count_donor = db.cursor.fetchall()
+            for don in count_donor:
+                donor_count += don[0]
+                # print(f'{don[0]} - {don}')
+
+            db.cursor.execute("""
+                            SELECT COUNT(DISTINCT donor_ID)
+                            FROM donor_has_snp 
+                            WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2);
+                        """ %
+            (int(res['snp_ID'])))
+            count_donor = db.cursor.fetchall()
+            for don in count_donor:
+                donor_count_uniek += don[0]
+                # print(f'{don[0]} - {don}')
+        print('dict count', dict_count, 'donor count uniek', donor_count_uniek)
+        ALT_all = 0
+        for key, value in dict_count.items():
+            ALT_all += (int(key) * int(value))
+        AF = ALT_all / (donor_count_uniek * 2)
+        print(f"AF: {AF} = {ALT_all} / ({donor_count_uniek} * 2)")
+
+        AF_whole = ALT_all / (c_donors * 2)
+        print(f"AF whole: {AF_whole} = {ALT_all} / ({c_donors} * 2)")
+        # if donor_count != donor_count_uniek:
+        #     print(ID)
+        #     print('donor count', donor_count)
+        #     print('donor count uniek', donor_count_uniek)
+        #     db.cursor.execute("""
+        #                     SELECT *
+        #                     FROM donor_has_snp
+        #                     WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2);
+        #                 """ %
+        #     (int(ID)))
+        #     results = db.cursor.fetchall()
+        #     for res in results:
+        #         print(f"{res['GT']} - {res['snp_ID']} - {res['donor_ID']}")
+        #     print('++++++++++++++++++++++++')
+        
 
     
 
