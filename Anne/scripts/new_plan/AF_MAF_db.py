@@ -92,46 +92,87 @@ def cal_AF(db):
     # max_id = get_snps(db)
     # for id in range(1, max_id):
     #     print()
-    print('hoi')
+    # print('hoi')
 
-    db.cursor.execute("""
-                    SELECT GT, COUNT(*) as used_count
-                    FROM donor_has_snp
-                    GROUP BY GT;
-                """) # %
-    # (int(2222))) #WHERE snp_ID = %s
-    print('hoi2')
-    results = db.cursor.fetchall()
-    print('start')
-    for res in results:
-        print(f"{res[0]}-{res[1]}")
+    # db.cursor.execute("""
+    #                 SELECT GT, COUNT(*) as used_count
+    #                 FROM donor_has_snp
+    #                 GROUP BY GT;
+    #             """) # %
+    # # (int(2222))) #WHERE snp_ID = %s
+    # print('hoi2')
+    # results = db.cursor.fetchall()
+    # print('start')
+    # for res in results:
+    #     print(f"{res[0]}-{res[1]}")
     #https://stackoverflow.com/questions/30649873/how-do-i-count-distinct-combinations-of-column-values
-
-    db.cursor.execute("""
-                    SELECT GT, snp_ID, COUNT(*) as used_count
-                    FROM donor_has_snp
-                    WHERE snp_ID = 259183
-                    GROUP BY GT, snp_ID
-                    ORDER BY snp_ID;
-                """) # %
-    # (int(2222))) #WHERE snp_ID = %s
-    print('hoi2')
-    results = db.cursor.fetchall()
-    print('start')
-    for res in results:
-        if res['used_count'] > 1:
-            print(f"{res['GT']} - {res['snp_ID']} - {res['used_count']}")
 
     db.cursor.execute("""
                     SELECT *
                     FROM donor_has_snp
-                    WHERE snp_ID = 259183;
-                """) 
-    print('hoi2')
+                    WHERE snp_ID = %s AND GT = %s;
+                """ %
+    (int(259183), 1))
     results = db.cursor.fetchall()
-    print('start')
     for res in results:
         print(f"{res['GT']} - {res['snp_ID']} - {res['donor_ID']}")
+
+    print('######################')
+
+    db.cursor.execute("""
+                    SELECT GT, snp_ID, COUNT(*) as used_count
+                    FROM donor_has_snp
+                    WHERE snp_ID = %s
+                    GROUP BY GT, snp_ID
+                    ORDER BY snp_ID;
+                """ %
+    (int(259183)))
+    results = db.cursor.fetchall()
+
+    for res in results:
+        print('---------------')
+        print(f"{res['GT']} - {res['snp_ID']} - {res['used_count']}")
+        if isinstance(res['GT'], type(None)):
+            GT = 'NULL'
+        else:
+            GT = res['GT']
+        # COUNT donors
+        print('DONOR')
+        db.cursor.execute("""
+                        SELECT snp_ID, donor_ID, COUNT(*) as donor_c
+                        FROM donor_has_snp
+                        WHERE snp_ID = %s AND GT = %s
+                        GROUP BY snp_ID
+                        ORDER BY snp_ID;
+                    """ %
+        (int(res['snp_ID']), GT))
+        count_donor = db.cursor.fetchall()
+        for cd in count_donor:
+            print(f"{cd['snp_ID']} - {cd['donor_c']}")
+        print('UNIEK')
+        db.cursor.execute("""
+                        SELECT COUNT(DISTINCT donor_ID)
+                        FROM donor_has_snp 
+                        WHERE snp_ID = %s AND GT = %s;
+                    """ %
+        (int(res['snp_ID']), GT))
+        count_donor = db.cursor.fetchall()
+        for cd in count_donor:
+            print(f'{cd[0]} - {cd}')
+        print('NIET UNIEK')
+        db.cursor.execute("""
+                        SELECT COUNT(donor_ID)
+                        FROM donor_has_snp
+                        WHERE snp_ID = %s AND GT = %s;
+                    """ %
+        (int(res['snp_ID']), GT))
+        count_donor = db.cursor.fetchall()
+        for cd in count_donor:
+            print(f'{cd[0]} - {cd}')
+
+    
+
+    
     # db.cursor.execute("""
     #                 SELECT GT, snp_ID
     #                 FROM donor_has_snp
