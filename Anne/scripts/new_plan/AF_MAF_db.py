@@ -89,6 +89,7 @@ def get_snps(db):
 
 
 def cal_AF(db):
+    # COUNT donors
     db.cursor.execute("""
                     SELECT COUNT(DISTINCT ID)
                     FROM donor
@@ -98,36 +99,11 @@ def cal_AF(db):
         c_donors = don[0]
     print('DONOR', c_donors)
     # max_id = get_snps(db)
-    # for id in range(1, max_id):
-    #     print()
-    # print('hoi')
-
-    # db.cursor.execute("""
-    #                 SELECT GT, COUNT(*) as used_count
-    #                 FROM donor_has_snp
-    #                 GROUP BY GT;
-    #             """) # %
-    # # (int(2222))) #WHERE snp_ID = %s
-    # print('hoi2')
-    # results = db.cursor.fetchall()
-    # print('start')
-    # for res in results:
-    #     print(f"{res[0]}-{res[1]}")
+    
     #https://stackoverflow.com/questions/30649873/how-do-i-count-distinct-combinations-of-column-values
 
     for ID in range(1, 10000):
         print(ID)
-        # db.cursor.execute("""
-        #                 SELECT *
-        #                 FROM donor_has_snp
-        #                 WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2);
-        #             """ %
-        # (int(ID)))
-        # results = db.cursor.fetchall()
-        # for res in results:
-        #     print(f"{res['GT']} - {res['snp_ID']} - {res['donor_ID']}")
-
-        # print('######################')
         # # COUNT GT (but not if none/null)
         db.cursor.execute("""
                         SELECT GT, snp_ID, COUNT(*) as used_count
@@ -146,14 +122,8 @@ def cal_AF(db):
                 dict_count[res['GT']] = dict_count[res['GT']] + 1
             else:
                 dict_count[res['GT']] = 1
-            # print('---------------')
-            # print(f"{res['GT']} - {res['snp_ID']} - {res['used_count']}")
-            # if isinstance(res['GT'], type(None)):
-            #     GT = 'NULL'
-            # else:
-            #     GT = res['GT']
+           
             # COUNT donors
-            # print('UNIEK')
             db.cursor.execute("""
                             SELECT COUNT(donor_ID)
                             FROM donor_has_snp 
