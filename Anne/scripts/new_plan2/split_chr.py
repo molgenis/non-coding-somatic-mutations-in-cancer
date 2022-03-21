@@ -8,67 +8,6 @@ import numpy as np
 from scipy.sparse import csr_matrix
 
 
-def add_value(db):
-    """
-    Adds values (in_transcript, in_coding, and in_exon) to the database (table snp).
-    :param db:  The database object
-    :return:
-    """
-    # Add in_transcript
-    db.cursor.execute(f"""
-                    ALTER TABLE snp
-                    ADD `in_transcript` BOOLEAN DEFAULT(FALSE)
-                    """)
-    # Add in_coding
-    db.cursor.execute(f"""
-                    ALTER TABLE snp
-                    ADD `in_coding` BOOLEAN DEFAULT(FALSE)
-                    """)
-    # Add in_exon
-    db.cursor.execute(f"""
-                    ALTER TABLE snp
-                    ADD `in_exon` BOOLEAN DEFAULT(FALSE)
-                    """)
-    # Committing the current transactions
-    db.mydb_connection.commit()
-
-
-def set_gene(db, row, chr):
-    """
-    Makes the values (in_transcript, in_coding, and in_exon) correct, by checking whether a snp is within certain
-    start and stop.
-    :param db:  The database object
-    :param row: One row out of the gene file (columns: #name, chrom, strand, txStart, txEnd, cdsStart, cdsEnd,
-                exonCount, exonStarts, exonEnds, proteinID, alignID)
-    :param chr: Chromosome number or letter (without chr)
-    :return:
-    """
-    # Update in_transcript
-    db.cursor.execute(
-        """UPDATE snp
-            SET in_transcript = TRUE
-            WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-        (str(chr), int(row['txStart']), int(row['txEnd'])))
-    # Update in_coding
-    db.cursor.execute(
-        """UPDATE snp
-            SET in_coding = TRUE
-            WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-        (str(chr), int(row['cdsStart']), int(row['cdsEnd'])))
-    # Get start and end of the exons
-    exon_start = row['exonStarts'].rstrip(',').split(',')
-    exon_end = row['exonEnds'].rstrip(',').split(',')
-    # Loop over the exons start-end
-    for i in range(int(row['exonCount'])):
-        # Update in_exon
-        db.cursor.execute(
-            """UPDATE snp
-                SET in_exon = TRUE
-                WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-            (str(chr), int(exon_start[i]), int(exon_end[i])))
-    # Committing the current transactions
-    db.mydb_connection.commit()
-
 
 def check_snp_id(db, snp_ids, donor_dict, donor_list, gene_index, sparse_matrix_overall, sparse_matrix_region,
                  total_read):
@@ -110,7 +49,6 @@ def check_snp_id(db, snp_ids, donor_dict, donor_list, gene_index, sparse_matrix_
                 donor_read_count[donor_dict[res['donor_ID']]] = [res['total_read_count'], res['dosages'], 1]
         # Extend the list with the donor_set
         donor_list_snp.extend(donor_set)
-    # print('------DONOR_read_count', donor_read_count)
     for key, value in donor_read_count.items():
         donor_index = donor_list.index(key)
         sparse_matrix_overall[donor_index, gene_index] = value[2]
@@ -123,7 +61,7 @@ def check_snp_id(db, snp_ids, donor_dict, donor_list, gene_index, sparse_matrix_
     return donor_list_snp, sparse_matrix_overall, sparse_matrix_region, total_read
 
 
-def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_list, gene_name_list, sparse_matrix_region,
+def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_list, region_list, sparse_matrix_region,
              sparse_matrix_overall, donor_cancer_list, total_read):
     """
     Selects all snps that occur in a specific region on a specific chromosome.
@@ -138,18 +76,16 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
     :param donor_dict:        A dictionary with as key the automatically generated donor ID and as value the donor
                               IDs that are used in the research.
     :param donor_list:        List of donor names (to be used later as rows in the sparse matrix)
-    :param gene_name_list:    List of gene names (to be used later as columns in the sparse matrix)
+    :param region_list:    List of gene names (to be used later as columns in the sparse matrix)
     :param sparse_matrix_region:     A matrix which contains very few non-zero elements. It contains the counts of a specific
                               region-donor combination.
     :param donor_cancer_list: List of cancers. This list has the same order as donor_list.
     :return: sparse_matrix_region:   A matrix which contains very few non-zero elements. It contains the counts of a specific
                               region-donor combination.
-             gene_name_list:  List of gene names (to be used later as columns in the sparse matrix)
+             region_list:  List of gene names (to be used later as columns in the sparse matrix)
     """
     # Get index of the gene name in the list
-    gene_index = gene_name_list.index(gene)
-    # Replace the name with gene_name:chromosoom:start_pos-end_pos
-    gene_name_list[gene_index] = f'{gene}:chr{chr}:{int(start_pos)}-{int(end_pos)}'
+    gene_index = region_list.index(gene)
     snp_id_list = db.get_snps(chr, start_pos, end_pos)
     if len(snp_id_list) > 0:
         # Call donor_list_before
@@ -172,24 +108,24 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
         donor_count = dict(Counter(donor_list_snp))
 
         # Write to file
-        gene_file.write(gene + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
+        gene_file.write(chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
             len(snp_id_list)) + '\t' + ','.join(map(str, snp_id_list)) + '\t' + str(len(donor_list_snp)) + '\t' + str(
             donor_count) + '\t' + str(cancer_count) + '\n')
         # str(len(set(donor_list_snp)))+'\t'+','.join(map(str,donor_list_snp))+'\t'
     else:
         # Write to file
-        gene_file.write(gene + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
+        gene_file.write(chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
             len(snp_id_list)) + '\t-\t-\t-\t-\n')
 
-    return sparse_matrix_region, sparse_matrix_overall, gene_name_list, total_read
+    return sparse_matrix_region, sparse_matrix_overall, region_list, total_read
 
 
-def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, pos, donor_cancer_list, total_read):
+def write_sparse_matrix(sparse_matrix, region_list, donor_list, save_path, pos, donor_cancer_list, total_read):
     """
     Writes the sparse_matrix to a compressed (.gz) .tsv file
     :param sparse_matrix:     A matrix which contains very few non-zero elements. It contains the counts of a specific
                               region-donor combination.
-    :param gene_name_list:    List of gene names (to be used later as columns in the sparse matrix)
+    :param region_list:    List of gene names (to be used later as columns in the sparse matrix)
     :param donor_list:        List of donor names (to be used later as rows in the sparse matrix)
     :param save_path:         Path to save files
     :param pos:               A string indicating whether it is before or after a gene (bef/aft)
@@ -197,8 +133,8 @@ def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, po
     :return:
 
     """
-    # Creates a dataframe from the sparse_matrix with column names gene_name_list
-    df = pd.DataFrame(data=sparse_matrix, columns=gene_name_list)
+    # Creates a dataframe from the sparse_matrix with column names region_list
+    df = pd.DataFrame(data=sparse_matrix, columns=region_list)
     # Add donor IDs as column
     df['donor_id'] = donor_list
     # Add cancer types as column
@@ -208,13 +144,12 @@ def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, po
     # Makes the donor_ids column the index of the data frame
     df.set_index('donor_id', inplace=True)
     # Write the dataframe to a compressed .tsv file
-    df.to_csv(f'{save_path}sparsematrix_{pos}.tsv.gz', sep="\t", index=True, encoding='utf-8',
+    df.to_csv(f'{save_path}chr_sparsematrix_{pos}.tsv.gz', sep="\t", index=True, encoding='utf-8',
               compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 
-def loop_over_genes(db, gene_df, position_out_gene, position_in_gene, donor_dict, donor_list, donor_cancer_list,
-                    save_path, gene_name_bef, gene_name_aft, sparse_matrix_before_region, sparse_matrix_after_region,
-                    sparse_matrix_before_overall, sparse_matrix_after_overall):
+def loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_cancer_list,
+                        save_path, region_list, sparse_matrix_region, sparse_matrix_overall):
     """
     Loop over the gene data frame.
     :param db:                  The database object
@@ -242,70 +177,73 @@ def loop_over_genes(db, gene_df, position_out_gene, position_in_gene, donor_dict
     # TODO Het kan nu overlappen, er kan nu twee keer hetzelfde gen mee worden genomen
     # TODO
     # The header for the files before_gene_file and after_gene_file
-    header_file = 'gene\tchr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
+    header_file = 'chr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
                   '\tdonor_count\tcancer_count\n'
     # Make file
-    before_gene_file = open(f'{save_path}gene_before_{position_out_gene}_{position_in_gene}.tsv', 'w')
+    before_gene_file = open(f'{save_path}chr_region_{steps}.tsv', 'w')
     # Write header
     before_gene_file.write(header_file)
-    # Make file
-    after_gene_file = open(f'{save_path}gene_after_{position_out_gene}_{position_in_gene}.tsv', 'w')
-    # Write header
-    after_gene_file.write(header_file)
     # TODO make nist
     total_read = [0] * len(donor_list)
     # Loop over genes in file
-    for index, row in gene_df.iterrows():
-        # Remove 'chr' from the chromosome (chr1 --> 1)
-        chr = row['chrom'].replace('chr', '')
-        print(chr, row['txStart'], row['txEnd'])
-        # Call set_gene
-        set_gene(db, row, chr)
-        # Call close_to
-        print('BEF')
-        sparse_matrix_before_region, sparse_matrix_before_overall, gene_name_bef, total_read = close_to(db,
-                                                                                                        row['#name'],
-                                                                                                        chr,
-                                                                                                        row[
-                                                                                                            'txStart'] - position_out_gene,
-                                                                                                        row[
-                                                                                                            'txStart'] + position_in_gene,
-                                                                                                        before_gene_file,
-                                                                                                        donor_dict,
-                                                                                                        donor_list,
-                                                                                                        gene_name_bef,
-                                                                                                        sparse_matrix_before_region,
-                                                                                                        sparse_matrix_before_overall,
-                                                                                                        donor_cancer_list,
-                                                                                                        total_read)
-        print('AFT')
-        sparse_matrix_after_region, sparse_matrix_after_overall, gene_name_aft, total_read = close_to(db, row['#name'],
-                                                                                                      chr,
-                                                                                                      row[
-                                                                                                          'txEnd'] - position_in_gene,
-                                                                                                      row[
-                                                                                                          'txEnd'] + position_out_gene,
-                                                                                                      after_gene_file,
-                                                                                                      donor_dict,
-                                                                                                      donor_list,
-                                                                                                      gene_name_aft,
-                                                                                                      sparse_matrix_after_region,
-                                                                                                      sparse_matrix_after_overall,
-                                                                                                      donor_cancer_list,
-                                                                                                      total_read)
-
+    i_start = 0
+    for i in range(0, length_chrom+1, steps):
+        if i != 0:
+            print(i_start, '-', i)
+            # Call close_to
+            sparse_matrix_region, sparse_matrix_overall, region_list, total_read = close_to(db,
+                                                                                            f'{chr}:{i_start}-{i}',
+                                                                                            chr,
+                                                                                            i_start,
+                                                                                            i,
+                                                                                            before_gene_file,
+                                                                                            donor_dict,
+                                                                                            donor_list,
+                                                                                            region_list,
+                                                                                            sparse_matrix_region,
+                                                                                            sparse_matrix_overall,
+                                                                                            donor_cancer_list,
+                                                                                            total_read)
+        if length_chrom == (i + (length_chrom % steps)):
+            last_i = (i + (length_chrom % steps))
+            if i != last_i:
+                print(i+1, '-', last_i)
+                sparse_matrix_region, sparse_matrix_overall, region_list, total_read = close_to(db,
+                                                                                                f'{chr}:{i_start}-{i}',
+                                                                                                chr,
+                                                                                                (i + 1),
+                                                                                                last_i,
+                                                                                                before_gene_file,
+                                                                                                donor_dict,
+                                                                                                donor_list,
+                                                                                                region_list,
+                                                                                                sparse_matrix_region,
+                                                                                                sparse_matrix_overall,
+                                                                                                donor_cancer_list,
+                                                                                                total_read)
+        i_start = (i + 1)
     # Close file
     before_gene_file.close()
-    after_gene_file.close()
     # Call write_sparse_matrix
-    write_sparse_matrix(sparse_matrix_before_region, gene_name_bef, donor_list, save_path, 'bef_region',
+    write_sparse_matrix(sparse_matrix_region, region_list, donor_list, save_path, 'region',
+                        donor_cancer_list, total_read)    
+    write_sparse_matrix(sparse_matrix_overall, region_list, donor_list, save_path, 'overall',
                         donor_cancer_list, total_read)
-    write_sparse_matrix(sparse_matrix_after_region, gene_name_aft, donor_list, save_path, 'aft_region',
-                        donor_cancer_list, total_read)
-    write_sparse_matrix(sparse_matrix_before_overall, gene_name_bef, donor_list, save_path, 'bef_overall',
-                        donor_cancer_list, total_read)
-    write_sparse_matrix(sparse_matrix_after_overall, gene_name_aft, donor_list, save_path, 'aft_overall',
-                        donor_cancer_list, total_read)
+
+def set_region_list(steps, chr, length_chrom):
+    # name_file = f'D:/Hanze_Groningen/STAGE/NEW PLAN/chr{key}.tsv.gz'
+    i_start=0
+    region_list = []
+    for i in range(0,length_chrom+1,steps):
+        if i != 0:
+            region_list.append(f'{chr}:{i_start}-{i}')
+            if length_chrom == (i + (length_chrom % steps)):
+                last_i = (i + (length_chrom % steps))
+                if i != last_i:
+                    region_list.append(f'{chr}:{(i + 1)}-{last_i}')
+        i_start = (i + 1)
+    return region_list
+
 
 
 def main():
@@ -313,48 +251,40 @@ def main():
     path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
     db = Database(path_db)
-    # Path of the genes and there positions
-    gene_path = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"  # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
     # Path to save files
     save_path = "D:/Hanze_Groningen/STAGE/db/"
-    # Read gene file
-    gene_df = pd.read_csv(gene_path, sep='\t')
-    print(len(gene_df))
-    # Replace all empty values with NaN in the column proteinID
-    gene_df['proteinID'].replace('', np.nan, inplace=True)
-    # Drop all NaN values (in column proteinID)
-    gene_df.dropna(subset=['proteinID'], inplace=True)
-    print(len(gene_df))
-    gene_name_list = gene_df['#name'].tolist()
-    print(len(gene_name_list))
+    # The steps for the region
+    steps= 2000
+    #https://en.wikipedia.org/wiki/Human_genome
+    chr_length = {'1':248956422}#{'1':248956422, '2':242193529} #, '3':198295559, '4':190214555,
+                # '5':181538259, '6':170805979, '7':159345973, '8':145138636,
+                # '9':138394717, '10':133797422, '11':135086622, '12':133275309,
+                # '13':114364328, '14':107043718, '15':101991189, '16':90338345,
+                # '17':83257441, '18':80373285, '19':58617616, '20':64444167,
+                # '21':46709983, '22':50818468, 'X':156040895, 'Y':57227415} #{'17':83257441, '18':80373285, '19':58617616, '20':64444167}
+    
     """
     Okosun et al. 
     * Regions of  -2000bp - 250bp (5' UTRs if applicable) from the transcription starting sites (TSS) 
     for each transcript were screened. For transcripts from the same gene that share the same promoter 
     mutation profiles, only one representative transcript was selected.
     """
-    # Region before the start position of a gene or after the stop position of a gene
-    position_out_gene = 2000
-    # Region after the start position of a gene or before the stop position of a gene
-    position_in_gene = 250
-    # Call add_value
-    # add_value(db)
-    print('set GENE')
     # Call get_projects
     project_dict = db.get_projects()
     # Call get_donors
     donor_list, donor_dict, donor_cancer_list = db.get_donors(project_dict)
-    # Creating a len(donor_list) * len(gene_name_list) sparse matrix
-    sparse_matrix_before_region = csr_matrix((len(donor_list), len(gene_name_list)),
-                                             dtype=np.int8).toarray()
-    sparse_matrix_after_region = csr_matrix((len(donor_list), len(gene_name_list)),
-                                            dtype=np.int8).toarray()
-    print('loop over genes')
-    # Call loop_over_genes
-    loop_over_genes(db, gene_df, position_out_gene, position_in_gene, donor_dict, donor_list, donor_cancer_list,
-                    save_path, gene_name_list, gene_name_list.copy(), sparse_matrix_before_region,
-                    sparse_matrix_after_region, sparse_matrix_before_region.copy(), sparse_matrix_after_region.copy())
-    print('CLOSE')
+
+    for chr, length_chrom in chr_length.items():
+        region_list = set_region_list(steps, chr, length_chrom)
+        print(region_list)
+        # Creating a len(donor_list) * len(gene_name_list) sparse matrix
+        sparse_matrix = csr_matrix((len(donor_list), len(region_list)),
+                                                dtype=np.int8).toarray()
+        print('loop over genes')
+        # Call loop_over_genes
+        loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_cancer_list,
+                        save_path, region_list, sparse_matrix, sparse_matrix.copy())
+        print('CLOSE')
     # Close database connection
     db.close()
 
