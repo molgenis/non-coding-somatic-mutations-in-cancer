@@ -6,6 +6,9 @@ from collections import Counter
 # Import required package
 import numpy as np
 from scipy.sparse import csr_matrix
+from multiprocessing import Pool, Queue
+import multiprocessing as mp
+import math 
 
 
 
@@ -120,7 +123,7 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
     return sparse_matrix_region, sparse_matrix_overall, region_list, total_read
 
 
-def write_sparse_matrix(sparse_matrix, region_list, donor_list, save_path, pos, donor_cancer_list, total_read):
+def write_sparse_matrix(sparse_matrix, region_list, donor_list, save_path, pos, donor_cancer_list, total_read, chr):
     """
     Writes the sparse_matrix to a compressed (.gz) .tsv file
     :param sparse_matrix:     A matrix which contains very few non-zero elements. It contains the counts of a specific
@@ -144,7 +147,7 @@ def write_sparse_matrix(sparse_matrix, region_list, donor_list, save_path, pos, 
     # Makes the donor_ids column the index of the data frame
     df.set_index('donor_id', inplace=True)
     # Write the dataframe to a compressed .tsv file
-    df.to_csv(f'{save_path}chr_sparsematrix_{pos}.tsv.gz', sep="\t", index=True, encoding='utf-8',
+    df.to_csv(f'{save_path}chr{chr}_sparsematrix_{pos}.tsv.gz', sep="\t", index=True, encoding='utf-8',
               compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 
@@ -180,7 +183,7 @@ def loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_
     header_file = 'chr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
                   '\tdonor_count\tcancer_count\n'
     # Make file
-    before_gene_file = open(f'{save_path}chr_region_{steps}.tsv', 'w')
+    before_gene_file = open(f'{save_path}chr{chr}_region_{steps}.tsv', 'w')
     # Write header
     before_gene_file.write(header_file)
     # TODO make nist
@@ -226,9 +229,9 @@ def loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_
     before_gene_file.close()
     # Call write_sparse_matrix
     write_sparse_matrix(sparse_matrix_region, region_list, donor_list, save_path, 'region',
-                        donor_cancer_list, total_read)    
+                        donor_cancer_list, total_read, chr)    
     write_sparse_matrix(sparse_matrix_overall, region_list, donor_list, save_path, 'overall',
-                        donor_cancer_list, total_read)
+                        donor_cancer_list, total_read, chr)
 
 def set_region_list(steps, chr, length_chrom):
     # name_file = f'D:/Hanze_Groningen/STAGE/NEW PLAN/chr{key}.tsv.gz'
@@ -245,6 +248,30 @@ def set_region_list(steps, chr, length_chrom):
     return region_list
 
 
+def multiprocess(chr_length, steps, donor_list, donor_dict, donor_cancer_list, save_path):
+    # Path of the database
+    path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    # Database connection
+    db = Database(path_db)
+    for chr, length_chrom in chr_length.items():
+        region_list = set_region_list(steps, chr, length_chrom)
+        # Creating a len(donor_list) * len(gene_name_list) sparse matrix
+        sparse_matrix = csr_matrix((len(donor_list), len(region_list)),
+                                                dtype=np.int8).toarray()
+        print('loop over genes')
+        # Call loop_over_genes
+        loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_cancer_list,
+                        save_path, region_list, sparse_matrix, sparse_matrix.copy())
+        print('CLOSE')
+
+def split_dict(d, n, chr_length):
+    """
+    # https://stackoverflow.com/questions/22878743/how-to-split-dictionary-into-multiple-dictionaries-fast
+    """
+    keys = list(d.keys())
+    for i in range(0, len(keys), n):
+        yield {k: chr_length[k] for k in keys[i: i + n]}
+
 
 def main():
     # Path of the database
@@ -256,12 +283,12 @@ def main():
     # The steps for the region
     steps= 2000
     #https://en.wikipedia.org/wiki/Human_genome
-    chr_length = {'1':248956422}#{'1':248956422, '2':242193529} #, '3':198295559, '4':190214555,
-                # '5':181538259, '6':170805979, '7':159345973, '8':145138636,
-                # '9':138394717, '10':133797422, '11':135086622, '12':133275309,
-                # '13':114364328, '14':107043718, '15':101991189, '16':90338345,
-                # '17':83257441, '18':80373285, '19':58617616, '20':64444167,
-                # '21':46709983, '22':50818468, 'X':156040895, 'Y':57227415} #{'17':83257441, '18':80373285, '19':58617616, '20':64444167}
+    chr_length = {'1':248956422, '2':242193529, '3':198295559, '4':190214555,
+                '5':181538259, '6':170805979, '7':159345973, '8':145138636,
+                '9':138394717, '10':133797422, '11':135086622, '12':133275309,
+                '13':114364328, '14':107043718, '15':101991189, '16':90338345,
+                '17':83257441, '18':80373285, '19':58617616, '20':64444167,
+                '21':46709983, '22':50818468, 'X':156040895, 'Y':57227415} #{'17':83257441, '18':80373285, '19':58617616, '20':64444167}
     
     """
     Okosun et al. 
@@ -274,17 +301,44 @@ def main():
     # Call get_donors
     donor_list, donor_dict, donor_cancer_list = db.get_donors(project_dict)
 
-    for chr, length_chrom in chr_length.items():
-        region_list = set_region_list(steps, chr, length_chrom)
-        print(region_list)
-        # Creating a len(donor_list) * len(gene_name_list) sparse matrix
-        sparse_matrix = csr_matrix((len(donor_list), len(region_list)),
-                                                dtype=np.int8).toarray()
-        print('loop over genes')
-        # Call loop_over_genes
-        loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_cancer_list,
-                        save_path, region_list, sparse_matrix, sparse_matrix.copy())
-        print('CLOSE')
+
+    cpus = mp.cpu_count()-2
+    n = math.ceil(len(chr_length) / cpus)
+    print(n)
+    print(len(chr_length))
+
+    arg_multi_list = []
+    for item in split_dict({i: i for i in chr_length}, n, chr_length):
+        print(item)
+        arg_multi_list.append((item, steps, donor_list, donor_dict, donor_cancer_list, save_path))
+        
+    # for i in range(1, len(chr_length), n):
+    #     new_dict = dict()
+    #     if i != 22:
+    #         new_dict[str(i)] =  chr_length[str(i)]
+    #         new_dict[str(i+1)] =  chr_length[str(i+1)]
+    #         new_dict[str(i+2)] =  chr_length[str(i+2)]
+    #     else:
+    #         new_dict[str(i)] =  chr_length[str(i)]
+    #         new_dict['X'] =  chr_length['X']
+    #         new_dict['Y'] =  chr_length['Y']
+
+    pool = Pool(processes=cpus)
+    pool.starmap(func=multiprocess, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
+
+    # for chr, length_chrom in chr_length.items():
+    #     region_list = set_region_list(steps, chr, length_chrom)
+    #     print(region_list)
+    #     # Creating a len(donor_list) * len(gene_name_list) sparse matrix
+    #     sparse_matrix = csr_matrix((len(donor_list), len(region_list)),
+    #                                             dtype=np.int8).toarray()
+    #     print('loop over genes')
+    #     # Call loop_over_genes
+    #     loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_cancer_list,
+    #                     save_path, region_list, sparse_matrix, sparse_matrix.copy())
+    #     print('CLOSE')
     # Close database connection
     db.close()
 
