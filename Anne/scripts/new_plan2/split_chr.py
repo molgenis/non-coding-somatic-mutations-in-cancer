@@ -290,12 +290,6 @@ def main():
                 '17':83257441, '18':80373285, '19':58617616, '20':64444167,
                 '21':46709983, '22':50818468, 'X':156040895, 'Y':57227415} #{'17':83257441, '18':80373285, '19':58617616, '20':64444167}
     
-    """
-    Okosun et al. 
-    * Regions of  -2000bp - 250bp (5' UTRs if applicable) from the transcription starting sites (TSS) 
-    for each transcript were screened. For transcripts from the same gene that share the same promoter 
-    mutation profiles, only one representative transcript was selected.
-    """
     # Call get_projects
     project_dict = db.get_projects()
     # Call get_donors
@@ -311,17 +305,6 @@ def main():
     for item in split_dict({i: i for i in chr_length}, n, chr_length):
         print(item)
         arg_multi_list.append((item, steps, donor_list, donor_dict, donor_cancer_list, save_path))
-        
-    # for i in range(1, len(chr_length), n):
-    #     new_dict = dict()
-    #     if i != 22:
-    #         new_dict[str(i)] =  chr_length[str(i)]
-    #         new_dict[str(i+1)] =  chr_length[str(i+1)]
-    #         new_dict[str(i+2)] =  chr_length[str(i+2)]
-    #     else:
-    #         new_dict[str(i)] =  chr_length[str(i)]
-    #         new_dict['X'] =  chr_length['X']
-    #         new_dict['Y'] =  chr_length['Y']
 
     pool = Pool(processes=cpus)
     pool.starmap(func=multiprocess, iterable=arg_multi_list)

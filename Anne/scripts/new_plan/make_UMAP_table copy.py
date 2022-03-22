@@ -74,7 +74,7 @@ def get_number_snps_region(snp_list, donor_dict, donor_list, step_index, sparseM
         db.cursor.execute("""
                         SELECT donor_ID
                         FROM donor_has_snp
-                        WHERE snp_ID = '%s'
+                        WHERE snp_ID = '%s' AND total_read_count > 0 AND mutant_allele_read_count > 0;
                     """ %
         (int(ID_snp)))
         donor_had_snps = db.cursor.fetchall()

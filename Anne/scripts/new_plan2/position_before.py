@@ -48,18 +48,18 @@ def set_gene(db, row, chr):
         """UPDATE snp
             SET in_transcript = TRUE
             WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-        (str(chr), int(row['txStart']), int(row['txEnd'])))
+        (str(chr), int(row['hg19.knownGene.txStart']), int(row['hg19.knownGene.txEnd'])))
     # Update in_coding
     db.cursor.execute(
         """UPDATE snp
             SET in_coding = TRUE
             WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-        (str(chr), int(row['cdsStart']), int(row['cdsEnd'])))
+        (str(chr), int(row['hg19.knownGene.cdsStart']), int(row['hg19.knownGene.cdsEnd'])))
     # Get start and end of the exons
-    exon_start = row['exonStarts'].rstrip(',').split(',')
-    exon_end = row['exonEnds'].rstrip(',').split(',')
+    exon_start = row['hg19.knownGene.exonStarts'].rstrip(',').split(',')
+    exon_end = row['hg19.knownGene.exonEnds'].rstrip(',').split(',')
     # Loop over the exons start-end
-    for i in range(int(row['exonCount'])):
+    for i in range(int(row['hg19.knownGene.exonCount'])):
         # Update in_exon
         db.cursor.execute(
             """UPDATE snp
@@ -257,19 +257,19 @@ def loop_over_genes(db, gene_df, position_out_gene, position_in_gene, donor_dict
     # Loop over genes in file
     for index, row in gene_df.iterrows():
         # Remove 'chr' from the chromosome (chr1 --> 1)
-        chr = row['chrom'].replace('chr', '')
-        print(chr, row['txStart'], row['txEnd'])
+        chr = row['hg19.knownGene.chrom'].replace('chr', '')
+        print(chr, row['hg19.knownGene.txStart'], row['hg19.knownGene.txEnd'])
         # Call set_gene
         set_gene(db, row, chr)
         # Call close_to
         print('BEF')
         sparse_matrix_before_region, sparse_matrix_before_overall, gene_name_bef, total_read = close_to(db,
-                                                                                                        row['#name'],
+                                                                                                        row['hg19.kgXref.geneSymbol'],
                                                                                                         chr,
                                                                                                         row[
-                                                                                                            'txStart'] - position_out_gene,
+                                                                                                            'hg19.knownGene.txStart'] - position_out_gene,
                                                                                                         row[
-                                                                                                            'txStart'] + position_in_gene,
+                                                                                                            'hg19.knownGene.txStart'] + position_in_gene,
                                                                                                         before_gene_file,
                                                                                                         donor_dict,
                                                                                                         donor_list,
@@ -279,12 +279,12 @@ def loop_over_genes(db, gene_df, position_out_gene, position_in_gene, donor_dict
                                                                                                         donor_cancer_list,
                                                                                                         total_read)
         print('AFT')
-        sparse_matrix_after_region, sparse_matrix_after_overall, gene_name_aft, total_read = close_to(db, row['#name'],
+        sparse_matrix_after_region, sparse_matrix_after_overall, gene_name_aft, total_read = close_to(db, row['hg19.kgXref.geneSymbol'],
                                                                                                       chr,
                                                                                                       row[
-                                                                                                          'txEnd'] - position_in_gene,
+                                                                                                          'hg19.knownGene.txEnd'] - position_in_gene,
                                                                                                       row[
-                                                                                                          'txEnd'] + position_out_gene,
+                                                                                                          'hg19.knownGene.txEnd'] + position_out_gene,
                                                                                                       after_gene_file,
                                                                                                       donor_dict,
                                                                                                       donor_list,
@@ -314,18 +314,18 @@ def main():
     # Database connection
     db = Database(path_db)
     # Path of the genes and there positions
-    gene_path = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"  # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
+    gene_path = "D:/Hanze_Groningen/STAGE/db/all_genes_new.tsv"  # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
     # Path to save files
     save_path = "D:/Hanze_Groningen/STAGE/db/"
     # Read gene file
     gene_df = pd.read_csv(gene_path, sep='\t')
-    print(len(gene_df))
-    # Replace all empty values with NaN in the column proteinID
-    gene_df['proteinID'].replace('', np.nan, inplace=True)
-    # Drop all NaN values (in column proteinID)
-    gene_df.dropna(subset=['proteinID'], inplace=True)
-    print(len(gene_df))
-    gene_name_list = gene_df['#name'].tolist()
+    # print(len(gene_df))
+    # # Replace all empty values with NaN in the column proteinID
+    # gene_df['proteinID'].replace('', np.nan, inplace=True)
+    # # Drop all NaN values (in column proteinID)
+    # gene_df.dropna(subset=['proteinID'], inplace=True)
+    # print(len(gene_df))
+    gene_name_list = gene_df['hg19.kgXref.geneSymbol'].tolist()
     print(len(gene_name_list))
     """
     Okosun et al. 
