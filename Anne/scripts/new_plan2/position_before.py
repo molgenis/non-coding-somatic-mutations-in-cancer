@@ -310,13 +310,13 @@ def loop_over_genes(db, gene_df, position_out_gene, position_in_gene, donor_dict
 
 def main():
     # Path of the database
-    path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    path_db = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
     db = Database(path_db)
     # Path of the genes and there positions
-    gene_path = "D:/Hanze_Groningen/STAGE/db/all_genes_new.tsv"  # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
+    gene_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_genes_new.tsv"  # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
     # Path to save files
-    save_path = "D:/Hanze_Groningen/STAGE/db/"
+    save_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/"
     # Read gene file
     gene_df = pd.read_csv(gene_path, sep='\t')
     # print(len(gene_df))
