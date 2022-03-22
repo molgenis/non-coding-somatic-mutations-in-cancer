@@ -338,7 +338,7 @@ def main():
     # Region after the start position of a gene or before the stop position of a gene
     position_in_gene = 250
     # Call add_value
-    # add_value(db)
+    add_value(db)
     print('set GENE')
     # Call get_projects
     project_dict = db.get_projects()
