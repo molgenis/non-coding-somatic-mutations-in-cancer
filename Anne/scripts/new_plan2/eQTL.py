@@ -6,7 +6,15 @@ from Database import Database
 
 def add_value(db, ID_eQT, eQT, close_eQT):
     """
-
+    Adds values (ID_eQT, eQT, close_eQT) to the database (table snp).
+    :param db:  The database object
+    :param ID_eQT:  String. This is the name of the parameter from the database that is set to an ID 
+                    when that snp exactly matches an eQT.
+    :param eQT:  String. This is the name of the parameter in the database that will 
+                 be set to true when a snp matches an eQT exactly
+    :param close_eQT:  String. This is the name of the parameter in the database that is set 
+                       to true when a snp falls within a certain region (before or after) a known eQT
+    :return:
     """
     db.cursor.execute("""
                     ALTER TABLE snp
@@ -26,8 +34,15 @@ def add_value(db, ID_eQT, eQT, close_eQT):
 
 def set_value(db, ID_eQT, eQT, row):
     """
-
-    """
+    The parameters ID_eQT and eQT are set to either an ID or true when a snp exactly matches an eQT in position, ref and alt
+    :param db:  The database object
+    :param ID_eQT:  String. This is the name of the parameter from the database that is set to an ID 
+                    when that snp exactly matches an eQT.
+    :param eQT:  String. This is the name of the parameter in the database that will 
+                 be set to true when a snp matches an eQT exactly
+    :param row:  Line from the eQT file with information about 1 eQT
+    :return:
+    """ #TODO also alt and ref????
     # Add ID_eQTL and eQTL to snp that matches the matches in chr, pos_start, pos_end, ref and alt.
     db.cursor.execute(
             """UPDATE snp
@@ -40,20 +55,35 @@ def set_value(db, ID_eQT, eQT, row):
 
 def set_value_close_to(db, row, close_eQT, region):
     """
-
+    The parameter close_eQT is set to true when a snp falls within the region (before or after) of an eQT
+    :param db:  The database object
+    :param row:  Line from the eQT file with information about 1 eQT
+    :param close_eQT:  String. This is the name of the parameter in the database that is set 
+                       to true when a snp falls within a certain region (before or after) a known eQT
+    :param region:  Region (front or back) an eQT, within which snps are searched.
+    :return:
     """
     db.cursor.execute(
             """UPDATE snp
                 SET %s = TRUE
-                WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s
-                AND ref = '%s' AND alt = '%s';""" %
+                WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
             (close_eQT, str(row['SNPChr']), int(row['SNPPos'])-region, 
-            int(row['SNPPos'])+region, str(row['AssessedAllele']), str(row['OtherAllele'])))
+            int(row['SNPPos'])+region))
 
 
 def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region):
     """
-
+    Loop over the eQT dataframe
+    :param db:  The database object
+    :param eQTL_df:  The eQT file as data frame
+    :param ID_eQT:  String. This is the name of the parameter from the database that is set to an ID 
+                    when that snp exactly matches an eQT.
+    :param eQT:  String. This is the name of the parameter in the database that will 
+                 be set to true when a snp matches an eQT exactly
+    :param close_eQT: String. This is the name of the parameter in the database that is set 
+                      to true when a snp falls within a certain region (before or after) a known eQT
+    :param region: Region (front or back) an eQT, within which snps are searched.
+    :return:
     """
     for index, row in eQTL_df.iterrows():
         print(index)

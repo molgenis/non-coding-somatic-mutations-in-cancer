@@ -234,6 +234,11 @@ def loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_
                         donor_cancer_list, total_read, chr)
 
 def set_region_list(steps, chr, length_chrom):
+    """
+    
+    :param db:  The database object
+    :return:
+    """
     # name_file = f'D:/Hanze_Groningen/STAGE/NEW PLAN/chr{key}.tsv.gz'
     i_start=0
     region_list = []
@@ -249,6 +254,11 @@ def set_region_list(steps, chr, length_chrom):
 
 
 def multiprocess(chr_length, steps, donor_list, donor_dict, donor_cancer_list, save_path):
+    """
+    
+    :param db:  The database object
+    :return:
+    """
     # Path of the database
     path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
@@ -267,6 +277,10 @@ def multiprocess(chr_length, steps, donor_list, donor_dict, donor_cancer_list, s
 def split_dict(d, n, chr_length):
     """
     # https://stackoverflow.com/questions/22878743/how-to-split-dictionary-into-multiple-dictionaries-fast
+
+    
+    :param db:  The database object
+    :return:
     """
     keys = list(d.keys())
     for i in range(0, len(keys), n):

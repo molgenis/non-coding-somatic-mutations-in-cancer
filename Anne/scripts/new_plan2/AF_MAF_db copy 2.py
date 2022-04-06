@@ -4,6 +4,12 @@ import multiprocessing as mp
 
 
 def get_snps(db):
+    """
+    Finds the highest and lowest snp ID.
+    :param db:  The database object
+    :return: max_snp_id: The highest snp id
+             min_snp_id: The lowest snp id
+    """
     print('GET SNPS')
     # MAX
     db.cursor.execute("""
@@ -26,10 +32,10 @@ def get_snps(db):
 
 def add_value(db):
     """
-    Adds values (in_transcript, in_coding, and in_exon) to the database (table snp).
+    Adds values (AF and AF2) to the database (table snp).
     :param db:  The database object
     :return:
-    """
+    """ #TODO explain AF and AF2
     # Add in_transcript
     db.cursor.execute(f"""
                     ALTER TABLE snp
@@ -43,8 +49,12 @@ def add_value(db):
     # Committing the current transactions
     db.mydb_connection.commit()
 
-
-def cal_AF(db, type_GT):
+def find_number_donors(db):
+    """
+    Finds the number of donors in the database
+    :param db:  The database object
+    :return:  c_donors: Number of donors in the database
+    """
     # COUNT donors
     db.cursor.execute("""
                     SELECT COUNT(DISTINCT ID)
@@ -54,6 +64,18 @@ def cal_AF(db, type_GT):
     for don in count_donor:
         c_donors = don[0]
     print('DONOR', c_donors)
+    return c_donors
+
+
+
+def cal_AF(db, type_GT):
+    """
+    
+    :param db:  The database object
+    :param type_GT:
+    :return:
+    """
+    c_donors = find_number_donors(db)
     max_snp_id, min_snp_id = get_snps(db)
     print(max_snp_id)
     

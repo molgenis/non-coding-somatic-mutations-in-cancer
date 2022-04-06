@@ -42,7 +42,7 @@ class Database:
         Searches for all projects in the database and converts them into a specific dictionary. (key: ID, value: cancer)
         :param db:             The database object
         :return: project_dict: Dictionary with as key project ID (automatically generated) and as value the type of cancer
-                            that belongs to it.
+                               that belongs to it.
         """
         # Select all projects in the database
         self.cursor.execute("""SELECT *
@@ -62,9 +62,9 @@ class Database:
         :param project_dict:        Dictionary with as key project ID (automatically generated) and as value the type of
                                     cancer that belongs to it.
         :return: donor_list:        List of donor names (to be used later as rows in the sparse matrix)
-                donor_dict:        A dictionary with as key the automatically generated donor ID and as value the donor
+                donor_dict:         A dictionary with as key the automatically generated donor ID and as value the donor
                                     IDs that are used in the research.
-                donor_cancer_list: List of cancers. This list has the same order as donor_list.
+                donor_cancer_list:  List of cancers. This list has the same order as donor_list.
         """
         # Select all donors in the database
         self.cursor.execute("""SELECT *
@@ -82,7 +82,11 @@ class Database:
 
     def get_snps(self, chr, start_pos, end_pos):
         """
-        
+        Finds the snps between certain positions and puts the snp IDs in a list.
+        :param chr:         Chromosoom number or letter
+        :param start_pos:   The start position
+        :param end_pos:     The end position
+        :return:
         """
         # Find all snps that are on a certain chromosome in a certain region (between a certain start and stop)
         self.cursor.execute("""

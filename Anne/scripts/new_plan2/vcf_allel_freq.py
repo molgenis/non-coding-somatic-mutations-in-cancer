@@ -6,6 +6,11 @@ import glob
 
 
 def calculate_all_freq(df, all_freq_path, all_freq_vcf):
+    """
+    
+    :param db:  The database object
+    :return:
+    """
     format_index = list(df.columns).index('FORMAT') + 1
     all_freq_df = df.iloc[:, :format_index] 
     select_df = df.iloc[:, format_index:]    

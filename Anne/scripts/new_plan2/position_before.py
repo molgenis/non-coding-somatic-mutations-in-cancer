@@ -93,7 +93,7 @@ def check_snp_id(db, snp_ids, donor_dict, donor_list, gene_index, sparse_matrix_
         # Make donor_set. Set because duplicate snps from a donor don't count
         donor_set = set()
         # See how many snp_IDs there are in this table that are equal to the ID of the snp and total_read_count > 0
-        # AND mutant_allele_read_count >
+        # AND mutant_allele_read_count > 0
         db.cursor.execute("""
                         SELECT snp_ID, donor_ID, total_read_count, dosages
                         FROM 'donor_has_snp'
@@ -102,7 +102,7 @@ def check_snp_id(db, snp_ids, donor_dict, donor_list, gene_index, sparse_matrix_
         results = db.cursor.fetchall()
         for res in results:
             # Add donor_ID to the set
-            donor_set.add(donor_dict[res['donor_ID']])  # res['donor_ID']
+            donor_set.add(donor_dict[res['donor_ID']])
             if donor_dict[res['donor_ID']] in donor_read_count:
                 donor_read_count[donor_dict[res['donor_ID']]][0] += res['total_read_count']
                 donor_read_count[donor_dict[res['donor_ID']]][1] += res['dosages']
@@ -111,7 +111,7 @@ def check_snp_id(db, snp_ids, donor_dict, donor_list, gene_index, sparse_matrix_
                 donor_read_count[donor_dict[res['donor_ID']]] = [res['total_read_count'], res['dosages'], 1]
         # Extend the list with the donor_set
         donor_list_snp.extend(donor_set)
-    # print('------DONOR_read_count', donor_read_count)
+    # Loop over dict: donor_read_count
     for key, value in donor_read_count.items():
         donor_index = donor_list.index(key)
         sparse_matrix_overall[donor_index, gene_index] = value[2]
@@ -125,6 +125,28 @@ def check_snp_id(db, snp_ids, donor_dict, donor_list, gene_index, sparse_matrix_
 
 def filter_tot_read(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_list, sparse_matrix_region,
              sparse_matrix_overall, donor_cancer_list, total_read, snp_id_list, gene_index, filter_num):
+    """
+
+    :param db:                The database object
+    :param gene:              The name of the gene
+    :param chr:               Chromosome number or letter (without chr)
+    :param start_pos:         The starting position or a particular region
+    :param end_pos:           The stop position of a particular region
+    :param gene_file:         The file after which the genes with their specific region before or after
+                              a gene are written.
+    :param donor_dict:        A dictionary with as key the automatically generated donor ID and as value the donor
+                              IDs that are used in the research.
+    :param donor_list:        List of donor names (to be used later as rows in the sparse matrix)
+    :param sparse_matrix_region: A matrix which contains very few non-zero elements. It contains the counts of a specific
+                              region-donor combination.
+    :param sparse_matrix_overall:
+    :param donor_cancer_list: List of cancers. This list has the same order as donor_list.
+    :param total_read:
+    :param snp_id_list:
+    :param gene_index:
+    :param filter_num:           
+    :return: donor_list_snp : List of donors (research donor IDs) who contain snps within a particular region.
+    """
     if len(snp_id_list) > 0:
         # Call donor_list_before
         donor_list_snp, sparse_matrix_overall, sparse_matrix_region, total_read = check_snp_id(db, snp_id_list, donor_dict,
