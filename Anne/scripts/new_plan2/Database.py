@@ -14,7 +14,7 @@ class Database:
         """
         self.name = db_name
         self.mydb_connection = self.connect()
-        print(self.mydb_connection)
+        # print(self.mydb_connection)
         self.mydb_connection.row_factory = sqlite3.Row
         self.cursor = self.mydb_connection.cursor()
 
@@ -81,6 +81,9 @@ class Database:
         return donor_list, donor_dict, donor_cancer_list
 
     def get_snps(self, chr, start_pos, end_pos):
+        """
+        
+        """
         # Find all snps that are on a certain chromosome in a certain region (between a certain start and stop)
         self.cursor.execute("""
                         SELECT ID

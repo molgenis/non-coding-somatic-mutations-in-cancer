@@ -88,7 +88,7 @@ def get_snps(db):
 
 
 
-def cal_AF(db):
+def cal_AF(db, type_GT):
     # COUNT donors
     db.cursor.execute("""
                     SELECT COUNT(DISTINCT ID)
@@ -102,34 +102,33 @@ def cal_AF(db):
     
     #https://stackoverflow.com/questions/30649873/how-do-i-count-distinct-combinations-of-column-values
 
-    for ID in range(1, 10000):
+    for ID in range(1, 10000): #TODO max id
         print(ID)
-        # # COUNT GT (but not if none/null)
+        # COUNT GT (but not if none/null)
         db.cursor.execute("""
-                        SELECT GT, snp_ID, COUNT(*) as used_count
+                        SELECT %s, snp_ID, COUNT(*) as used_count
                         FROM donor_has_snp
-                        WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2)
-                        GROUP BY GT, snp_ID
+                        WHERE snp_ID = %s AND (%s = 0 OR %s = 1 OR %s = 2)
+                        GROUP BY %s, snp_ID
                         ORDER BY snp_ID;
-                    """ %
-        (int(ID)))
+                    """ % (type_GT, int(ID), type_GT, type_GT, type_GT, type_GT))
         results = db.cursor.fetchall()
         dict_count = dict()
         donor_count = 0
         donor_count_uniek = 0
         for res in results:
-            if res['GT'] in dict_count:
-                dict_count[res['GT']] = dict_count[res['GT']] + 1
+            if res[type_GT] in dict_count:
+                dict_count[res[type_GT]] = dict_count[res[type_GT]] + 1
             else:
-                dict_count[res['GT']] = 1
+                dict_count[res[type_GT]] = 1
            
             # COUNT donors
             db.cursor.execute("""
                             SELECT COUNT(donor_ID)
                             FROM donor_has_snp 
-                            WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2);
+                            WHERE snp_ID = %s AND (%s = 0 OR %s = 1 OR %s = 2);
                         """ %
-            (int(res['snp_ID'])))
+            (int(res['snp_ID']), type_GT, type_GT, type_GT))
             count_donor = db.cursor.fetchall()
             for don in count_donor:
                 donor_count += don[0]
@@ -138,9 +137,9 @@ def cal_AF(db):
             db.cursor.execute("""
                             SELECT COUNT(DISTINCT donor_ID)
                             FROM donor_has_snp 
-                            WHERE snp_ID = %s AND (GT = 0 OR GT = 1 OR GT = 2);
+                            WHERE snp_ID = %s AND (%s = 0 OR %s = 1 OR %s = 2);
                         """ %
-            (int(res['snp_ID'])))
+            (int(res['snp_ID']), type_GT, type_GT, type_GT))
             count_donor = db.cursor.fetchall()
             for don in count_donor:
                 donor_count_uniek += don[0]
@@ -231,7 +230,7 @@ def main():
     path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
     db = Database(path_db)
-    cal_AF(db)
+    cal_AF(db, 'GT')
       
 
 
