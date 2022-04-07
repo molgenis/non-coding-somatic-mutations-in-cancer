@@ -32,10 +32,10 @@ def get_snps(db):
 
 def add_value(db):
     """
-    Adds values (AF and AF2) to the database (table snp).
+    Adds values (AF and AF_whole) to the database (table snp).
     :param db:  The database object
     :return:
-    """ #TODO explain AF and AF2
+    """ #TODO explain AF and AF_whole
     # Add in_transcript
     db.cursor.execute(f"""
                     ALTER TABLE snp
@@ -44,10 +44,12 @@ def add_value(db):
     # Add in_coding
     db.cursor.execute(f"""
                     ALTER TABLE snp
-                    ADD `AF2` BOOLEAN DEFAULT(FALSE)
+                    ADD `AF_whole` BOOLEAN DEFAULT(FALSE)
                     """)
     # Committing the current transactions
     db.mydb_connection.commit()
+
+
 
 def find_number_donors(db):
     """
@@ -86,7 +88,7 @@ def cal_AF(db, type_GT):
         # COUNT GT (but not if none/null)
         db.cursor.execute("""
                         SELECT %s, snp_ID, donor_ID, COUNT(*) as used_count
-                        FROM donor_has_snp
+                        FROM sum_dosage_GT
                         WHERE snp_ID = %s AND (%s = 0 OR %s = 1 OR %s = 2)
                         GROUP BY %s, snp_ID
                         ORDER BY snp_ID;
@@ -104,6 +106,7 @@ def cal_AF(db, type_GT):
                 snp_count_dict[res[type_GT]] = 1
             # donor_ID
             if res['donor_ID'] in donor_count_dict:
+                print('BESTAAT AL')
                 donor_count_dict[res['donor_ID']] = donor_count_dict[res['donor_ID']] + 1
                 donor_count += 1
             else:
@@ -111,27 +114,42 @@ def cal_AF(db, type_GT):
                 donor_count += 1
                 donor_count_uniek += 1
 
-        print(snp_count_dict)
-        print('donor_count', donor_count, 'donor_count_uniek', donor_count_uniek)
+        # if donor_count != donor_count_uniek:
+        #     print()
+            # print(snp_count_dict)
+            # print('donor_count', donor_count, 'donor_count_uniek', donor_count_uniek)
         ALT_all = 0
         for key, value in snp_count_dict.items():
             ALT_all += (int(key) * int(value)) ##########################################
-        # donor uniek
-        AF = ALT_all / (donor_count_uniek * 2)
-        print(f"AF uniek: {AF} = {ALT_all} / ({donor_count_uniek} * 2)")
-        # donor 
-        AF = ALT_all / (donor_count * 2)
-        print(f"AF: {AF} = {ALT_all} / ({donor_count} * 2)")
-        # all donors
-        AF_whole = ALT_all / (c_donors * 2)
-        print(f"AF whole: {AF_whole} = {ALT_all} / ({c_donors} * 2)")
+        if donor_count_uniek != 0 or donor_count != 0:
+            # # donor uniek
+            AF2 = ALT_all / (donor_count_uniek * 2)
+            # donor
+            AF = ALT_all / (donor_count * 2)
+            # all donors
+            AF_whole = ALT_all / (c_donors * 2)
+        else:
+            print(ALT_all, donor_count, donor_count_uniek)
+            AF = 0
+            AF2 = 0
+            AF_whole = 0
 
-        # # Update in_transcript
-        # db.cursor.execute(
-        #     """UPDATE snp
-        #         SET ..... = %s
-        #         WHERE ID = %s;""" %
-        #     (AF, ID))
+        if AF != AF2:
+            print(snp_count_dict)
+            print('donor_count', donor_count) #, 'donor_count_uniek', donor_count_uniek)
+            # # donor uniek
+            # print(f"AF uniek: {AF2} = {ALT_all} / ({donor_count_uniek} * 2)")
+            # donor                
+            print(f"AF: {AF} = {ALT_all} / ({donor_count} * 2)")
+            # all donors            
+            print(f"AF whole: {AF_whole} = {ALT_all} / ({c_donors} * 2)")
+
+        db.cursor.execute(
+            """UPDATE snp
+                SET AF = %s, AF_whole = %s
+                WHERE ID = %s;""" % (AF, AF_whole, ID))
+    # Add to database
+    db.mydb_connection.commit()
 
 
 def main():
@@ -140,35 +158,39 @@ def main():
     #'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db' #
     # Database connection
     db = Database(path_db)
+    add_value(db)
     type_GT = 'GT'
-    # cal_AF(db, type_GT)
+    cal_AF(db, type_GT)
+    print('#########################################')
+    type_GT = 'GT2'
+    cal_AF(db, type_GT)
 
 
 
-    #CHECK
-    db.cursor.execute("""
-                    SELECT snp_ID, donor_ID, total_read_count, mutant_allele_read_count
-                    FROM donor_has_snp
-                    WHERE donor_ID = 614;
-                """)
-    results = db.cursor.fetchall()
-    snp_count_dict = dict()
-    for res in results:
-        # GT
-        if res['snp_ID'] in snp_count_dict:
-            snp_count_dict[res['snp_ID']] = snp_count_dict[res['snp_ID']] + 1
-        else:
-            snp_count_dict[res['snp_ID']] = 1
-    print(snp_count_dict)
-    #1436355
-    db.cursor.execute(f"""
-                    SELECT snp_ID, donor_ID, total_read_count, mutant_allele_read_count, {type_GT}
-                    FROM donor_has_snp
-                    WHERE donor_ID = 614 AND snp_ID = 1436355;
-                """)
-    results = db.cursor.fetchall()
-    for res in results:
-        print('total_read_count ', res['total_read_count'], ' mutant_allele_read_count ', res['mutant_allele_read_count'], ' type_GT ', res[type_GT])
+    # #CHECK
+    # db.cursor.execute("""
+    #                 SELECT snp_ID, donor_ID, total_read_count, mutant_allele_read_count
+    #                 FROM donor_has_snp
+    #                 WHERE donor_ID = 614;
+    #             """)
+    # results = db.cursor.fetchall()
+    # snp_count_dict = dict()
+    # for res in results:
+    #     # GT
+    #     if res['snp_ID'] in snp_count_dict:
+    #         snp_count_dict[res['snp_ID']] = snp_count_dict[res['snp_ID']] + 1
+    #     else:
+    #         snp_count_dict[res['snp_ID']] = 1
+    # print(snp_count_dict)
+    # #1436355
+    # db.cursor.execute(f"""
+    #                 SELECT snp_ID, donor_ID, total_read_count, mutant_allele_read_count, {type_GT}
+    #                 FROM donor_has_snp
+    #                 WHERE donor_ID = 614 AND snp_ID = 1436355;
+    #             """)
+    # results = db.cursor.fetchall()
+    # for res in results:
+    #     print('total_read_count ', res['total_read_count'], ' mutant_allele_read_count ', res['mutant_allele_read_count'], ' type_GT ', res[type_GT])
         
 
 

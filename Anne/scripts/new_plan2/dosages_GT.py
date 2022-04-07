@@ -78,16 +78,19 @@ def set_GT2(db, table):
                 WHERE GT IS NULL;"""% table)
     db.mydb_connection.commit()
 
-def mean_dosage_GT(db):
+def sum_dosage_GT(db):
+    """
+    Sum of dosages
+    """
     db.cursor.execute("""
-    DROP TABLE mean_dosage_GT;
+    DROP TABLE sum_dosage_GT;
     """)
    
 
 
     db.cursor.execute("""
-        CREATE TABLE mean_dosage_GT AS
-            SELECT donor_has_snp.snp_ID, donor_has_snp.donor_ID,
+        CREATE TABLE sum_dosage_GT AS
+            SELECT donor_has_snp.snp_ID, donor_has_snp.donor_ID, donor_has_snp.donor_project_ID,
                     (CAST(SUM(donor_has_snp.mutant_allele_read_count) AS REAL) / CAST(SUM(donor_has_snp.total_read_count) AS REAL)) AS "dosages",
                     SUM(donor_has_snp.total_read_count) AS "total_read_count_sum", 
                     SUM(donor_has_snp.mutant_allele_read_count) AS "mutant_allele_read_count_sum",
@@ -103,29 +106,28 @@ def mean_dosage_GT(db):
         BEGIN TRANSACTION;
     """)
     db.cursor.execute("""
-        CREATE TABLE mean_dosage_GT_new( 
+        CREATE TABLE sum_dosage_GT_new( 
                     `snp_ID` INT NOT NULL,
                     `donor_ID` INT NOT NULL,
+                    `donor_project_ID` INT NOT NULL,
                     `dosages` INT NULL DEFAULT NULL,
                     `total_read_count_sum` INT NULL DEFAULT NULL,
                     `mutant_allele_read_count_sum` INT NULL DEFAULT NULL,
                     `number_snps` INT NULL DEFAULT NULL,
-                    CONSTRAINT `fk_donor_has_snp_donor1`
-                        FOREIGN KEY (`donor_ID`)
-                        REFERENCES `donor_has_snp` (`donor_ID`)
-                    CONSTRAINT `fk_donor_has_snp_snp1`
-                        FOREIGN KEY (`snp_ID`)
-                        REFERENCES `donor_has_snp` (`snp_ID`)
+                    
+                    CONSTRAINT `fk_sum_dosage_GT_new`
+                        FOREIGN KEY (`donor_ID`, `donor_project_ID`, `snp_ID`)
+                        REFERENCES `donor_has_snp` (`donor_ID`, `donor_project_ID`, `snp_ID`)
                 );
     """)
     db.cursor.execute("""
-        INSERT INTO mean_dosage_GT_new SELECT * FROM mean_dosage_GT;
+        INSERT INTO sum_dosage_GT_new SELECT * FROM sum_dosage_GT;
     """)
     db.cursor.execute("""
-        DROP TABLE mean_dosage_GT;
+        DROP TABLE sum_dosage_GT;
     """)
     db.cursor.execute("""
-        ALTER TABLE mean_dosage_GT_new RENAME TO mean_dosage_GT;
+        ALTER TABLE sum_dosage_GT_new RENAME TO sum_dosage_GT;
     """)
     db.cursor.execute("""
         COMMIT;
@@ -140,17 +142,17 @@ def mean_dosage_GT(db):
 
 
 
-    # 258589 27 74 44 2
-    db.cursor.execute("""
-                        SELECT *
-                        FROM mean_dosage_GT
-                        WHERE snp_ID = 258589 AND donor_ID = 27
-                    """)
+    # # 258589 27 74 44 2
+    # db.cursor.execute("""
+    #                     SELECT *
+    #                     FROM sum_dosage_GT
+    #                     WHERE snp_ID = 258589 AND donor_ID = 27
+    #                 """)
 
-    results = db.cursor.fetchall()
-    for res in results:
-        print(res[2], res[3], res[4])
-        print(res[4]/res[3])
+    # results = db.cursor.fetchall()
+    # for res in results:
+    #     print(res[3], res[4], res[5])
+    #     print(res[5]/res[4])
 
 
 
@@ -165,9 +167,9 @@ def main():
     # set_dosages(db)
     # set_GT(db, 'donor_has_snp')
     # set_GT2(db, 'donor_has_snp')
-    mean_dosage_GT(db)
-    set_GT(db, 'mean_dosage_GT')
-    set_GT2(db, 'mean_dosage_GT')
+    sum_dosage_GT(db)
+    set_GT(db, 'sum_dosage_GT')
+    set_GT2(db, 'sum_dosage_GT')
 
     
       
