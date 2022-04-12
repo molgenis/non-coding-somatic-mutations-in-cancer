@@ -3,7 +3,7 @@ import sys
 import multiprocessing as mp
 
 
-def get_snps(db):
+def get_min_max_snpID(db):
     """
     Finds the highest and lowest snp ID.
     :param db:  The database object
@@ -39,12 +39,12 @@ def add_value(db):
     # Add in_transcript
     db.cursor.execute(f"""
                     ALTER TABLE snp
-                    ADD `AF` BOOLEAN DEFAULT(FALSE)
+                    ADD `AF` INT NULL DEFAULT NULL
                     """)
     # Add in_coding
     db.cursor.execute(f"""
                     ALTER TABLE snp
-                    ADD `AF_whole` BOOLEAN DEFAULT(FALSE)
+                    ADD `AF_whole` INT NULL DEFAULT NULL
                     """)
     # Committing the current transactions
     db.mydb_connection.commit()
@@ -78,13 +78,13 @@ def cal_AF(db, type_GT):
     :return:
     """
     c_donors = find_number_donors(db)
-    max_snp_id, min_snp_id = get_snps(db)
+    max_snp_id, min_snp_id = get_min_max_snpID(db)
     print(max_snp_id)
     
     #https://stackoverflow.com/questions/30649873/how-do-i-count-distinct-combinations-of-column-values
 
-    for ID in range(1, 200): #TODO min_snp_id, max_snp_id
-        print(ID)
+    for ID in range(1,21): #(min_snp_id, max_snp_id+1):
+        # print(ID)
         # COUNT GT (but not if none/null)
         db.cursor.execute("""
                         SELECT %s, snp_ID, donor_ID, COUNT(*) as used_count
@@ -97,7 +97,7 @@ def cal_AF(db, type_GT):
         snp_count_dict = dict()
         donor_count_dict = dict()
         donor_count = 0
-        donor_count_uniek = 0
+        # donor_count_uniek = 0
         for res in results:
             # GT
             if res[type_GT] in snp_count_dict:
@@ -112,44 +112,102 @@ def cal_AF(db, type_GT):
             else:
                 donor_count_dict[res['donor_ID']] = 1
                 donor_count += 1
-                donor_count_uniek += 1
+                # donor_count_uniek += 1
 
-        # if donor_count != donor_count_uniek:
-        #     print()
-            # print(snp_count_dict)
-            # print('donor_count', donor_count, 'donor_count_uniek', donor_count_uniek)
+        
         ALT_all = 0
         for key, value in snp_count_dict.items():
             ALT_all += (int(key) * int(value)) ##########################################
-        if donor_count_uniek != 0 or donor_count != 0:
+        # print(f'ALL {ALT_all}')
+        if donor_count != 0: #donor_count_uniek != 0 or 
             # # donor uniek
-            AF2 = ALT_all / (donor_count_uniek * 2)
+            # AF2 = ALT_all / (donor_count_uniek * 2)
             # donor
             AF = ALT_all / (donor_count * 2)
             # all donors
             AF_whole = ALT_all / (c_donors * 2)
         else:
-            print(ALT_all, donor_count, donor_count_uniek)
-            AF = 0
-            AF2 = 0
-            AF_whole = 0
+            # print(ALT_all, donor_count) #donor_count_uniek
+            AF = 'NULL'
+            # AF2 = 0
+            AF_whole = 'NULL'
 
-        if AF != AF2:
-            print(snp_count_dict)
-            print('donor_count', donor_count) #, 'donor_count_uniek', donor_count_uniek)
-            # # donor uniek
-            # print(f"AF uniek: {AF2} = {ALT_all} / ({donor_count_uniek} * 2)")
-            # donor                
-            print(f"AF: {AF} = {ALT_all} / ({donor_count} * 2)")
-            # all donors            
-            print(f"AF whole: {AF_whole} = {ALT_all} / ({c_donors} * 2)")
+        print(ID, ALT_all, AF)
 
-        db.cursor.execute(
+        
+    #     db.cursor.execute(
+    #         """UPDATE snp
+    #             SET AF = %s, AF_whole = %s
+    #             WHERE ID = %s;""" % (AF, AF_whole, ID))
+    # # Add to database
+    # db.mydb_connection.commit()
+
+def cal_AF_new(db, type_GT):
+    """
+    
+    :param db:  The database object
+    :param type_GT:
+    :return:
+    """
+    c_donors = find_number_donors(db)
+    # db.cursor.execute(
+    #         """UPDATE sum_dosage_GT 
+    #             SET AF = (CAST(SUM(%s) AS REAL) / (CAST(COUNT(donor_ID) AS REAL) * 2)), AF_whole = (CAST(SUM(%s) AS REAL) / (CAST(COUNT(%s) AS REAL) * 2))
+    #             WHERE snp_ID < 22 AND (%s = 0 OR %s = 1 OR %s = 2)
+    #             GROUP BY snp_ID;"""% (type_GT, type_GT, c_donors, type_GT, type_GT, type_GT))
+
+    #https://stackoverflow.com/questions/25151371/sqlite-update-using-group-by
+    # db.cursor.execute(
+    #         """UPDATE sum_dosage_GT
+    #             SET
+    #             AF=(
+    #                 SELECT (CAST(SUM(%s) AS REAL) / (CAST(COUNT(donor_ID) AS REAL) * 2))
+    #                 FROM sum_dosage_GT
+    #                 WHERE snp_ID < 22 AND (%s = 0 OR %s = 1 OR %s = 2)
+    #                 GROUP BY snp_ID
+    #                 ORDER BY snp_ID;
+    #             ),
+    #             AF_whole=(
+    #                 SELECT (CAST(SUM(%s) AS REAL) / (CAST(COUNT(%s) AS REAL) * 2))
+    #                 FROM sum_dosage_GT
+    #                 WHERE snp_ID < 22 AND (%s = 0 OR %s = 1 OR %s = 2)
+    #                 GROUP BY snp_ID
+    #                 ORDER BY snp_ID;
+    #             );"""% type_GT, type_GT, type_GT, type_GT, type_GT, c_donors, type_GT, type_GT, type_GT)
+
+    db.cursor.execute(
             """UPDATE snp
-                SET AF = %s, AF_whole = %s
-                WHERE ID = %s;""" % (AF, AF_whole, ID))
+            SET AF = cal_AF.AF, AF_whole = cal_AF.AF_whole
+            FROM (SELECT (CAST(SUM(sum_dosage_GT.%s) AS REAL) / (CAST(COUNT(sum_dosage_GT.donor_ID) AS REAL) * 2)) AS AF, 
+                    (CAST(SUM(sum_dosage_GT.%s) AS REAL) / (CAST(COUNT(%s) AS REAL) * 2)) AS AF_whole 
+                    FROM sum_dosage_GT, snp
+                    WHERE sum_dosage_GT.snp_ID = snp.ID AND (sum_dosage_GT.%s = 0 OR sum_dosage_GT.%s = 1 OR sum_dosage_GT.%s = 2)
+                    GROUP BY sum_dosage_GT.snp_ID
+                    ORDER BY sum_dosage_GT.snp_ID) AS cal_AF;"""% (type_GT, type_GT, c_donors, type_GT, type_GT, type_GT))
+
+
+    print('JA')
+    # #, COUNT(*) as used_count
+    # db.cursor.execute("""
+    #             SELECT snp_ID, SUM(%s), (CAST(SUM(%s) AS REAL) / (CAST(COUNT(donor_ID) AS REAL) * 2))
+    #             FROM sum_dosage_GT
+    #             WHERE snp_ID < 22 AND (%s = 0 OR %s = 1 OR %s = 2)
+    #             GROUP BY snp_ID
+    #             ORDER BY snp_ID;
+    #         """ % (type_GT, type_GT, type_GT, type_GT, type_GT))
+    # results = db.cursor.fetchall()
+    # # snp_count_dict = dict()
+    # # donor_count_dict = dict()
+    # # donor_count = 0
+    # # donor_count_uniek = 0
+    # for res in results:
+    #     print(f"{res[0]} - {res[1]} - {res[2]}")
+
     # Add to database
     db.mydb_connection.commit()
+     
+
+    
 
 
 def main():
@@ -160,11 +218,11 @@ def main():
     db = Database(path_db)
     add_value(db)
     type_GT = 'GT'
-    cal_AF(db, type_GT)
+    # cal_AF(db, type_GT)
+    cal_AF_new(db, type_GT)
     print('#########################################')
-    type_GT = 'GT2'
-    cal_AF(db, type_GT)
-
+    # type_GT = 'GT2'
+    # cal_AF(db, type_GT)
 
 
     # #CHECK

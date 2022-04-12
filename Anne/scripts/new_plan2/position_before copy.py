@@ -245,8 +245,10 @@ def main():
     position_out_gene = 2000
     # Region after the start position of a gene or before the stop position of a gene
     position_in_gene = 250
-    #
-    filter_num = 0
+    #https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-247
+    #https://www.nature.com/articles/nature07517#Sec6
+    # SNP discovery increases with increasing depth: essentially all homozygous positions are detected at 15×, whereas heterozygous positions accumulate more gradually to 33× (Fig. 5a). 
+    filter_num = 33
     with_type = 'genes'
     # Call add_value
     # add_value(db)
