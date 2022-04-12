@@ -108,21 +108,33 @@ def read_file(path, db, project_cancer, donor_info, specimen_df):
     :return: 
     """
     # Read file
+    print('READ')
     df = pd.read_csv(path, sep='\t', compression='gzip')
     # Drop all duplicates
+    print('remove duplicates')
     df = df.drop_duplicates()
     # Selects only the SNPs found with WGS
+    print('filter WGS')
     df = df.loc[df['seq_strategy'] == 'WGS']
+    print('fill')
     df[['total_read_count', 'mutant_allele_read_count']] = df[['total_read_count', 'mutant_allele_read_count']].fillna('NULL')
     # Checked if df is not empty (Some projects do not contain WGS SNPs)
+    print('check')
     if len(df) != 0:
         # SNPs
+        print('snps')
         dict_snp = fill_snps(db, df)
+        db.mydb_connection.commit()
         # Project
-        dict_project = fill_project(db, df, project_cancer)        
+        print('project')
+        dict_project = fill_project(db, df, project_cancer)  
+        db.mydb_connection.commit()      
         # Donor
+        print('donor')
         dict_donor = fill_donor(db, df, dict_project, donor_info)
+        db.mydb_connection.commit()
         # ALL
+        print('all')
         fill_donor_has_snp(db, df, dict_snp, dict_project, dict_donor, specimen_df)        
     db.mydb_connection.commit()
 
@@ -182,8 +194,10 @@ def main():
     # Database connection
     # db = Database(path_db)
     # Calls fill_tissue
+    print('fill_tissue')
     fill_tissue(specimen_df, db)
     # Calls read_file
+    print('read_file')
     read_file('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/000000bigfile.tsv.gz', db, project_cancer, donor_info, specimen_df)
     # read_file('D:\Hanze_Groningen\STAGE\DATAB\SKCM-US_db_NEW.tsv.gz', db) #, project_cancer, donor_info, specimen_df)
 
