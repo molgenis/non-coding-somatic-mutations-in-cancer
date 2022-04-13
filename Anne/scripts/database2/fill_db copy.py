@@ -58,7 +58,7 @@ def fill_snps(db, df):
                             str(snp_split[6]), str(snp_split[7])))
         last_id_snp = db.cursor.lastrowid
         dict_snp[snp] = last_id_snp
-    return dict_snp
+    return dict_snp, df
 
 def fill_donor_has_snp(db, df, dict_snp, dict_project, dict_donor, specimen_df):
     print('connection')
@@ -123,7 +123,7 @@ def read_file(path, db, project_cancer, donor_info, specimen_df):
     if len(df) != 0:
         # SNPs
         print('snps')
-        dict_snp = fill_snps(db, df)
+        dict_snp, df = fill_snps(db, df)
         db.mydb_connection.commit()
         # Project
         print('project')
