@@ -198,7 +198,7 @@ def main():
     fill_tissue(specimen_df, db)
     # Calls read_file
     print('read_file')
-    read_file('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/000000bigfile.tsv.gz', db, project_cancer, donor_info, specimen_df)
+    read_file('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/000000ALL_WGS_tot_mut.tsv.gz', db, project_cancer, donor_info, specimen_df)
     # read_file('D:\Hanze_Groningen\STAGE\DATAB\SKCM-US_db_NEW.tsv.gz', db) #, project_cancer, donor_info, specimen_df)
 
     # Close database connection
@@ -207,89 +207,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# # Make Database object
-# path_db = "D:\Hanze_Groningen\STAGE\DATAB\hest.db" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
-# # Database connection
-# db = Database(path_db)
-
-# path = 'D:\Hanze_Groningen\STAGE\DATAB\SKCM-US_db_NEW.tsv.gz'
-# df = pd.read_csv(path, sep='\t', compression='gzip')
-# # Drop all duplicates
-# df = df.drop_duplicates()
-# # Selects only the SNPs found with WGS
-# df = df.loc[df['seq_strategy'] == 'WGS']
-# df[['total_read_count', 'mutant_allele_read_count']] = df[['total_read_count', 'mutant_allele_read_count']].fillna('NULL')
-# # Checked if df is not empty (Some projects do not contain WGS SNPs)
-# if len(df) != 0:
-#     # SNPs
-#     print('snps')
-#     df['snp'] = df['chr'] + '_' + df['pos_start'].map(str) + '_' + df['pos_end'].map(str) + '_' + df['ref'] + '_' + df['alt'] + '_' + df['genome_version'] + '_' + df['platform'] + '_' + df['seq_strategy']
-#     snp_set = list(set(df['snp']))
-#     dict_snp = dict()
-#     for snp in snp_set:
-#         snp_split = snp.split('_')
-#         db.cursor.execute("""
-#             INSERT INTO snp (chr, pos_start, pos_end, ref, alt, genome_version,
-#                         platform, seq_strategy)
-#             VALUES ('%s', %s, %s, '%s', '%s', '%s', '%s', '%s')""" %
-#                             (str(snp_split[0]), int(snp_split[1]), int(snp_split[2]),
-#                             str(snp_split[3]), str(snp_split[4]), str(snp_split[5]),
-#                             str(snp_split[6]), str(snp_split[7])))
-#         last_id_snp = db.cursor.lastrowid
-#         dict_snp[snp] = last_id_snp
-#     # Project
-#     print('projects')
-#     project_id_set = list(set(df['project_id']))
-#     dict_project = dict()
-#     for project_id in project_id_set:
-#         db.cursor.execute("""INSERT INTO project (project_ID, cancer) 
-#                             VALUES ('%s', '%s')""" % (str(project_id), str('test')))
-#         last_id_project = db.cursor.lastrowid
-#         dict_project[project_id] = last_id_project
-#     # Donor
-#     print('donors')
-#     donor_id_set = list(set(df['donor_id']))
-#     dict_donor = dict()
-#     for donor_id in donor_id_set:
-#         db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
-#                                                     age_at_last_followup, disease_status_last_followup)
-#                                 VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" %
-#                             (str(donor_id), int(last_id_project), '',
-#                             '',
-#                             3,
-#                             4,
-#                             ''))
-                
-#         # Get the last ID (private key of the donor table) used
-#         last_id_donor = db.cursor.lastrowid
-#         dict_donor[donor_id] = last_id_donor
-
-#     # ALL
-#     print('connection')
-#     df['ALL'] = df['project_id'] + '___' + df['donor_id'] + '___' + df['snp'] + '___' + df['total_read_count'].map(str) + '___' + df['mutant_allele_read_count'].map(str)
-#     all_set = list(set(df['ALL']))
-#     for all in all_set:
-#         all_split = all.split('___')
-#         if all_split[3] == 'NULL':
-#             total_read = 'NULL'
-#         else:
-#             total_read = int(float(all_split[3]))
-
-#         if all_split[4] == 'NULL':
-#             mut_read = 'NULL'
-#         else:
-#             mut_read = int(float(all_split[4]))
-               
-#         db.cursor.execute("""
-#                 INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id, 
-#                                             total_read_count, mutant_allele_read_count)
-#                 VALUES (%s, %s, %s, %s, '%s', %s, %s)""" %
-#                                 (int(dict_project[all_split[0]]), int(dict_donor[all_split[1]]), int(dict_snp[all_split[2]]), int(3),
-#                                 str('ddd'), total_read, mut_read))
-# db.mydb_connection.commit()
-        
-        
-        
-            
