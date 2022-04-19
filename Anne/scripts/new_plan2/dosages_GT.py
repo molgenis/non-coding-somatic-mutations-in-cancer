@@ -197,7 +197,7 @@ def make_dist_plot_dosages(db, max_donor_id):
     count_snps = dict(sorted(count_snps.items()))
     plt.bar(count_snps.keys(), count_snps.values(), color='g')
     plt.tight_layout()
-    plt.savefig(f"D:/Hanze_Groningen/STAGE/eQTL/count_snps.png")
+    plt.savefig(f"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/count_snps.png")
     plt.clf()
     plt.close()
     # for key, value in dosages_dict.items():        
@@ -228,7 +228,7 @@ def make_dist_plot_dosages(db, max_donor_id):
     count_snps2 = dict(sorted(count_snps2.items()))
     plt.bar(count_snps2.keys(), count_snps2.values(), color='g')
     plt.tight_layout()
-    plt.savefig(f"D:/Hanze_Groningen/STAGE/eQTL/count_snps2_zonderfilter.png")
+    plt.savefig(f"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/count_snps2_zonderfilter.png")
     plt.clf()
     plt.close()
 
@@ -272,7 +272,7 @@ def make_dist_plot_tot(db):
         tot_list.append(res['dosages'])
     sns.displot(tot_list)
     plt.tight_layout()
-    plt.savefig("D:/Hanze_Groningen/STAGE/eQTL/tot_snps_donor.png")
+    plt.savefig("/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/tot_snps_donor.png")
     plt.clf()
     plt.close()
 
@@ -308,55 +308,55 @@ def get_min_max_snpID(db):
 
 def main():
     # Path of the database
-    path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
     db = Database(path_db)
-    # set_dosages(db)
-    # set_GT(db, 'donor_has_snp')
-    # set_GT2(db, 'donor_has_snp')
-    # sum_dosage_GT(db)
-    # set_GT(db, 'sum_dosage_GT')
-    # set_GT2(db, 'sum_dosage_GT')
+    set_dosages(db)
+    set_GT(db, 'donor_has_snp')
+    set_GT2(db, 'donor_has_snp')
+    sum_dosage_GT(db)
+    set_GT(db, 'sum_dosage_GT')
+    set_GT2(db, 'sum_dosage_GT')
 
-    max_donor_id, min_donor_id = get_min_max_snpID(db)
+    # max_donor_id, min_donor_id = get_min_max_snpID(db)
 
-    listtest = make_dist_plot_dosages(db, max_donor_id)
-    # make_dist_plot_tot(db)
-    myfile = open('D:/Hanze_Groningen/STAGE/eQTL/Number_and_none_values.txt', 'w')
-    myfile.writelines(f'donor\tcountNan\tcountNum\tcountNan_sum\tcountNum_sum\n')
+    # listtest = make_dist_plot_dosages(db, max_donor_id)
+    # # make_dist_plot_tot(db)
+    # myfile = open('D:/Hanze_Groningen/STAGE/eQTL/Number_and_none_values.txt', 'w')
+    # myfile.writelines(f'donor\tcountNan\tcountNum\tcountNan_sum\tcountNum_sum\n')
 
-    for value in range(1, max_donor_id+1): #listtest:
-        countNan = 0
-        countNum = 0
-        # print(f'------value: {value}')        
-        db.cursor.execute(f"""
-                        SELECT snp_ID, total_read_count, mutant_allele_read_count
-                        FROM donor_has_snp
-                        WHERE donor_ID = {value};
-                        """)
-        results = db.cursor.fetchall()
-        for res in results:
-            if res['total_read_count'] is None:
-                countNan += 1
-            else:
-                countNum += 1
-        countNan_sum = 0
-        countNum_sum = 0
-        db.cursor.execute(f"""
-                        SELECT snp_ID, total_read_count_sum, mutant_allele_read_count_sum
-                        FROM sum_dosage_GT
-                        WHERE donor_ID = {value};
-                        """)
-        results = db.cursor.fetchall()
-        for res in results:
-            if res['total_read_count_sum'] is None:
-                countNan_sum += 1
-            else:
-                countNum_sum += 1
-        myfile.writelines(f'{value}\t{countNan}\t{countNum}\t{countNan_sum}\t{countNum_sum}\n')
+    # for value in range(1, max_donor_id+1): #listtest:
+    #     countNan = 0
+    #     countNum = 0
+    #     # print(f'------value: {value}')        
+    #     db.cursor.execute(f"""
+    #                     SELECT snp_ID, total_read_count, mutant_allele_read_count
+    #                     FROM donor_has_snp
+    #                     WHERE donor_ID = {value};
+    #                     """)
+    #     results = db.cursor.fetchall()
+    #     for res in results:
+    #         if res['total_read_count'] is None:
+    #             countNan += 1
+    #         else:
+    #             countNum += 1
+    #     countNan_sum = 0
+    #     countNum_sum = 0
+    #     db.cursor.execute(f"""
+    #                     SELECT snp_ID, total_read_count_sum, mutant_allele_read_count_sum
+    #                     FROM sum_dosage_GT
+    #                     WHERE donor_ID = {value};
+    #                     """)
+    #     results = db.cursor.fetchall()
+    #     for res in results:
+    #         if res['total_read_count_sum'] is None:
+    #             countNan_sum += 1
+    #         else:
+    #             countNum_sum += 1
+    #     myfile.writelines(f'{value}\t{countNan}\t{countNum}\t{countNan_sum}\t{countNum_sum}\n')
 
-    myfile.close()
+    # myfile.close()
     
       
 

@@ -389,15 +389,15 @@ def check_filter(db):
 
 def main():
     # Path of the database
-    path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
     db = Database(path_db)
     
     # check_filter(db)
     # Path of the genes and there positions
-    gene_path = 'D:/Hanze_Groningen/STAGE/db/all_genes_new.tsv'#"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_genes_new.tsv"  # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
+    gene_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/all_genes_new.tsv'#'D:/Hanze_Groningen/STAGE/db/all_genes_new.tsv'#"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_genes_new.tsv"  # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
     # Path to save files
-    save_path = 'D:/Hanze_Groningen/STAGE/db/'#"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/"
+    save_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/"
     # Read gene file
     gene_df = pd.read_csv(gene_path, sep='\t')
     # print(len(gene_df))
