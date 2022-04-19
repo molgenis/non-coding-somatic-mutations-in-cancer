@@ -48,12 +48,12 @@ def set_GT(db, table):
     db.cursor.execute(
             """UPDATE %s 
                 SET GT = 1
-                WHERE dosages < 0.9 AND dosages > 0.1;"""% table)
+                WHERE dosages < 0.9 AND dosages > 0.33;"""% table)
     # Homozygoot ref
     db.cursor.execute(
             """UPDATE %s 
                 SET GT = 0
-                WHERE dosages <= 0.1;"""% table)
+                WHERE dosages <= 0.33;"""% table)
     # Add to database
     db.mydb_connection.commit()
     
@@ -293,11 +293,11 @@ def main():
     # Database connection
     db = Database(path_db)
     # set_dosages(db)
-    # set_GT(db, 'donor_has_snp')
-    # set_GT2(db, 'donor_has_snp')
+    set_GT(db, 'donor_has_snp')
+    set_GT2(db, 'donor_has_snp')
     # sum_dosage_GT(db)
-    # set_GT(db, 'sum_dosage_GT')
-    # set_GT2(db, 'sum_dosage_GT')
+    set_GT(db, 'sum_dosage_GT')
+    set_GT2(db, 'sum_dosage_GT')
 
     max_donor_id, min_donor_id = get_min_max_snpID(db)
 
