@@ -150,30 +150,6 @@ def cal_AF_new(db, type_GT):
     :return:
     """
     c_donors = find_number_donors(db)
-    # db.cursor.execute(
-    #         """UPDATE sum_dosage_GT 
-    #             SET AF = (CAST(SUM(%s) AS REAL) / (CAST(COUNT(donor_ID) AS REAL) * 2)), AF_whole = (CAST(SUM(%s) AS REAL) / (CAST(COUNT(%s) AS REAL) * 2))
-    #             WHERE snp_ID < 22 AND (%s = 0 OR %s = 1 OR %s = 2)
-    #             GROUP BY snp_ID;"""% (type_GT, type_GT, c_donors, type_GT, type_GT, type_GT))
-
-    #https://stackoverflow.com/questions/25151371/sqlite-update-using-group-by
-    # db.cursor.execute(
-    #         """UPDATE sum_dosage_GT
-    #             SET
-    #             AF=(
-    #                 SELECT (CAST(SUM(%s) AS REAL) / (CAST(COUNT(donor_ID) AS REAL) * 2))
-    #                 FROM sum_dosage_GT
-    #                 WHERE snp_ID < 22 AND (%s = 0 OR %s = 1 OR %s = 2)
-    #                 GROUP BY snp_ID
-    #                 ORDER BY snp_ID;
-    #             ),
-    #             AF_whole=(
-    #                 SELECT (CAST(SUM(%s) AS REAL) / (CAST(COUNT(%s) AS REAL) * 2))
-    #                 FROM sum_dosage_GT
-    #                 WHERE snp_ID < 22 AND (%s = 0 OR %s = 1 OR %s = 2)
-    #                 GROUP BY snp_ID
-    #                 ORDER BY snp_ID;
-    #             );"""% type_GT, type_GT, type_GT, type_GT, type_GT, c_donors, type_GT, type_GT, type_GT)
 
     db.cursor.execute(
             """UPDATE snp
@@ -187,27 +163,8 @@ def cal_AF_new(db, type_GT):
 
 
     print('JA')
-    # #, COUNT(*) as used_count
-    # db.cursor.execute("""
-    #             SELECT snp_ID, SUM(%s), (CAST(SUM(%s) AS REAL) / (CAST(COUNT(donor_ID) AS REAL) * 2))
-    #             FROM sum_dosage_GT
-    #             WHERE snp_ID < 22 AND (%s = 0 OR %s = 1 OR %s = 2)
-    #             GROUP BY snp_ID
-    #             ORDER BY snp_ID;
-    #         """ % (type_GT, type_GT, type_GT, type_GT, type_GT))
-    # results = db.cursor.fetchall()
-    # # snp_count_dict = dict()
-    # # donor_count_dict = dict()
-    # # donor_count = 0
-    # # donor_count_uniek = 0
-    # for res in results:
-    #     print(f"{res[0]} - {res[1]} - {res[2]}")
-
     # Add to database
     db.mydb_connection.commit()
-     
-
-    
 
 
 def main():
@@ -221,39 +178,9 @@ def main():
     # cal_AF(db, type_GT)
     cal_AF_new(db, type_GT)
     print('#########################################')
-    # type_GT = 'GT2'
+    type_GT = 'GT2'
     # cal_AF(db, type_GT)
-
-
-    # #CHECK
-    # db.cursor.execute("""
-    #                 SELECT snp_ID, donor_ID, total_read_count, mutant_allele_read_count
-    #                 FROM donor_has_snp
-    #                 WHERE donor_ID = 614;
-    #             """)
-    # results = db.cursor.fetchall()
-    # snp_count_dict = dict()
-    # for res in results:
-    #     # GT
-    #     if res['snp_ID'] in snp_count_dict:
-    #         snp_count_dict[res['snp_ID']] = snp_count_dict[res['snp_ID']] + 1
-    #     else:
-    #         snp_count_dict[res['snp_ID']] = 1
-    # print(snp_count_dict)
-    # #1436355
-    # db.cursor.execute(f"""
-    #                 SELECT snp_ID, donor_ID, total_read_count, mutant_allele_read_count, {type_GT}
-    #                 FROM donor_has_snp
-    #                 WHERE donor_ID = 614 AND snp_ID = 1436355;
-    #             """)
-    # results = db.cursor.fetchall()
-    # for res in results:
-    #     print('total_read_count ', res['total_read_count'], ' mutant_allele_read_count ', res['mutant_allele_read_count'], ' type_GT ', res[type_GT])
-        
-
-
-      
-
+    cal_AF_new(db, type_GT)
 
 
 if __name__ == '__main__':
