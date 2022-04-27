@@ -45,12 +45,12 @@ def main():
     # Database connection
     db = Database(path_db)
     #
-    path_file = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/GREEN_DB/2022-04-13_GRCh37_UCNE.bed' #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
+    path_file = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GREEN_DB/2022-04-13_GRCh37_UCNE.bed' #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
     name_variant = 'UCNE'
     df_variant = pd.read_csv(path_file, sep='\t')
     print(len(df_variant))
 
-    # add_value(db, name_variant)
+    add_value(db, name_variant)
 
     f = open(f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/{name_variant}_num_snps.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
     f.write(f"#Chromosome\tStart\tEnd\tnum_snps_region\n")
