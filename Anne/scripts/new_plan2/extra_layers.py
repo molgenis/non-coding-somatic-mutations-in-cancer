@@ -45,8 +45,8 @@ def main():
     # Database connection
     db = Database(path_db)
     #
-    path_file = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GREEN_DB/2022-04-13_GRCh37_UCNE.bed.gz' #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
-    name_variant = 'UCNE'
+    path_file = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GREEN_DB/2022-04-13_GRCh37_TFBS.merged.bed.gz' #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
+    name_variant = 'TFBS'
     df_variant = pd.read_csv(path_file, sep='\t', compression='gzip')
     print(len(df_variant))
 
