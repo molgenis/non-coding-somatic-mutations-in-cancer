@@ -199,13 +199,93 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, path_peaks_chr, n
                     peaks(kp, peaks_file, chr)
                     dev.off()     
                 }   
-            }     
-
-        }
-       
+            }
+        }       
     }   
 }
 
+
+
+
+
+
+
+
+
+read_files <- function(filenames, chr, r0, r1, path_info_save, path_peaks_chr, num_of_pictures, num_for_r, custom.cytobands, zoom.region, row) {
+    ##########################################
+    #
+    ##########################################
+    print(filenames)
+    # Paste 'chr' for each chromosome
+    chr <- paste('chr', chr, sep="")
+    # Make empty dataframe
+    df <- read.table(text = "", col.names = c("gene_id", "seqnames","Start","End"))
+    # Loop over all files that end with .bed
+    for (i in 1:length(filenames)){  
+        print(i)
+        # With one file I have to split on something else than with the other file
+        basename_file <- tools::file_path_sans_ext(strsplit(basename(filenames[i]), ".", fixed = TRUE)[[1]][1])
+        # peaks_file_big <- paste(path_peaks_chr, basename_file, '_', chr, '.tsv', sep="")
+        # print(peaks_file_big)
+        # peaks <- read.table(file = peaks_file_big, sep = '\t', header = FALSE, col.names = c("id", "chromosoom","Start","End"))
+        # for (index_row in 1:nrow(peaks)){
+        # row <- peaks[index_row,]
+        # zoom.region <- toGRanges(data.frame(row$chromosoom, row$Start, row$End))
+        print(basename_file)
+        # Checked that a maximum of 12 participants are clearly visible in a plot. 
+        # So now he makes multiple plots with 12 (or fewer) participants per plot.
+        if ( (i%%(num_of_pictures+1)) == 0 || i == 1){
+            # If i is not 1, he has to close the previous plot, with 1 that is not yet possible,
+            # because then no plot has been made yet.
+            if (i != 1 || num_of_pictures == 1){
+                dev.off()
+            }
+            # Set counter to 0: Keeps track of plot number
+            counter <- 0 
+            # Create name for the figure that saves ~12 plots      
+            name <- paste(path_info_save, 'plot', i, '_', basename_file, '_', row$id, '_', row$chromosoom, '_', row$Start, '_', row$End, '.png', sep="")
+            # Make figure
+            png(name, width = 2000, height = 1000) 
+            # Call make_plots
+            info <- make_plots(chr, filenames, df, i, basename_file, counter, r0, r1, '', 'new', '', num_for_r, custom.cytobands, zoom.region) #kp, df, counter
+            # The kp plot (karyoplot object)
+            kp <- info[[1]]
+            # The data frame that is continuously expanded with new data for the SUM plot
+            df <- info[[2]]
+            # counter: Keeps track of plot number
+            counter <- info[[3]]  
+            peaks_file <- paste(path_info_save, basename_file, '_', chr, '_', row$id, '_', row$chromosoom, '_', row$Start, '_', row$End, '.tsv', sep="")
+            peaks(kp, peaks_file, chr)
+        } else{
+            # Call make_plots
+            info <- make_plots(chr, filenames, df, i, basename_file, counter, r0, r1, '', 'add', kp, num_for_r, custom.cytobands, zoom.region) #kp, df, counter
+            # The kp plot (karyoplot object)
+            kp <- info[[1]]
+            # The data frame that is continuously expanded with new data for the SUM plot
+            df <- info[[2]]
+            # counter: Keeps track of plot number
+            counter <- info[[3]]  
+            peaks_file <- paste(path_info_save, basename_file, '_', chr, '_', row$id, '_', row$chromosoom, '_', row$Start, '_', row$End, '.tsv', sep="")
+            peaks(kp, peaks_file, chr)
+            # When you arrive at the last *.bed file, a plot is made in which all patients are added up. 
+            # So that you have everything in 1 enumerating picture.
+            if (i == length(filenames)){
+                dev.off()
+                # Create name for the figure that saves SUM of plots
+                name <- paste(path_info_save, 'ALLplot_', i, '_', basename_file, '_', row$id, '_', row$chromosoom, '_', row$Start, '_', row$End, '.png', sep="")
+                peaks_file <- paste(path_info_save, 'ALLplot_', chr, '_', row$id, '_', row$chromosoom, '_', row$Start, '_', row$End, '.tsv', sep="")
+                png(name, width = 2000, height = 1000)
+                # Call make_plots
+                kp <- make_plots(chr, filenames, df, i, basename_file, counter, r0, r1, 'sum', 'new', '', num_for_r, custom.cytobands, zoom.region)
+                # Call peaks
+                peaks(kp, peaks_file, chr)
+                dev.off()     
+            }   
+        }
+        # }       
+    }   
+}
 
 
 
@@ -232,7 +312,7 @@ main <- function() {
     # Color chromosome on genes
     custom.cytobands <- toGRanges('D:/Hanze_Groningen/STAGE/db/mycytobands_R.txt')
     # How many layers do you want on one plot
-    num_of_pictures = 1
+    num_of_pictures = 2
     # Number for calculating R
     num_for_r = 12/num_of_pictures
     # Parameters for where the plots will be placed
@@ -248,16 +328,23 @@ main <- function() {
     
     # Loop over chromosomes
     for (chr in chrom){
-        print(chr)
-        path_info_save = paste(path_save, '/chr', chr, '/', sep='')
-        path_peaks_chr = paste(path_peaks, '/chr', chr, '/', sep='')
-        print(path_info_save)
-        # Makes folder if it doesn't exists
-        if (!dir.exists(path_info_save)){
-            dir.create(path_info_save, recursive = T)
+        # peaks_file_big <- paste(path_peaks_chr, basename_file, '_', chr, '.tsv', sep="")
+        # print(peaks_file_big)
+        peaks <- read.table(file = 'D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/chr3/breast_chr3.tsv', sep = '\t', header = FALSE, col.names = c("id", "chromosoom","Start","End"))
+        for (index_row in 1:nrow(peaks)){
+            row <- peaks[index_row,]
+            zoom.region <- toGRanges(data.frame(row$chromosoom, row$Start, row$End))
+            print(chr)
+            path_info_save = paste(path_save, '/chr', chr, '/', sep='')
+            path_peaks_chr = paste(path_peaks, '/chr', chr, '/', sep='')
+            print(path_info_save)
+            # Makes folder if it doesn't exists
+            if (!dir.exists(path_info_save)){
+                dir.create(path_info_save, recursive = T)
+            }      
+            # Call read_files      
+            read_files(filenames, chr, r0, r1, path_info_save, path_peaks_chr, num_of_pictures, num_for_r, custom.cytobands, zoom.region, row)  
         }      
-        # Call read_files      
-        read_files(filenames, chr, r0, r1, path_info_save, path_peaks_chr, num_of_pictures, num_for_r, custom.cytobands)        
     }
 }
 

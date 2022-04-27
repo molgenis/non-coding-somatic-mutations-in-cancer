@@ -76,14 +76,14 @@ peaks <- function(kp, peaks_file, chr){
   textfile=file.path(peaks_file);    
   printer = file(textfile,"a+");
   # Get the 10 highest peaks
-  indexes <- order(density, decreasing=TRUE)[1:20]
+  indexes <- order(density, decreasing=TRUE)#[1:20]
   count <- 0
   # Grab the window belonging to the highest peaks
   for (index in indexes){
     count <- count + 1
     # Write info to file - 'hight of peak' - 'start of window' - 'end of window'
     #write(c(density[index], start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 3);
-    write(c(count, chr, start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 4);
+    write(c(count, density[index], chr, start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 5);
   }
   close(printer)
 }
@@ -167,7 +167,7 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, 
       # counter: Keeps track of plot number
       counter <- info[[3]]  
       
-      peaks_file <- paste(path_info_save, basename_file, '_', chr, '.tsv', sep="")
+      peaks_file <- paste(path_info_save, basename_file, '_LONG_', chr, '.tsv', sep="")
       peaks(kp, peaks_file, chr)
     } else{
       # Call make_plots
@@ -179,7 +179,7 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, 
       # counter: Keeps track of plot number
       counter <- info[[3]]  
       
-      peaks_file <- paste(path_info_save, basename_file, '_', chr, '.tsv', sep="")
+      peaks_file <- paste(path_info_save, basename_file, '_LONG_', chr, '.tsv', sep="")
       peaks(kp, peaks_file, chr)
       # When you arrive at the last *.bed file, a plot is made in which all patients are added up. 
       # So that you have everything in 1 enumerating picture.
@@ -187,7 +187,7 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, 
         dev.off()
         # Create name for the figure that saves SUM of plots
         name <- paste(path_info_save, 'ALLplot_', chr, '.png', sep="")
-        peaks_file <- paste(path_info_save, 'ALLplot_', chr, '.tsv', sep="")
+        peaks_file <- paste(path_info_save, 'ALLplot_LONG_', chr, '.tsv', sep="")
         png(name, width = 2000, height = 1000)
         # Call make_plots
         kp <- make_plots(chr, filenames, df, i, basename_file, counter, r0, r1, 'sum', 'new', '', num_for_r, custom.cytobands)
@@ -205,7 +205,7 @@ main <- function() {
   # List of chromosomes
   #numbers <-  seq(1, 22, by=1)
   #chrom <- append(numbers, c('X', 'Y'))
-  chrom <- c(3)
+  chrom <- c(22)
   
   
   # Cancer
