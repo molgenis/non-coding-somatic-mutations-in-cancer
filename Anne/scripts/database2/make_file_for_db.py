@@ -3,6 +3,8 @@ import pandas as pd
 import sys
 import os
 import glob
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 # Also takes the folder 1 higher, so that I can do the import after
 # sys.path.append("..")
@@ -68,10 +70,11 @@ def main():
     """
 
     """
+    config = get_config()
     # The path to the data
-    path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/'
+    path = config['cancer_data_path']
     # The path where the new data should be stored
-    out_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_data_db/'
+    out_path = config['database_path']
     # download?fn=%2Fcurrent%2FProjects%2FALL-US%2Fsimple_somatic_mutation.open.ALL-US.tsv.gz
     path_files = f"{path}download*.tsv.gz"
     # Loop over all files in path that ends with .tsv

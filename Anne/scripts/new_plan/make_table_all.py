@@ -9,6 +9,9 @@ import glob
 import numpy as np
 import scipy.sparse
 from scipy.sparse import csr_matrix
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def set_donor_snp(project_file):
@@ -111,10 +114,11 @@ def create_vcf(sparseMatrix, list_donor, list_snp, name_vcf):
 
 
 def main():
+    config = get_config()
     # Path to the file
-    path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/allfiles.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/allfiles.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
+    path_file = config['allfiles'] #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
     # File name vcf file
-    name_vcf = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/ALL.vcf.gz" #D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz" # "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/" #all_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
+    name_vcf = config['vcf_all'] #D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
     # Open and unzip file
     project_file = gzip.open(path_file, 'rt')
 

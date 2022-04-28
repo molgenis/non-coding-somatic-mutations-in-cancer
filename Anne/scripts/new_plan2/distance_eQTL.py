@@ -1,5 +1,8 @@
 from Database import Database
 import pandas as pd
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def search_snp(db, row, region):
@@ -38,11 +41,11 @@ def change_range(db, row, region):
         return 0, ''
 
 
-def search_close_snp(db, df_strong_eQTL):
+def search_close_snp(db, df_strong_eQTL, config):
     """
     
     """
-    f = open(f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/distance_eqtl.tsv', 'w') #D:/Hanze_Groningen/STAGE/eQTL/
+    f = open(config['distance_eqtl_path'], 'w') #D:/Hanze_Groningen/STAGE/eQTL/
     f.write(f"SNP_eQTL\chr\pos\Gene\tsnp_ID\tchr_snp\tpos_snp\tdistance\n")
     for index, row in df_strong_eQTL.iterrows():
         distance_eQTL = 100000
@@ -73,13 +76,14 @@ def search_close_snp(db, df_strong_eQTL):
         #             pass  
 
 def main():
+    config = get_config()
     #
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
+    path_db = config['database'] #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
     # Database connection
     db = Database(path_db)
-    path_strong_eQTL = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/eqtl_v1013_lead_snp_gene_with_info.txt'#"D:/Hanze_Groningen/STAGE/eQTL/eqtl_v1013_lead_snp_gene_with_info.txt"
+    path_strong_eQTL = config['strong_eqtl_path'] #"D:/Hanze_Groningen/STAGE/eQTL/eqtl_v1013_lead_snp_gene_with_info.txt"
     df_strong_eQTL = pd.read_csv(path_strong_eQTL, sep='\t')
-    search_close_snp(db, df_strong_eQTL)
+    search_close_snp(db, df_strong_eQTL, config)
 
 
 

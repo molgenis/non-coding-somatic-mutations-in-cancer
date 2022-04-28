@@ -1,6 +1,9 @@
 from Database import Database
 import sys
 import multiprocessing as mp
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def get_min_max_snpID(db):
@@ -168,9 +171,9 @@ def cal_AF_new(db, type_GT):
 
 
 def main():
+    config = get_config()
     # Path of the database
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
-    #'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db' #
+    path_db = config['database'] #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" 
     # Database connection
     db = Database(path_db)
     add_value(db)

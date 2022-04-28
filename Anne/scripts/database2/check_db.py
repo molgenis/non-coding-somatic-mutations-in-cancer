@@ -6,11 +6,14 @@ import math # nan
 import numpy as np
 
 from Database import Database
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def main():
+    config = get_config()
     # Make Database object
-    db = Database('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db') #00Database_internship_UPDATE2.0.db.db')
+    db = Database(config['database']) #'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db'
     projectset = set()
     db.cursor.execute("""SELECT *
                             FROM project""")

@@ -4,6 +4,10 @@ from itertools import combinations
 import sys
 
 from Sample import Sample
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
+
 
 
 def filter_file(path_file):
@@ -82,8 +86,9 @@ def main():
 
     :return:
     """
+    config = get_config()
     # the path to the file
-    path_file = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map"
+    path_file = config['sample_file']
     # Main path to where the file will be saved
     head_path = sys.argv[1]
     # Number of tumors you want to combine while running Mutect2.

@@ -6,6 +6,10 @@ import math # nan
 import numpy as np
 
 from Database import Database
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
+
 
 def fill_project(db, df, project_cancer):
     # Project
@@ -168,13 +172,14 @@ def fill_tissue(specimen_df, db):
     db.mydb_connection.commit()
 
 def main():
+    config = get_config()
     # Path to file with project ID and kind of cancer
-    site_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/site.csv'  # "E:/STAGE/Site/site.csv"
+    site_path = config['site']  # "E:/STAGE/Site/site.csv"
     site_df = pd.read_csv(site_path, sep=';')
     # Make dictionary of site_df, and get only the column cancer
     project_cancer = site_df.set_index('project_ID').to_dict('dict')['cancer']
     # Path to file with donor information like age, sex etc.
-    donor_info_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/donor.tsv'  # "E:/STAGE/WGS/donor.tsv"
+    donor_info_path = config['donor_info']  # "E:/STAGE/WGS/donor.tsv"
     donor_info_df = pd.read_csv(donor_info_path, sep='\t')
     # Make of gender (sex) and vital status a boolean
     donor_info_df['donor_sex'] = donor_info_df['donor_sex'].map({'male': 'FALSE', 'female': 'TRUE'})
@@ -186,11 +191,10 @@ def main():
     # Make dictionary of donor_info_df
     donor_info = donor_info_df.set_index('icgc_donor_id').to_dict('dict')
     # Path to file with specimen_type (Normal or tumor tissue)
-    specimen_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/all_specimen.tsv'  # "E:/STAGE/WGS/all_specimen.tsv"
+    specimen_path = config['all_specimen']  # "E:/STAGE/WGS/all_specimen.tsv"
     specimen_df = pd.read_csv(specimen_path, sep='\t')
     # Make Database object
-    db = Database('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/test.db')
-    # path_db = "D:\Hanze_Groningen\STAGE\DATAB\hest.db" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    db = Database(config['test_database'])
     # Database connection
     # db = Database(path_db)
     # Calls fill_tissue
@@ -198,7 +202,7 @@ def main():
     fill_tissue(specimen_df, db)
     # Calls read_file
     print('read_file')
-    read_file('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/data_db/000000ALL_WGS_tot_mut.tsv.gz', db, project_cancer, donor_info, specimen_df)
+    read_file(config['ALL_WGS_tot_mut'], db, project_cancer, donor_info, specimen_df)
     # read_file('D:\Hanze_Groningen\STAGE\DATAB\SKCM-US_db_NEW.tsv.gz', db) #, project_cancer, donor_info, specimen_df)
 
     # Close database connection

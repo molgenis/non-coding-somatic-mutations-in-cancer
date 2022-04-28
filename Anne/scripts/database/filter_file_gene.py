@@ -51,8 +51,8 @@ def check_gene(gene_df, mydb_connection, cursor):
 
 
 def main():
-    # path_fgene = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed'
-    # path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long2.db'
+    # path_fgene = config['checkGene'] 
+    # path_db = config['database'] '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long2.db'
     # db = Database(sys.argv[1]) #sys.argv[1]
     # mydb_connection = db.mydb_connection
     # cursor = db.cursor

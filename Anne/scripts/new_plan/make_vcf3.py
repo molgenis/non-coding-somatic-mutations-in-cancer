@@ -1,6 +1,10 @@
 import gzip
 import pandas as pd
 import numpy as np
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
 
 
 def read_file(project_file, name_vcf):
@@ -68,10 +72,11 @@ def read_file(project_file, name_vcf):
 
 
 def main():
+    config = get_config()
     # Path to the file
-    path_file = "D:/Hanze_Groningen/STAGE/NEW PLAN/B.tsv.gz" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/allfiles.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
+    path_file = "D:/Hanze_Groningen/STAGE/NEW PLAN/B.tsv.gz" #config['allfiles'] #"D:/Hanze_Groningen/STAGE/NEW PLAN/ALL-US.tsv.gz"
     # File name vcf file
-    name_vcf = "D:/Hanze_Groningen/STAGE/NEW PLAN/00" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/" #all_vcf.tsv.gz" #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
+    name_vcf = "D:/Hanze_Groningen/STAGE/NEW PLAN/00" #config['cancer_data_path'] #"D:/Hanze_Groningen/STAGE/NEW PLAN/test_vcf.tsv.gz"
     # Open and unzip file
     project_file = gzip.open(path_file, 'rt')
 

@@ -1,6 +1,10 @@
 from Database import Database
 import sys
 import multiprocessing as mp
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
+
 
 
 def get_snps(db):
@@ -78,7 +82,7 @@ def get_snps(db):
 #     print(n)
 #     arg_multi_list = []
 #     for i in range(0, len(snp_list), n):
-#         name_file = f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/chr{key}_{i}.tsv.gz' #f'D:/Hanze_Groningen/STAGE/NEW PLAN/chr{key}_{i}.tsv.gz' #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/
+#         name_file = f'{config['umap_path']}chr{key}_{i}.tsv.gz' #f'D:/Hanze_Groningen/STAGE/NEW PLAN/chr{key}_{i}.tsv.gz' 
 #         arg_multi_list.append((snp_list[i: i+n], donor_dict, donor_list, step_index, sparseMatrix, step_list, donor_cancer_list, name_file))
 
 #     pool = Pool(processes=cpus)
@@ -226,6 +230,7 @@ def cal_AF(db, type_GT):
 
 
 def main():
+    config = get_config()
     # Path of the database
     path_db = "D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection

@@ -1,7 +1,10 @@
 import pandas as pd
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
-
-gene_path = 'D:/Hanze_Groningen/STAGE/db/all_genes_new - kopie.tsv' #'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/all_genes_new.tsv'
+config = get_config()
+gene_path = config['all_genes'] #'D:/Hanze_Groningen/STAGE/db/all_genes_new - kopie.tsv'
 gene_df = pd.read_csv(gene_path, sep='\t')
 print(gene_df.columns)
 columns_select = ['#hg19.knownCanonical.chrom', 'hg19.knownCanonical.chromStart', 'hg19.knownCanonical.chromEnd', 'hg19.kgXref.geneSymbol'] #hg19.kgXref.geneSymbol   hg19.knownGene.name

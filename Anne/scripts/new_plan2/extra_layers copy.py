@@ -2,6 +2,9 @@ from Database import Database
 import pandas as pd
 from multiprocessing import Pool
 import multiprocessing as mp
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def add_value(db, name_variant):
@@ -40,10 +43,10 @@ def set_value(db, row, name_variant):
     results = db.cursor.fetchall()
     return len(results)
 
-def make_file_extra_layers(df_variant, chr, name_variant, path_db):
+def make_file_extra_layers(df_variant, chr, name_variant, path_db, config):
     # Database connection
     db = Database(path_db)
-    f = open(f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/{name_variant}_{chr}_num_snps.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
+    f = open(f'{config["genes_eQTL_etc"]}{name_variant}_{chr}_num_snps.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
     f.write(f"#Chromosome\tStart\tEnd\tnum_snps_region\n")
     for index, row in df_variant.iterrows():
         num_snps_region = set_value(db, row, name_variant)
@@ -55,13 +58,14 @@ def make_file_extra_layers(df_variant, chr, name_variant, path_db):
     
 
 def main():
+    config = get_config()
     #
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
+    path_db = config['database'] #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
     # Database connection
     db = Database(path_db)
     #
-    path_file = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GREEN_DB/2022-04-13_GRCh37_DNase.merged.bed.gz' #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
-    name_variant = 'DNase'
+    path_file = config['TFBS'] #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
+    name_variant = 'TFBS'
     df_variant = pd.read_csv(path_file, sep='\t', compression='gzip')
     print(len(df_variant))
 
@@ -71,7 +75,7 @@ def main():
     for item in list(set(df_variant['#Chromosome'])):
         select_variant_df = df_variant.loc[df_variant['#Chromosome'] == item]
         print(item)
-        arg_multi_list.append((select_variant_df, item, name_variant, path_db))
+        arg_multi_list.append((select_variant_df, item, name_variant, path_db, config))
 
     pool = Pool(processes=mp.cpu_count())
     pool.starmap(func=make_file_extra_layers, iterable=arg_multi_list)

@@ -9,6 +9,9 @@ import glob
 import numpy as np
 import scipy.sparse
 from scipy.sparse import csr_matrix
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def set_donor_snp(project_file, set_donor, set_snp):
@@ -118,12 +121,13 @@ def create_vcf(sparseMatrix, list_donor, list_snp, name_vcf):
 
 
 def main():
+    config = get_config()
     # The path to the data
-    path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/'
+    path = config['cancer_data_path']
     # The path where the new data should be stored
-    out_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/'
+    out_path = config['vcf_path']
 
-    cancer_types_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/site.csv' #"D:/Hanze_Groningen/STAGE/NEW PLAN/site.csv"
+    cancer_types_path = config['site'] #"D:/Hanze_Groningen/STAGE/NEW PLAN/site.csv"
     cancer_types = pd.read_csv(cancer_types_path, sep=';')
     
     grouped = cancer_types.groupby(['cancer'])

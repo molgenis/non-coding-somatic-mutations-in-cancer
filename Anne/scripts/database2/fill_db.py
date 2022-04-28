@@ -6,6 +6,10 @@ import math # nan
 import numpy as np
 
 from Database import Database
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
+
 
 
 def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, last_id_donor):
@@ -235,13 +239,14 @@ def fill_tissue(specimen_df, db):
 
 
 def main():
+    config = get_config()
     # Path to file with project ID and kind of cancer
-    site_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/site.csv'  # "E:/STAGE/Site/site.csv"
+    site_path = config['site'] # "E:/STAGE/Site/site.csv"
     site_df = pd.read_csv(site_path, sep=';')
     # Make dictionary of site_df, and get only the column cancer
     project_cancer = site_df.set_index('project_ID').to_dict('dict')['cancer']
     # Path to file with donor information like age, sex etc.
-    donor_info_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/donor.tsv'  # "E:/STAGE/WGS/donor.tsv"
+    donor_info_path = config['donor_info'] # "E:/STAGE/WGS/donor.tsv"
     donor_info_df = pd.read_csv(donor_info_path, sep='\t')
     # Make of gender (sex) and vital status a boolean
     donor_info_df['donor_sex'] = donor_info_df['donor_sex'].map({'male': 'FALSE', 'female': 'TRUE'})
@@ -253,7 +258,7 @@ def main():
     # Make dictionary of donor_info_df
     donor_info = donor_info_df.set_index('icgc_donor_id').to_dict('dict')
     # Path to file with specimen_type (Normal or tumor tissue)
-    specimen_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/all_specimen.tsv'  # "E:/STAGE/WGS/all_specimen.tsv"
+    specimen_path = config['all_specimen'] # "E:/STAGE/WGS/all_specimen.tsv"
     specimen_df = pd.read_csv(specimen_path, sep='\t')
     # Make Database object
     db = Database(sys.argv[1])

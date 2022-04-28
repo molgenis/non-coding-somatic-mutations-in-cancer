@@ -11,6 +11,10 @@ from germline_eQTL import place_germline
 from gene import place_gene
 from eQTL import place_eQTL
 #TRUE = 1 and FALSE=0
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
+
 
 
 def make_plot(xas, groups, title, in_trans, in_trans_germ, in_trans_somatic):
@@ -103,8 +107,8 @@ def analyse_dbSNP_non_coding(db, cursor, gene_path, where, eQTL_path):
 
 
 def main():
-    # '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene_long.db'
-    # db_path='/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene.db'
+    config = get_config()
+    # db_path= config['database'] #'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/Database_internship_gene.db'
     db_path="D:/Hanze_Groningen/STAGE/DATAB/Database_internship_gene_long_NEW2.0 - kopie (3).db"
     gene_path = "D:/Hanze_Groningen/STAGE/db/snp132_ucsc_hg19_checkGene.bed"
     eQTL_path = "C:/Users/Anne_/Downloads/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt"

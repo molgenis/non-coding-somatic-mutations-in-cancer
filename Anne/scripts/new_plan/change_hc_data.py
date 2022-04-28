@@ -1,6 +1,11 @@
 import pandas as pd
 import os
 import io
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
+
 
 
 def read_vcf(path):
@@ -27,6 +32,7 @@ def read_vcf(path):
 
 
 def main():
+    config = get_config()
     path = "C:/Users/Anne_/Downloads/0c6ccd67-2fd2-45d9-a147-d1b6eb6a0b52.vcf"
     df = read_vcf(path)
     print(df.head())
@@ -40,14 +46,14 @@ def main():
     print(set(df['NORMAL']))
     print(set(df['TUMOR']))
 
-    # path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/'
+    # path = config['vcf_path'] 
     # path_files = f"{path}*.vcf.gz"
     # # Loop over all files in path that ends with .tsv
     # for filename in glob.glob(path_files):
     #     # Get the base name of the specified path
     #     basename = os.path.basename(filename)    
-    #     all_freq_path = f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/allel_freq/af_{basename}'
-    #     all_freq_vcf = f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/vcf_allel_freq/vcf_af_{basename}'
+    #     all_freq_path = f'{config['allel_freq']}af_{basename}'
+    #     all_freq_vcf = f'{config['vcf_allel_freq']}vcf_af_{basename}'
     #     df = pd.read_csv(filename, sep='\t', compression='gzip')
     #     calculate_all_freq(df, all_freq_path, all_freq_vcf)
 

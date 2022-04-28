@@ -10,6 +10,10 @@ from multiprocessing import Pool, Queue
 import multiprocessing as mp
 import math
 from search_snps_between import close_to, write_sparse_matrix
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
 
 
 
@@ -115,14 +119,14 @@ def set_region_list(steps, chr, length_chrom):
     return region_list
 
 
-def multiprocess(chr_length, steps, donor_list, donor_dict, donor_cancer_list, save_path, filter_num, with_type):
+def multiprocess(chr_length, steps, donor_list, donor_dict, donor_cancer_list, save_path, filter_num, with_type, config):
     """
     
     :param db:  The database object
     :return:
     """
     # Path of the database
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    path_db = config['database'] #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"  
     # Database connection
     db = Database(path_db)
     for chr, length_chrom in chr_length.items():
@@ -150,12 +154,13 @@ def split_dict(d, n, chr_length):
 
 
 def main():
+    config = get_config()
     # Path of the database
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    path_db = config['database'] 
     # Database connection
     db = Database(path_db)
     # Path to save files
-    save_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/"
+    save_path = config['umap_path'] 
     # The steps for the region
     steps= 2000
 
@@ -186,7 +191,7 @@ def main():
     arg_multi_list = []
     for item in split_dict({i: i for i in chr_length}, n, chr_length):
         print(item)
-        arg_multi_list.append((item, steps, donor_list, donor_dict, donor_cancer_list, save_path, filter_num, with_type))
+        arg_multi_list.append((item, steps, donor_list, donor_dict, donor_cancer_list, save_path, filter_num, with_type, config))
 
     pool = Pool(processes=cpus)
     pool.starmap(func=multiprocess, iterable=arg_multi_list)

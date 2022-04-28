@@ -1,5 +1,8 @@
 from Database import Database
 import pandas as pd
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def add_value(db, name_variant):
@@ -40,19 +43,20 @@ def set_value(db, row, name_variant):
     
 
 def main():
+    config = get_config()
     #
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
+    path_db = config['database']  #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
     # Database connection
     db = Database(path_db)
     #
-    path_file = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GREEN_DB/2022-04-13_GRCh37_DNase.merged.bed.gz' #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
+    path_file = config['DNase'] #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
     name_variant = 'DNase'
     df_variant = pd.read_csv(path_file, sep='\t', compression='gzip')
     print(len(df_variant))
 
     add_value(db, name_variant)
 
-    f = open(f'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/{name_variant}_num_snps.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
+    f = open(f'{config["genes_eQTL_etc"]}{name_variant}_num_snps.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
     f.write(f"#Chromosome\tStart\tEnd\tnum_snps_region\n")
     for index, row in df_variant.iterrows():
         num_snps_region = set_value(db, row, name_variant)

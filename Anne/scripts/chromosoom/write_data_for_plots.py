@@ -7,6 +7,8 @@ import os
 sys.path.append(
     '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from database.Database import Database
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 def IN_OUT(cursor, info, column_name, file, true_false):
     cursor.execute("""
@@ -78,6 +80,7 @@ def main():
     """
 
     """
+    config = get_config()
     # Path to database
     path_db = "D:/Hanze_Groningen/STAGE/TEST_DEL/test3.db"
     # Path to where the plots should be saved

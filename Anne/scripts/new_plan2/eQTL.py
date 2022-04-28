@@ -2,6 +2,8 @@
 import pandas as pd
 import sys
 from Database import Database
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def add_value(db, ID_eQT, eQT, close_eQT):
@@ -94,10 +96,11 @@ def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region):
 
 
 def main():
+    config = get_config()
     # Database file
-    db_path='/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"#"D:/Hanze_Groningen/STAGE/TEST_DEL/Database_internship_gene_long_NEW2.0 - kopie.db"
+    db_path= config['database'] #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"#"D:/Hanze_Groningen/STAGE/TEST_DEL/Database_internship_gene_long_NEW2.0 - kopie.db"
     # File with eQTLs
-    eQTL_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt'#"D:/Hanze_Groningen/STAGE/eQTL/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt"
+    eQTL_path = config['strong_eqtl_path'] #'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt'#"D:/Hanze_Groningen/STAGE/eQTL/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt"
     # eQTM_path = "C:/Users/Anne_/Downloads/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt"
     # Database class
     db = Database(db_path) #sys.argv[1]

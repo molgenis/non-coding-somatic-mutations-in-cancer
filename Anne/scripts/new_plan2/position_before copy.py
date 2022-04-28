@@ -8,6 +8,9 @@ import numpy as np
 from scipy.sparse import csr_matrix
 # from matplotlib import pyplot as plt
 from search_snps_between import close_to, write_sparse_matrix
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def add_value(db):
@@ -215,16 +218,17 @@ def check_filter(db):
 
 
 def main():
+    config = get_config()
     # Path of the database
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    path_db = config['database'] #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" 
     # Database connection
     db = Database(path_db)
     
     # check_filter(db)
     # Path of the genes and there positions
-    gene_path = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/all_genes_new.tsv' #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/all_genes_new.tsv"  # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
+    gene_path = config['all_genes'] # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
     # Path to save files
-    save_path = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/UMAP/"
+    save_path = config['umap_path']
     # Read gene file
     gene_df = pd.read_csv(gene_path, sep='\t')
     # print(len(gene_df))

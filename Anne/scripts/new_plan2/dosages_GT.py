@@ -3,6 +3,8 @@ import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def set_dosages(db):
@@ -142,7 +144,7 @@ def sum_dosage_GT(db):
     db.mydb_connection.commit()
 
 
-def make_dist_plot_dosages(db, max_donor_id):
+def make_dist_plot_dosages(db, max_donor_id, config):
     # All snps, all donors
     print('All snps, all donors')
     db.cursor.execute("""
@@ -169,7 +171,7 @@ def make_dist_plot_dosages(db, max_donor_id):
     print(max(filtered_list), min(filtered_list))
     sns.displot(dosages_list)
     plt.tight_layout()
-    plt.savefig("/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/dosages_snps_donor.png")
+    plt.savefig(f"{config['genes_eQTL_etc']}dosages_snps_donor.png")
     plt.clf()
     plt.close()
     # # All donors
@@ -194,7 +196,7 @@ def make_dist_plot_dosages(db, max_donor_id):
     count_snps = dict(sorted(count_snps.items()))
     plt.bar(count_snps.keys(), count_snps.values(), color='g')
     plt.tight_layout()
-    plt.savefig(f"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/count_snps.png")
+    plt.savefig(f"{config['genes_eQTL_etc']}count_snps.png")
     plt.clf()
     plt.close()
     # for key, value in dosages_dict.items():        
@@ -225,7 +227,7 @@ def make_dist_plot_dosages(db, max_donor_id):
     count_snps2 = dict(sorted(count_snps2.items()))
     plt.bar(count_snps2.keys(), count_snps2.values(), color='g')
     plt.tight_layout()
-    plt.savefig(f"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/count_snps2_zonderfilter.png")
+    plt.savefig(f"{config['genes_eQTL_etc']}count_snps2_zonderfilter.png")
     plt.clf()
     plt.close()
 
@@ -238,7 +240,7 @@ def make_dist_plot_dosages(db, max_donor_id):
     return listtest
     
         
-def make_dist_plot_tot(db):
+def make_dist_plot_tot(db, config):
     # All snps, all donors
     print('All snps, all donors')
     db.cursor.execute("""
@@ -252,7 +254,7 @@ def make_dist_plot_tot(db):
         tot_list.append(res['dosages'])
     sns.displot(tot_list)
     plt.tight_layout()
-    plt.savefig("/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/tot_snps_donor.png")
+    plt.savefig(f"{config['genes_eQTL_etc']}tot_snps_donor.png")
     plt.clf()
     plt.close()
 
@@ -287,9 +289,9 @@ def get_min_max_snpID(db):
 
 
 def main():
+    config = get_config()
     # Path of the database
-    path_db = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db' #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
-    #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db" #/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    path_db = config['database'] #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" 
     # Database connection
     db = Database(path_db)
     # set_dosages(db)
@@ -301,9 +303,9 @@ def main():
 
     max_donor_id, min_donor_id = get_min_max_snpID(db)
 
-    listtest = make_dist_plot_dosages(db, max_donor_id)
-    # make_dist_plot_tot(db)
-    myfile = open('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/Number_and_none_values.txt', 'w')
+    listtest = make_dist_plot_dosages(db, max_donor_id, config)
+    # make_dist_plot_tot(db, config)
+    myfile = open(config['Number_and_none_values'], 'w')
     myfile.writelines(f'donor\tcountNan\tcountNum\tcountNan_sum\tcountNum_sum\n')
 
     for value in range(1, max_donor_id+1): #listtest:

@@ -9,6 +9,7 @@ sys.path.append(
 from vcf_reader import read_vcf
 
 
+
 def main():
     path = sys.argv[1]
     # Get the basename of the file

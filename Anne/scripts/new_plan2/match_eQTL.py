@@ -1,7 +1,12 @@
 import pandas as pd
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
-def compare_eQTL_files(df_eQTL, df_strong_eQTL):
+
+
+def compare_eQTL_files(df_eQTL, df_strong_eQTL, config):
     print('START')
     df = pd.DataFrame(columns=df_eQTL.columns)
     len_df = len(df)
@@ -14,19 +19,20 @@ def compare_eQTL_files(df_eQTL, df_strong_eQTL):
             print(row)
             print('----')
         len_df = len(df)
-    df.to_csv("/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/eqtl_v1013_lead_snp_gene_with_info.txt", sep='\t', encoding='utf-8', index=False)
+    df.to_csv(config['strong_eqtl_path'], sep='\t', encoding='utf-8', index=False)
 
 
 
 
 def main():
-    path_eQTL = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt"
+    config = get_config()
+    path_eQTL = config['all_sig_eqtl']
     df_eQTL = pd.read_csv(path_eQTL, sep='\t')
     print('read 1 done')
-    path_strong_eQTL = "/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/eQTL/eqtl_v1013_lead_snp_gene.txt"
+    path_strong_eQTL = config['strong_eqtl_noInfo']
     df_strong_eQTL = pd.read_csv(path_strong_eQTL, sep='\t', header=None)
     print('read 2 done')
-    compare_eQTL_files(df_eQTL, df_strong_eQTL)
+    compare_eQTL_files(df_eQTL, df_strong_eQTL, config)
 
 
 

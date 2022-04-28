@@ -2,6 +2,10 @@ from Database import Database
 import sys
 import multiprocessing as mp
 import pandas as pd
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
+
+
 
 def get_project_ids(db):
     db.cursor.execute("""SELECT *
@@ -93,11 +97,8 @@ def test(db, dict_project):
     {'chr8', 'chr19', 'chr4', 'chr12', 'chr15', 'chr14', 'chr20', 'chr10', 'chr11', 'chr22', 'chr3', 'chr16', 'chr2', 'chr7', 'chr21', 'chr17', 'chr13', 'chrX', 'chr1', 'chr6', 'chr5', 'chr18', 'chrY', 'chr9'}
     """
            
-        #sqlite3 -header -csv /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db "SELECT sum_dosage_GT.donor_project_ID, sum_dosage_GT.donor_ID, sum_dosage_GT.snp_ID, snp.chr, snp.pos_start, snp.pos_end FROM sum_dosage_GT, snp WHERE sum_dosage_GT.donor_project_ID = {key} AND sum_dosage_GT.snp_ID=snp.ID;" > /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/test.csv
-        # sqlite3 -header -csv /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/db_laatste_copy.db "SELECT sum_dosage_GT.donor_project_ID, sum_dosage_GT.donor_ID, sum_dosage_GT.snp_ID, snp.chr, snp.pos_start, snp.pos_end FROM sum_dosage_GT, snp WHERE sum_dosage_GT.snp_ID=snp.ID;" > /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/test.csv
-
-
 def main():
+    config = get_config()
     #
     path_db = 'D:/Hanze_Groningen/STAGE/db_laatste_copy.db' #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
     # Database connection
