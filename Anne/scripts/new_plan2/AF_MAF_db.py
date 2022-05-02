@@ -177,9 +177,9 @@ def main():
     # Database connection
     db = Database(path_db)
     add_value(db)
-    type_GT = 'GT'
-    # cal_AF(db, type_GT)
-    cal_AF_new(db, type_GT)
+    # type_GT = 'GT'
+    # # cal_AF(db, type_GT)
+    # cal_AF_new(db, type_GT)
     print('#########################################')
     type_GT = 'GT2'
     # cal_AF(db, type_GT)

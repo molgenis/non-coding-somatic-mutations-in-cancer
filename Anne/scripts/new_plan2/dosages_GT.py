@@ -45,17 +45,17 @@ def set_GT(db, table):
     db.cursor.execute(
             """UPDATE %s 
                 SET GT = 2
-                WHERE dosages >= 0.9;"""% table)
+                WHERE dosages >= 0.8;"""% table)
     # Heterozygoot 
     db.cursor.execute(
             """UPDATE %s 
                 SET GT = 1
-                WHERE dosages < 0.9 AND dosages > 0.33;"""% table)
+                WHERE dosages < 0.8 AND dosages > 0.2;"""% table)
     # Homozygoot ref
     db.cursor.execute(
             """UPDATE %s 
                 SET GT = 0
-                WHERE dosages <= 0.33;"""% table)
+                WHERE dosages <= 0.2;"""% table)
     # Add to database
     db.mydb_connection.commit()
     
