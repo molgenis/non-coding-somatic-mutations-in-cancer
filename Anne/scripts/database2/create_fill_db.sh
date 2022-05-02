@@ -14,11 +14,14 @@
 ml Anaconda3/5.3.0
 source activate stage
 
-SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/database2/
-PATH_DATA=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_data_db/ #todo /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_copy/
-DB_NAME='00Database_internship_UPDATE2.0.db' #'Database_internship_UPDATE2.0'
-DATABASE_SNP=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/${DB_NAME}.db
-GENE_FILE=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed
+source /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/read_yaml.sh
+YAML_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/config.yaml
+
+SCRIPT_PATH=$(yaml $YAML_PATH "['database_scripts']")
+PATH_DATA=$(yaml $YAML_PATH "['database_path']")
+# DB_NAME='00Database_internship_UPDATE2.0.db'
+DATABASE_SNP=$(yaml $YAML_PATH "['database']") #${DB_NAME}.db
+GENE_FILE=$(yaml $YAML_PATH "['checkGene']")
 
 #A, D, H, W, M, U, E, G, K, N, O, T, R, S, C, B, P, L
 # GEDAAN: 'O' 'A' 'D' 'H' 'W' 'U' 'G' 'K' 'N' 'T' 'R' 'B' 'C'
