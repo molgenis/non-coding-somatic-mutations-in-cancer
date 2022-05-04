@@ -111,7 +111,7 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
     return sparse_matrix_region, sparse_matrix_overall, gene_name_list, total_read
 
 
-def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, pos, donor_cancer_list, total_read):
+def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, pos, donor_cancer_list, total_read, part_num):
     """
     Writes the sparse_matrix to a compressed (.gz) .tsv file
     :param sparse_matrix:     A matrix which contains very few non-zero elements. It contains the counts of a specific
@@ -135,7 +135,7 @@ def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, po
     # Makes the donor_ids column the index of the data frame
     df.set_index('donor_id', inplace=True)
     # Write the dataframe to a compressed .tsv file
-    df.to_csv(f'{save_path}sparsematrix_{pos}.tsv.gz', sep="\t", index=True, encoding='utf-8',
+    df.to_csv(f'{save_path}{part_num}_sparsematrix_{pos}.tsv.gz', sep="\t", index=True, encoding='utf-8',
               compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 

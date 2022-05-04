@@ -38,3 +38,6 @@ DNase: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GREEN_DB/202
 TFBS: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GREEN_DB/2022-04-13_GRCh37_TFBS.merged.bed.gz'
 UCNE: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GREEN_DB/2022-04-13_GRCh37_UCNE.bed.gz'
 new_plan2: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/new_plan2/'
+# database: "D:/Hanze_Groningen/STAGE/db_laatste_copy.db"
+# all_genes: "D:/Hanze_Groningen/STAGE/db/all_genes_new.tsv"
+# umap_path: "D:/Hanze_Groningen/STAGE/UMAP/"
