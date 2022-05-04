@@ -55,7 +55,7 @@ add_density <- function(kp, data, r0, r1, label) {
   #
   ##########################################
   # Plot the SNP density over the genome
-  kp <- kpPlotDensity(kp, data=data, r0=r0, r1=r1, window.size = 100000)
+  kp <- kpPlotDensity(kp, data=data, r0=r0, r1=r1, window.size = 1000)
   # Adding Y axis to our plots may help interpreting the magnitudes of plotted data and
   # identifying the space dedicated to each plot.
   kpAxis(kp, ymax=kp$latest.plot$computed.values$max.density, r0=r0, r1=r1, cex=0.8)
@@ -204,8 +204,9 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, 
 main <- function() {
   # List of chromosomes
   #numbers <-  seq(1, 22, by=1)
-  #chrom <- append(numbers, c('X', 'Y'))
-  chrom <- c(22)
+  numbers <-  seq(1, 5, by=1)
+  chrom <- append(numbers, c('X', 'Y'))
+  #chrom <- c(22)
   
   
   # Cancer
