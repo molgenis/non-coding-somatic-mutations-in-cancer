@@ -203,8 +203,8 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, 
 
 main <- function() {
   # List of chromosomes
-  #numbers <-  seq(1, 22, by=1)
-  numbers <-  seq(1, 5, by=1)
+  numbers <-  seq(1, 22, by=1)
+  #numbers <-  seq(1, 5, by=1)
   chrom <- append(numbers, c('X', 'Y'))
   #chrom <- c(22)
   

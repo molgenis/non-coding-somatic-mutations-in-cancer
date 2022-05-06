@@ -1,10 +1,10 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=AF
-#SBATCH --output=AF.out
-#SBATCH --error=AF.err
+#SBATCH --job-name=Gene
+#SBATCH --output=Gene.out
+#SBATCH --error=Gene.err
 #SBATCH --time=160:59:59
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=2
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
 #SBATCH --open-mode=append
@@ -19,4 +19,4 @@ YAML_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/config.yam
 
 SCRIPT_PATH=$(yaml $YAML_PATH "['new_plan2']")
 
-python3 ${SCRIPT_PATH}AF_MAF_db.py
+python3 ${SCRIPT_PATH}Gene.py
