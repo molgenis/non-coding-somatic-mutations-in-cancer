@@ -28,11 +28,11 @@ def add_value(db, ID_eQT, eQT, close_eQT):
                     ADD `%s` BOOLEAN DEFAULT(FALSE)
                     """ %
                     (eQT))
-    db.cursor.execute("""
-                    ALTER TABLE snp
-                    ADD `%s` BOOLEAN DEFAULT(FALSE)
-                    """ %
-                    (close_eQT))
+    # db.cursor.execute("""
+    #                 ALTER TABLE snp
+    #                 ADD `%s` BOOLEAN DEFAULT(FALSE)
+    #                 """ %
+    #                 (close_eQT))
 
 def set_value(db, ID_eQT, eQT, row):
     """
@@ -49,10 +49,19 @@ def set_value(db, ID_eQT, eQT, row):
     db.cursor.execute(
             """UPDATE snp
                 SET %s = '%s', %s = TRUE
-                WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s
-                AND ref = '%s' AND alt = '%s';""" %
+                WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
             (ID_eQT, str(row['SNP']), eQT, str(row['SNPChr']), int(row['SNPPos']), 
-            int(row['SNPPos']), str(row['AssessedAllele']), str(row['OtherAllele'])))
+            int(row['SNPPos'])))
+
+    # Count snps in region
+    db.cursor.execute(
+        """SELECT ID
+            FROM snp
+            WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
+        (str(row['SNPChr']), int(row['SNPPos']), int(row['SNPPos'])))
+    
+    results = db.cursor.fetchall()
+    return len(results)
 
 
 def set_value_close_to(db, row, close_eQT, region):
@@ -65,15 +74,24 @@ def set_value_close_to(db, row, close_eQT, region):
     :param region:  Region (front or back) an eQT, within which snps are searched.
     :return:
     """
+    # db.cursor.execute(
+    #         """UPDATE snp
+    #             SET %s = TRUE
+    #             WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
+    #         (close_eQT, str(row['SNPChr']), int(row['SNPPos'])-region, int(row['SNPPos'])+region))
+
+    # Count snps in region
     db.cursor.execute(
-            """UPDATE snp
-                SET %s = TRUE
-                WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-            (close_eQT, str(row['SNPChr']), int(row['SNPPos'])-region, 
-            int(row['SNPPos'])+region))
+        """SELECT ID
+            FROM snp
+            WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
+        (str(row['SNPChr']), int(row['SNPPos'])-region, int(row['SNPPos'])+region))
+    
+    results = db.cursor.fetchall()
+    return len(results)
 
 
-def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region):
+def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region, config):
     """
     Loop over the eQT dataframe
     :param db:  The database object
@@ -87,10 +105,14 @@ def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region):
     :param region: Region (front or back) an eQT, within which snps are searched.
     :return:
     """
+    f = open(f'{config["genes_eQTL_etc"]}eQTL_num_snps_{region}.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
+    f.write(f"eQTL\tchr\tStart\tEnd\texact\tclose\n")
     for index, row in eQTL_df.iterrows():
         print(index)
-        set_value(db, ID_eQT, eQT, row)
-        set_value_close_to(db, row, close_eQT, region)
+        exact_results = set_value(db, ID_eQT, eQT, row)
+        close_results = set_value_close_to(db, row, close_eQT, region)
+        f.write(f"{str(row['SNP'])}\t{str(row['SNPChr'])}\t{int(row['SNPPos'])}\t{int(row['SNPPos'])}\t{exact_results}\t{close_results}\n")
+    f.close()
     # Add to database
     db.mydb_connection.commit()
 
@@ -107,12 +129,12 @@ def main():
     # Read file
     eQTL_df = pd.read_csv(eQTL_path, sep='\t')
     # eQTM_df = pd.read_csv(eQTL_path, sep='\t')
-    region = 100
+    region = 1000
     # add_value(db, 'ID_eQTL', 'eQTL', 'close_eQTL')
     # Add to database
     db.mydb_connection.commit()
     # Call fill_eQTL
-    loop_eQTL(db, eQTL_df, 'ID_eQTL', 'eQTL', 'close_eQTL', region)
+    loop_eQTL(db, eQTL_df, 'ID_eQTL', 'eQTL', 'close_eQTL', region, config)
     # Add to database
     db.mydb_connection.commit()
     # Close connection cursor and mydb_connection

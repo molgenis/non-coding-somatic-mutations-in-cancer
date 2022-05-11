@@ -120,10 +120,12 @@ def main():
     db = Database(path_db)
     
     # check_filter(db)
-    # Path of the genes and there positions
+    # Path of the genes and there positions #'/local/1161112/rawdata/cancer_data/genes_eQTL_etc/all_genes_new.tsv'
+
     gene_path = config['all_genes'] # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
     # Path to save files
-    save_path = config['umap_path'] #TODO
+    save_path = config['umap_path'] #TODO umap_path: '/local/1161112/rawdata/cancer_data/UMAP/'
+
     # Read gene file
     gene_df = pd.read_csv(gene_path, sep='\t')
     # print(len(gene_df))
