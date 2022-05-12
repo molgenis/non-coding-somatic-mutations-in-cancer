@@ -125,12 +125,12 @@ def plot_tss_distance_whole(closest_df, output_path):
   y = gaussian_kde(closest_df['itemRgb'])(x) * n
   ax.plot(x, y,
           color='black', zorder=3,)
-  mean = closest_df['itemRgb'].mean()
+  median = closest_df['itemRgb'].median()
 
-  ax.vlines(mean, 0, gaussian_kde(closest_df['itemRgb'])(mean) * n,
+  ax.vlines(median, 0, gaussian_kde(closest_df['itemRgb'])(median) * n,
             color='black', zorder=3)
-  ax.annotate(xy=(mean, gaussian_kde(closest_df['itemRgb'])(mean) * n),
-                  text=f"{round(mean/1000, 0):.0f} kb", ha='left', va='bottom')
+  ax.annotate(xy=(median, gaussian_kde(closest_df['itemRgb'])(median) * n),
+                  text=f"{round(median/1000, 0):.0f} kb", ha='left', va='bottom')
   ax.fill_between(x, y, alpha=0.25,
                   color='black', zorder=3)
 
@@ -143,7 +143,7 @@ def plot_tss_distance_whole(closest_df, output_path):
   ax.tick_params('x', labelbottom=True)
 
   plt.tight_layout()
-  plt.savefig(f'{output_path}_WHOLE.png', dpi=300)
+  plt.savefig(f'{output_path}_WHOLE_median.png', dpi=300)
   plt.show()
 
 
