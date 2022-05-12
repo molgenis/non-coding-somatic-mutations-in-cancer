@@ -26,13 +26,15 @@ SOFTWARE.
 
 Uses:
 ./calculate_tss_distance.py -s 2022-04-22_LEXOGRAPHICALLY_SORTED_eqtl_v1013_lead_snp_gene_with_info.bed.gz -t /groups/umcg-fg/tmp01/projects/non-coding-somatic/TSS_eQTL_distance/2022-05-09_TSS_hg19_canonical_ref.bed -o ../TSS_eQTL_distance/2022-05-09_TSS_eQTL_distance.bed
+
+./calculate_tss_distance.py -s ../../ICGC_blood_data/tested_and_verified/2022-05-12_non-coding_tested_and_verified_blood_snps.bed -t ../../TSS_eQTL_distance/2022-05-09_TSS_hg19_canonical_ref.bed -o ../../TSS_eQTL_distance/2022-05-12_TSS_somatic_snps_distance.bed
 """
 
 # Metadata
 __title__ = "Calculate the distance between TSS and SNPs" 
 __author__ = "Tijs van Lieshout"
 __created__ = "2022-05-04"
-__updated__ = "2022-05-10"
+__updated__ = "2022-05-12"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
 __version__ = 1.2
@@ -48,6 +50,7 @@ from pybedtools import BedTool as bt
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
 
 from utilities import preprocess_bed_file
 
@@ -56,7 +59,8 @@ def main(args):
   tss_df = sort_tss_bed(args.TSS)
   snps_bed = preprocess_bed_file(args.SNPs, True)
   tss_bed = bt.from_dataframe(tss_df, header=True)
-  compute_tss_distance(snps_bed, tss_bed, args.OutFile)
+  closest_df = compute_tss_distance(snps_bed, tss_bed, args.OutFile)
+  plot_tss_distance(closest_df, args.OutFile)
 
 
 def sort_tss_bed(tss_path):
@@ -78,11 +82,18 @@ def compute_tss_distance(snps_bed, tss_bed, output_path):
   closest_df = closest_bed.to_dataframe()  
   #closest_df['manual_dist'] = abs(closest_df['thickStart'] - closest_df['start'])
   #print(closest_df.sample(30))
-  #return
-  # remove non-genic?
-  #closest_df = closest_df[closest_df['itemRgb'] > 0]
 
   print(100/len(closest_df) * len(closest_df[closest_df['itemRgb'] < 10000]))
+  return closest_df
+  
+
+def plot_tss_distance(closest_df, output_path):
+  plot_tss_distance_binned(closest_df, output_path)
+
+  plot_tss_distance_whole(closest_df, output_path)
+
+
+def plot_tss_distance_binned(closest_df, output_path):
   fig, ax = plt.subplots(figsize=(12, 6))
 
   bins = np.arange(0, 210000, 10000)
@@ -102,7 +113,37 @@ def compute_tss_distance(snps_bed, tss_bed, output_path):
     ax.spines[spine].set_visible(False)
 
   plt.tight_layout()
-  plt.savefig(f'{output_path}.png', dpi=300)
+  plt.savefig(f'{output_path}_BINNED.png', dpi=300)
+  plt.show()
+
+
+def plot_tss_distance_whole(closest_df, output_path):
+  fig, ax = plt.subplots(figsize=(12, 6))
+
+  n = len(closest_df['itemRgb'])
+  x = np.linspace(closest_df['itemRgb'].min(), closest_df['itemRgb'].max())
+  y = gaussian_kde(closest_df['itemRgb'])(x) * n
+  ax.plot(x, y,
+          color='black', zorder=3,)
+  mean = closest_df['itemRgb'].mean()
+
+  ax.vlines(mean, 0, gaussian_kde(closest_df['itemRgb'])(mean) * n,
+            color='black', zorder=3)
+  ax.annotate(xy=(mean, gaussian_kde(closest_df['itemRgb'])(mean) * n),
+                  text=f"{round(mean/1000, 0):.0f} kb", ha='left', va='bottom')
+  ax.fill_between(x, y, alpha=0.25,
+                  color='black', zorder=3)
+
+  ax.set_xlabel("Distance of SNP towards nearest gene (kb)", fontsize=18)
+  ax.set_ylabel("scaled density", fontsize=18)
+
+  for spine in ax.spines:
+    ax.spines[spine].set_visible(False)
+  ax.grid(color='lightgrey', axis='y', which='major')
+  ax.tick_params('x', labelbottom=True)
+
+  plt.tight_layout()
+  plt.savefig(f'{output_path}_WHOLE.png', dpi=300)
   plt.show()
 
 
