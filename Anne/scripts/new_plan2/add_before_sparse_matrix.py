@@ -68,7 +68,7 @@ def main():
                                              dtype=np.int8).toarray()
     
     # whole_numpy_array = sparse_matrix_before_region.to_numpy()
-    df_whole = pd.DataFrame(index=range(len(donor_list)),columns=range(len(gene_name_list)), columns = gene_name_list)
+    df_whole = pd.DataFrame(index=range(len(donor_list)), columns = gene_name_list)
     df_whole['donor_list'] = donor_list
     path = f"{save_path}*_sparsematrix_bef_overall.tsv.gz"
     for fname in glob.glob(path):
