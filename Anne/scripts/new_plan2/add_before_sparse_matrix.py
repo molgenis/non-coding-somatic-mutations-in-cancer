@@ -47,15 +47,6 @@ def main():
     for each transcript were screened. For transcripts from the same gene that share the same promoter 
     mutation profiles, only one representative transcript was selected.
     """
-    # Region before the start position of a gene or after the stop position of a gene
-    position_out_gene = 2000
-    # Region after the start position of a gene or before the stop position of a gene
-    position_in_gene = 250
-    #https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-247
-    #https://www.nature.com/articles/nature07517#Sec6
-    # SNP discovery increases with increasing depth: essentially all homozygous positions are detected at 15×, whereas heterozygous positions accumulate more gradually to 33× (Fig. 5a). 
-    filter_num = 33
-    with_type = 'genes'
     # Call add_value
     # add_value(db)
     print('set GENE')
@@ -67,20 +58,29 @@ def main():
     sparse_matrix_before_region = csr_matrix((len(donor_list), len(gene_name_list)),
                                              dtype=np.int8).toarray()
     
-    # whole_numpy_array = sparse_matrix_before_region.to_numpy()
-    df_whole = pd.DataFrame(index=range(len(donor_list)), columns = gene_name_list)
-    df_whole['donor_list'] = donor_list
+    whole_numpy_array = sparse_matrix_before_region.to_numpy()
+    # df_whole = pd.DataFrame(index=range(len(donor_list)), columns = gene_name_list)
+    # df_whole['donor_list'] = donor_list
     path = f"{save_path}*_sparsematrix_bef_overall.tsv.gz"
     for fname in glob.glob(path):
+        print(fname)
         df = pd.read_csv(fname, sep='\t', compression='gzip')
         cancer_list = df['cancer']
         donor_id = df['donor_id']
+        columns_name = df.columns
         df.set_index('donor_id', inplace=True)
         df.drop(['cancer'], axis=1, inplace=True)
-        # numpy_array = df.to_numpy()
+        numpy_array = df.to_numpy()
+        whole_numpy_array = whole_numpy_array + numpy_array
         # whole_numpy_array = np.add(whole_numpy_array, numpy_array) 
-        df_whole.add(df)
+        # df_whole.add(df)
+    df_whole = pd.DataFrame(data=whole_numpy_array, columns=columns_name)
+    # Add donor IDs as column
+    df_whole['donor_id'] = donor_id
+    # Add cancer types as column
     df_whole['cancer'] = cancer_list
+    # Makes the donor_ids column the index of the data frame
+    df_whole.set_index('donor_id', inplace=True)
     df_whole.to_csv(f'{save_path}ALL_sparsematrix_bef_overall.tsv.gz', sep="\t", index=True, encoding='utf-8',
               compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
