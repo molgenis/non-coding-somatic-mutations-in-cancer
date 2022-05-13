@@ -35,6 +35,8 @@ def main():
     path_save = 'D:/Hanze_Groningen/STAGE/UMAP/'
     path_file = f"D:/Hanze_Groningen/STAGE/UMAP/ALL_gene_{type_bef_aft}_2000_250.tsv"
     df_b_nb = prep_file(path_file, path_save, type_bef_aft)
+    # GET Number b and number nb
+    # do tests per region
 
 
 
