@@ -100,7 +100,7 @@ def fisher_test(S_C, df):
     return df
 
 
-def shapiro_test(df, column_name, column_name_filter):
+def shapiro_test(df, column_name, column_name_filter, path_file, type_analyse, type_df):
     """
     As the p value obtained from the Shapiro-Wilk test is significant (p < 0.05), 
     we conclude that the data is not normally distributed. Further, in histogram data 
@@ -113,7 +113,9 @@ def shapiro_test(df, column_name, column_name_filter):
     fig.suptitle('Frequency histogram')
     ax1.hist(df[column_name_filter], bins=df[column_name].max(), histtype='bar', ec='k') 
     ax2.hist(df[column_name], bins=df[column_name].max(), histtype='bar', ec='k') 
-    plt.show()
+    plt.title(f"{type_analyse} - {type_df} nonbreast")
+    plt.savefig(f'{path_file}shapiro_test_histo_{type_analyse}_{type_df}_{column_name}.png')
+    plt.clf()
 
 
 def mannwhitney(df, column_breast, column_nonbreast):
@@ -127,11 +129,14 @@ def mannwhitney(df, column_breast, column_nonbreast):
 
 
 
-def volcano_plot(df, p_value_column):
+def volcano_plot(df, p_value_column, path_file, type_analyse, type_df):
     """
     
     """
-    plt = visuz.GeneExpression.volcano(df=df,lfc='log2_fc',pv=p_value_column,show=True)
+    visuz.GeneExpression.volcano(df=df,lfc='log2_fc',pv=p_value_column, plotlegend=True, legendpos='upper right')
+    plt.title(f"{type_analyse} - {type_df} nonbreast")
+    plt.savefig(f'{path_file}volcano_{p_value_column}_{type_analyse}_{type_df}_both.png')
+    plt.clf()
     
 
 def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file):
@@ -140,15 +145,21 @@ def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file):
     """
     print('\nboxplot')
     df.boxplot(column=['counts_breast'], grid=False)
+    plt.title(f"{type_analyse} - {type_df} Breast")
+    plt.savefig(f'{path_file}boxplot_{type_analyse}_{type_df}_breast.png')
+    plt.clf()
     df.boxplot(column=['counts_nonbreast'], grid=False)
+    plt.title(f"{type_analyse} - {type_df} nonbreast")
+    plt.savefig(f'{path_file}boxplot_{type_analyse}_{type_df}_nonbreast.png')
+    plt.clf()
     
     print('\nfilter columns (divide by max)')
     df['filter_snps_b'] = df['counts_breast']/ num_donor_b
     df['filter_snps_nb'] = df['counts_nonbreast']/ num_donor_nb
     
     print('\nshapiro_test')
-    shapiro_test(df, 'counts_breast', 'filter_snps_b')
-    shapiro_test(df, 'counts_nonbreast', 'filter_snps_nb')
+    shapiro_test(df, 'counts_breast', 'filter_snps_b', path_file, type_analyse, type_df)
+    shapiro_test(df, 'counts_nonbreast', 'filter_snps_nb', path_file, type_analyse, type_df)
     
     print('\nmannwhitney')
     mannwhitney(df, 'filter_snps_b', 'filter_snps_nb')
@@ -162,9 +173,9 @@ def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file):
     df.to_csv(f"{path_file}{type_analyse}_{type_df}_both_0_TESTS.tsv", sep='\t', encoding='utf-8', index=False)
     
     print('\nvolcano_plot')
-    volcano_plot(df, 'p_value_X2_self')
-    volcano_plot(df, 'p_value_X2')
-    volcano_plot(df, 'p_value_F')
+    volcano_plot(df, 'p_value_X2_self', path_file, type_analyse, type_df)
+    volcano_plot(df, 'p_value_X2', path_file, type_analyse, type_df)
+    volcano_plot(df, 'p_value_F', path_file, type_analyse, type_df)
     
     return df
 

@@ -16,6 +16,8 @@ from scipy.stats import mannwhitneyu
 from fisher import pvalue_npy
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 def get_data_db(filter_par, path_file, path_db):
@@ -149,3 +151,17 @@ def get_coding_data(filter_par, path_file, path_db):
     num_donor_nb = len(list(set(coding_nonbreast['donor_ID'])))
 
     return coding_breast, coding_nonbreast, num_donor_b, num_donor_nb
+
+def main():
+    config = get_config()
+    path_file = config['analyse']
+    path_db = config['database']
+    df_whole = get_data_db(True, path_file, path_db)
+    all_breast, all_nonbreast = filter_whole_cancer(True, df_whole, path_file)
+    noncoding_df = filter_noncoding(True, df_whole, path_file)
+    noncoding_breast, noncoding_nonbreast = filter_noncoding_cancer(True, noncoding_df, path_file)
+    coding_df = filter_coding(True, df_whole, path_file)
+    coding_breast, coding_nonbreast = filter_coding_cancer(True, coding_df, path_file)
+
+if __name__ == '__main__':
+    main()

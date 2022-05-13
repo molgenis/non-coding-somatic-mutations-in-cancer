@@ -55,10 +55,8 @@ def main():
     # Call get_donors
     donor_list, donor_dict, donor_cancer_list = db.get_donors(project_dict)
     # Creating a len(donor_list) * len(gene_name_list) sparse matrix
-    sparse_matrix_before_region = csr_matrix((len(donor_list), len(gene_name_list)),
-                                             dtype=np.int8).toarray()
-    
-    whole_numpy_array = sparse_matrix_before_region.to_numpy()
+    whole_numpy_array = csr_matrix((len(donor_list), len(gene_name_list)+1),
+                                             dtype=np.int8).toarray() #+1 for total_reads
     # df_whole = pd.DataFrame(index=range(len(donor_list)), columns = gene_name_list)
     # df_whole['donor_list'] = donor_list
     path = f"{save_path}*_sparsematrix_bef_overall.tsv.gz"
