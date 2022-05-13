@@ -16,8 +16,8 @@ from scipy.stats import mannwhitneyu
 from fisher import pvalue_npy
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
-# sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
-# from config import get_config
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 import get_data as get_data
 import tests as tests
@@ -87,13 +87,13 @@ def coding_data(filter_par, path_file, path_db):
 
 
 def main():
-    # config = get_config()
-    path_db = 'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
-    path_file = 'D:/Hanze_Groningen/STAGE/lastdb/' #config['analyse']
-    filter_par = FALSE
-    # sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = all_data(filter_par, path_file, path_db)
+    config = get_config()
+    path_db = '' #config['database']
+    path_file = config['analyse']
+    filter_par = False
+    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = all_data(filter_par, path_file, path_db)
     sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = noncoding_data(filter_par, path_file, path_db)
-    # sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = coding_data(filter_par, path_file, path_db)
+    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = coding_data(filter_par, path_file, path_db)
 
 if __name__ == '__main__':
     main()

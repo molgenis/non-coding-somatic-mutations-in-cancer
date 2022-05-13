@@ -16,8 +16,8 @@ from scipy.stats import mannwhitneyu
 from fisher import pvalue_npy
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
-# sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
-# from config import get_config
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 import get_data as get_data
 import tests as tests
@@ -86,11 +86,12 @@ def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
 
 
 def main():
-    # config = get_config()
-    path_db = 'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
-    path_file = 'D:/Hanze_Groningen/STAGE/lastdb/' #config['analyse']
+    path_R = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/'
+    config = get_config()
+    path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
+    path_file = config['analyse'] #'D:/Hanze_Groningen/STAGE/lastdb/'
     filter_par = FALSE
-    all_data(filter_par, path_file, path_db, "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/breast_ALL_1000.tsv", "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/nonbreast_ALL_1000.tsv")
+    all_data(filter_par, path_file, path_db, f"{path_R}breast_ALL_1000.tsv", f"{path_R}nonbreast_ALL_1000.tsv")
     # noncoding_data(filter_par, path_file, path_db, "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/....tsv", "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/......tsv")
     # coding_data(filter_par, path_file, path_db, "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/....tsv", "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/......tsv")
     
