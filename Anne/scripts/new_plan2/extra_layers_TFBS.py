@@ -121,11 +121,11 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
         cancer_count = dict(Counter(cancer_list))
         donor_count = dict(Counter(donor_list_snp))
     
-        gene_file.write(filter_num + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
+        gene_file.write(str(filter_num) + '\t' + str(chr) + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
         len(snp_ID_list)) + '\t' + ','.join(map(str, snp_ID_list)) + '\t' + str(len(donor_list_snp)) + '\t' + str(
         donor_count) + '\t' + str(cancer_count) + '\n')
     else:       
-        gene_file.write(filter_num + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
+        gene_file.write(str(filter_num) + '\t' + str(chr) + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
         len(snp_ID_list)) + '\t-\t-\t-\t-\n')
     
 
