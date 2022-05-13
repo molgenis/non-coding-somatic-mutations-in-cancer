@@ -28,6 +28,9 @@ Uses:
 ./calculate_tss_distance.py -s 2022-04-22_LEXOGRAPHICALLY_SORTED_eqtl_v1013_lead_snp_gene_with_info.bed.gz -t /groups/umcg-fg/tmp01/projects/non-coding-somatic/TSS_eQTL_distance/2022-05-09_TSS_hg19_canonical_ref.bed -o ../TSS_eQTL_distance/2022-05-09_TSS_eQTL_distance.bed
 
 ./calculate_tss_distance.py -s ../../ICGC_blood_data/tested_and_verified/2022-05-12_non-coding_tested_and_verified_blood_snps.bed -t ../../TSS_eQTL_distance/2022-05-09_TSS_hg19_canonical_ref.bed -o ../../TSS_eQTL_distance/2022-05-12_TSS_somatic_snps_distance.bed
+
+./calculate_tss_distance.py -s ../../GREEN_DB/2022-05-13_cis-eqtl_p_1_without_duplicates.bed -t ../../TSS_eQTL_distance/2022-05-09_TSS_hg19_canonical_ref.bed -o ../../TSS_eQTL_distance/2022-05-13_TSS
+_eqtl_control_distance.bed
 """
 
 # Metadata
