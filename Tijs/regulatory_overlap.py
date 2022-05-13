@@ -42,6 +42,9 @@ Uses:
 
 
 ./regulatory_overlap.py -s ../ICGC_blood_data/tested_and_verified/2022-05-11_tested_and_verified_blood_snps.bed -r 2022-04-13_GRCh37_DNase.merged.bed.gz -o 2022-05-11_overlap_somatic_snps_DNase.bed -c 2022-05-02_eqtl_v1013_lead_snp_gene_with_info.bed --sortSNPs
+
+
+./regulatory_overlap.py -s ../../ICGC_blood_data/tested_and_verified/2022-05-12_non-coding_tested_and_verified_blood_snps.bed -r ../../chromatin_states/2022-05-12_healthy_blood_H3K4me1.bed -o 2022-05-13_overlap_somatic_snps_H3K4me1.bed -c ../../GREEN_DB/2022-05-02_eqtl_v1013_lead_snp_gene_with_info.bed --sortSNPs
 """
 
 # Metadata
@@ -87,7 +90,8 @@ def main(args):
 
   if args.ComparisonSNPs:
     comparison_overlap = compute_jaccard(comparison_snps_bed, reg_bed)
-    visualize_overlap_comparison(overlap, comparison_overlap, args.SNPs, args.ComparisonSNPs, args.RegRegion)
+    visualize_overlap_comparison(overlap, comparison_overlap, args.SNPs, 
+                                 args.ComparisonSNPs, args.RegRegion, args.OutFile)
 
 
 def compute_jaccard(snps_bed, reg_bed):
@@ -115,7 +119,7 @@ def compute_overlap(snps_bed, reg_bed, output_path, reg_path):
   plt.show()
 
 
-def visualize_overlap_comparison(overlap, comparison_overlap, snps_path, comparison_snps_path, reg_path):
+def visualize_overlap_comparison(overlap, comparison_overlap, snps_path, comparison_snps_path, reg_path, output_path):
   fig, ax = plt.subplots(figsize=(4, 4))
   labels = [snps_path.split("/")[-1].split(".")[0].replace("_", " "), 
             comparison_snps_path.split("/")[-1].split(".")[0].replace("_", " ")]
@@ -137,7 +141,7 @@ def visualize_overlap_comparison(overlap, comparison_overlap, snps_path, compari
 
   plt.tight_layout()
   output_title = title.split('\n')[-1]
-  plt.savefig(f"{output_title}_comparison.png", dpi=300)
+  plt.savefig(f"{output_path}_comparison.png".replace(" ","_"), dpi=300)
   plt.show()
 
 
