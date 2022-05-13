@@ -155,7 +155,7 @@ def get_coding_data(filter_par, path_file, path_db):
 def main():
     config = get_config()
     path_file = config['analyse']
-    path_db = config['database']
+    path_db = config['database_get_data']
     df_whole = get_data_db(True, path_file, path_db)
     all_breast, all_nonbreast = filter_whole_cancer(True, df_whole, path_file)
     noncoding_df = filter_noncoding(True, df_whole, path_file)
