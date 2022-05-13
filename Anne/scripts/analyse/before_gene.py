@@ -55,7 +55,7 @@ def prep_file(path_file, path_save, type_bef_aft):
 def main():
     path_db = 'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
     type_bef_aft = 'after'
-    filter_par = FALSE
+    filter_par = False
     path_save = 'D:/Hanze_Groningen/STAGE/UMAP/'
     path_file_save = f"D:/Hanze_Groningen/STAGE/UMAP/ALL_gene_{type_bef_aft}_2000_250.tsv"
     path_file = 'D:/Hanze_Groningen/STAGE/lastdb/' #config['analyse']

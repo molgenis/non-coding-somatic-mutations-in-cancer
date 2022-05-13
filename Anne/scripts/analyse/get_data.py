@@ -120,7 +120,7 @@ def filter_coding_cancer(filter_par, coding_df, path_file):
 def get_all_data(filter_par, path_file, path_db):
     if filter_par:
         df_whole = get_data_db(filter_par, path_file, path_db)
-        all_breast, all_nonbreast = filter_whole_cancer(filter_par, '', path_file)
+        all_breast, all_nonbreast = filter_whole_cancer(filter_par, df_whole, path_file)
     else:
         all_breast, all_nonbreast = filter_whole_cancer(filter_par, '', path_file)
     num_donor_b = len(list(set(all_breast['donor_ID'])))
