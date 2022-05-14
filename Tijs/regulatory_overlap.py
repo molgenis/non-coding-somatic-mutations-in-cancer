@@ -51,10 +51,10 @@ Uses:
 __title__ = "Calculate the overlap between SNPs and regulatory regions" 
 __author__ = "Tijs van Lieshout"
 __created__ = "2022-04-25"
-__updated__ = "2022-05-11"
+__updated__ = "2022-05-14"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
-__version__ = 1.2
+__version__ = 1.3
 __license__ = "GPLv3"
 __description__ = f"""{__title__} is a python script created on {__created__} by {__author__}.
                       Last update (version {__version__}) was on {__updated__} by {__maintainer__}.
@@ -68,6 +68,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib_venn import venn2_unweighted, venn2_circles
 from textwrap import wrap
+from scipy.stats import chi2_contingency
 
 from utilities import preprocess_bed_file
 
@@ -85,13 +86,16 @@ def main(args):
   if args.sortRegRegion:
     reg_bed = reg_bed.sort()
 
-  overlap = compute_jaccard(snps_bed, reg_bed)
+  overlap, jaccard = compute_jaccard(snps_bed, reg_bed)
   compute_overlap(snps_bed, reg_bed, args.OutFile, args.RegRegion)
 
   if args.ComparisonSNPs:
-    comparison_overlap = compute_jaccard(comparison_snps_bed, reg_bed)
+    comparison_overlap, comparison_jaccard = compute_jaccard(comparison_snps_bed, reg_bed)
+    p_value = calculate_chi2(jaccard['n_intersections'], comparison_jaccard['n_intersections'],
+                             len(snps_bed), len(comparison_snps_bed))
+    print(f"p-value = {p_value}")
     visualize_overlap_comparison(overlap, comparison_overlap, args.SNPs, 
-                                 args.ComparisonSNPs, args.RegRegion, args.OutFile)
+                                 args.ComparisonSNPs, args.RegRegion, args.OutFile, p_value)
 
 
 def compute_jaccard(snps_bed, reg_bed):
@@ -102,7 +106,7 @@ def compute_jaccard(snps_bed, reg_bed):
     print(f"{k:>15}{v:>15}")
   print()
   print(f"Which is {overlap:.2f}% of all SNPs")
-  return overlap
+  return overlap, jaccard
 
 
 def compute_overlap(snps_bed, reg_bed, output_path, reg_path):
@@ -119,7 +123,14 @@ def compute_overlap(snps_bed, reg_bed, output_path, reg_path):
   plt.show()
 
 
-def visualize_overlap_comparison(overlap, comparison_overlap, snps_path, comparison_snps_path, reg_path, output_path):
+def calculate_chi2(n_intersect, comparison_n_intersect, n_snps, comparison_n_snps):
+  chi2, p_value, dof, expected = chi2_contingency(np.array([[n_intersect, comparison_n_intersect],
+                                                            [n_snps, comparison_n_snps]]),
+                                                  lambda_="log-likelihood")
+  return p_value
+
+
+def visualize_overlap_comparison(overlap, comparison_overlap, snps_path, comparison_snps_path, reg_path, output_path, p_value):
   fig, ax = plt.subplots(figsize=(4, 4))
   labels = [snps_path.split("/")[-1].split(".")[0].replace("_", " "), 
             comparison_snps_path.split("/")[-1].split(".")[0].replace("_", " ")]
@@ -134,8 +145,10 @@ def visualize_overlap_comparison(overlap, comparison_overlap, snps_path, compari
   for spine in ax.spines:
     ax.spines[spine].set_visible(False)
 
-  title = '\n'.join(wrap(f"proportion of SNPs in {reg_path.split('.')[0]}", 40))
-  ax.set_title(title, pad=10)
+  title = '\n'.join(wrap(f"proportion of SNPs in {reg_path.split('_')[-1].split('.')[0]}", 40))
+  ax.set_title(title, pad=30)
+  ax.annotate(xy=(0.5, 1.05), xycoords='axes fraction', text=f"p-value of chi2 < {p_value:.2e}",
+              ha='center', va='bottom')
   ax.set(yticklabels=[])
   ax.tick_params(left=False)
 
