@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from pickle import FALSE, TRUE
 import pandas as pd
 import sys
 import numpy as np

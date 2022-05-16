@@ -1,4 +1,3 @@
-from pickle import FALSE
 import sys
 # import multiprocessing as mp
 import pandas as pd
@@ -66,7 +65,7 @@ def run_snp_tests(df_breast, df_nonbreast, type_df, type_analyse, path_file):
 def all_data(filter_par, path_file, path_db):    
     all_breast, all_nonbreast, num_donor_b, num_donor_nb = get_data.get_all_data(filter_par, path_file, path_db)
 
-    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = run_snp_tests(all_breast, all_nonbreast, 'ALL', 'snp', path_file)
+    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = run_snp_tests(all_breast, all_nonbreast, 'ALL', 'per_snp', path_file)
     return sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb
 
 
@@ -74,14 +73,14 @@ def all_data(filter_par, path_file, path_db):
 def noncoding_data(filter_par, path_file, path_db):
     noncoding_breast, noncoding_nonbreast, num_donor_b, num_donor_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
 
-    sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = run_snp_tests(noncoding_breast, noncoding_nonbreast, 'NonCoding', 'snp', path_file)
+    sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = run_snp_tests(noncoding_breast, noncoding_nonbreast, 'NonCoding', 'per_snp', path_file)
     return sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb
 
 
 def coding_data(filter_par, path_file, path_db):
     coding_breast, coding_nonbreast, num_donor_b, num_donor_nb = get_data.get_coding_data(filter_par, path_file, path_db)
 
-    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = run_snp_tests(coding_breast, coding_nonbreast, 'Coding', 'snp', path_file)
+    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = run_snp_tests(coding_breast, coding_nonbreast, 'Coding', 'per_snp', path_file)
     return sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb
 
 

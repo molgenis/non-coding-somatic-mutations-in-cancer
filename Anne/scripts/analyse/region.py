@@ -1,4 +1,3 @@
-from pickle import FALSE
 import sys
 # import multiprocessing as mp
 import pandas as pd
@@ -90,10 +89,10 @@ def main():
     config = get_config()
     path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
     path_file = config['analyse'] #'D:/Hanze_Groningen/STAGE/lastdb/'
-    filter_par = FALSE
-    all_data(filter_par, path_file, path_db, f"{path_R}breast_ALL_1000.tsv", f"{path_R}nonbreast_ALL_1000.tsv")
-    # noncoding_data(filter_par, path_file, path_db, "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/....tsv", "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/......tsv")
-    # coding_data(filter_par, path_file, path_db, "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/....tsv", "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter/......tsv")
+    filter_par = False
+    all_data(filter_par, path_file, path_db, f"{path_R}all_breast_ALL.tsv", f"{path_R}all_nonbreast_ALL.tsv")
+    noncoding_data(filter_par, path_file, path_db, f"{path_R}noncoding_breast_ALL.tsv", f"{path_R}noncoding_nonbreast_ALL.tsv")
+    coding_data(filter_par, path_file, path_db, f"{path_R}coding_breast_ALL.tsv", f"{path_R}coding_nonbreast_ALL.tsv")
     
 if __name__ == '__main__':
     main()

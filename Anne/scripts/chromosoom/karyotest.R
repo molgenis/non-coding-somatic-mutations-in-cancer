@@ -216,8 +216,8 @@ main <- function() {
   #path_file = "D:/Hanze_Groningen/STAGE/R/select_inf/project/"
   #path_save = "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/project/"
   # VS
-  path_file = "D:/Hanze_Groningen/STAGE/R/select_inf/vs/filter/" #vs\filter
-  path_save = "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/"
+  path_file = "D:/Hanze_Groningen/STAGE/R/select_inf/vs/filter/nu/" #vs\filter
+  path_save = "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter_all/"
   
   
   # Color chromosome on genes

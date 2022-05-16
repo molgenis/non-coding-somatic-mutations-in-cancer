@@ -1,4 +1,3 @@
-from pickle import FALSE
 import sys
 # import multiprocessing as mp
 import pandas as pd
@@ -85,7 +84,7 @@ def main():
     config = get_config()
     path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
     path_file = config['analyse']
-    filter_par = FALSE
+    filter_par = False
     all_data(filter_par, path_file, path_db)
     noncoding_data(filter_par, path_file, path_db)
     coding_data(filter_par, path_file, path_db)
