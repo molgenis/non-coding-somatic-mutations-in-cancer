@@ -29,18 +29,17 @@ Uses:
 
 ./calculate_tss_distance.py -s ../../ICGC_blood_data/tested_and_verified/2022-05-12_non-coding_tested_and_verified_blood_snps.bed -t ../../TSS_eQTL_distance/2022-05-09_TSS_hg19_canonical_ref.bed -o ../../TSS_eQTL_distance/2022-05-12_TSS_somatic_snps_distance.bed
 
-./calculate_tss_distance.py -s ../../GREEN_DB/2022-05-13_cis-eqtl_p_1_without_duplicates.bed -t ../../TSS_eQTL_distance/2022-05-09_TSS_hg19_canonical_ref.bed -o ../../TSS_eQTL_distance/2022-05-13_TSS
-_eqtl_control_distance.bed
+./calculate_tss_distance.py -s ../../GREEN_DB/2022-05-13_cis-eqtl_p_1_without_duplicates.bed -t ../../TSS_eQTL_distance/2022-05-09_TSS_hg19_canonical_ref.bed -o ../../TSS_eQTL_distance/2022-05-13_TSS_eqtl_control_distance.bed
 """
 
 # Metadata
 __title__ = "Calculate the distance between TSS and SNPs" 
 __author__ = "Tijs van Lieshout"
 __created__ = "2022-05-04"
-__updated__ = "2022-05-12"
+__updated__ = "2022-05-19"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
-__version__ = 1.2
+__version__ = 1.3
 __license__ = "GPLv3"
 __description__ = f"""{__title__} is a python script created on {__created__} by {__author__}.
                       Last update (version {__version__}) was on {__updated__} by {__maintainer__}.
@@ -63,7 +62,12 @@ def main(args):
   snps_bed = preprocess_bed_file(args.SNPs, True)
   tss_bed = bt.from_dataframe(tss_df, header=True)
   closest_df = compute_tss_distance(snps_bed, tss_bed, args.OutFile)
-  plot_tss_distance(closest_df, args.OutFile)
+  if args.ExpressionFile:
+    closest_df = add_mean_gene_expression(closest_df, args.ExpressionFile)
+    plot_tss_distance(closest_df, args.OutFile, grouped=True)
+  else:
+    plot_tss_distance(closest_df, args.OutFile)
+  print(closest_df)
 
 
 def sort_tss_bed(tss_path):
@@ -86,14 +90,59 @@ def compute_tss_distance(snps_bed, tss_bed, output_path):
   #closest_df['manual_dist'] = abs(closest_df['thickStart'] - closest_df['start'])
   #print(closest_df.sample(30))
 
-  print(100/len(closest_df) * len(closest_df[closest_df['itemRgb'] < 10000]))
+  print(f"percentage of SNPs within 10kb = {100/len(closest_df) * len(closest_df[closest_df['itemRgb'] < 10000]):.2f}%")
+  #print(closest_df.sample(3))
+  #print(closest_df[closest_df['itemRgb'] == closest_df['itemRgb'].max()])
   return closest_df
   
 
-def plot_tss_distance(closest_df, output_path):
-  plot_tss_distance_binned(closest_df, output_path)
+def add_mean_gene_expression(closest_df, expr_path):
+  expr_df = pd.read_csv(expr_path, sep='\t') 
+  closest_df = closest_df[closest_df['name'].isin(expr_df['gene_symbol'])]
+  merged_df = closest_df.merge(expr_df, left_on='name', right_on='gene_symbol')
 
-  plot_tss_distance_whole(closest_df, output_path)
+  # highest expressions are found in Quantile 1
+  merged_df['quantile'] = pd.qcut(merged_df['mean_exp'], 4, labels=['Q4', 'Q3', 'Q2', 'Q1'])
+  
+  return merged_df
+
+
+def plot_tss_distance(closest_df, output_path, grouped=False):
+  if grouped:
+    plot_tss_distance_grouped(closest_df, output_path)
+  else:
+    plot_tss_distance_binned(closest_df, output_path)
+    plot_tss_distance_whole(closest_df, output_path)
+
+
+def plot_tss_distance_grouped(closest_df, output_path):
+  fig, ax = plt.subplots(figsize=(12, 6))
+
+  bins = np.arange(0, 210000, 10000)
+
+  colors = ['#08519c', '#3182bd', '#6baed6', '#bdd7e7']
+  quantiles = np.sort(pd.unique(closest_df['quantile']))
+  stratified = [np.clip(closest_df[closest_df['quantile'] == quantile]['itemRgb'], 0, bins[-1]) for quantile in quantiles]
+  ax.hist(stratified, bins=bins, zorder=3, color=colors, label=quantiles) 
+
+  xlabels = bins[1:].astype(str)
+  xlabels = ["<" + str(x).replace("000", "") for x in xlabels] 
+  xlabels[-1] = xlabels[-1].replace("<", ">")
+  plt.xlim([0, 210000])
+  plt.xticks(10000 * np.arange(len(xlabels)) + 5000)
+  ax.set_xticklabels(xlabels) 
+  ax.set_xlabel("Distance of SNP towards nearest gene (kb)", fontsize=18)
+  ax.set_ylabel("No. genes", fontsize=18)
+
+  ax.grid(color='lightgrey', axis='y', which='major', zorder=-3)
+  ax.tick_params('x', labelbottom=True)
+  for spine in ax.spines:
+    ax.spines[spine].set_visible(False)
+  ax.legend(title="mean expression\n(descending)")
+
+  plt.tight_layout()
+  plt.savefig(f'{output_path}_STRATIFIED_on_expr.png', dpi=300)
+  plt.show()
 
 
 def plot_tss_distance_binned(closest_df, output_path):
@@ -137,13 +186,16 @@ def plot_tss_distance_whole(closest_df, output_path):
   ax.fill_between(x, y, alpha=0.25,
                   color='black', zorder=3)
 
-  ax.set_xlabel("Distance of SNP towards nearest gene (kb)", fontsize=18)
+  ax.set_xlabel("Distance of SNP towards nearest gene (in bases)", fontsize=18)
   ax.set_ylabel("scaled density", fontsize=18)
+  ax.set_xlim(0,9*10**7)
 
   for spine in ax.spines:
     ax.spines[spine].set_visible(False)
   ax.grid(color='lightgrey', axis='y', which='major')
-  ax.tick_params('x', labelbottom=True)
+  ax.ticklabel_format(useOffset=False, style='plain')
+
+  #ax.tick_params('x', labelbottom=True)
 
   plt.tight_layout()
   plt.savefig(f'{output_path}_WHOLE_median.png', dpi=300)
@@ -155,6 +207,7 @@ if __name__ == '__main__':
   parser.add_argument("-s", "--SNPs", type=str, required=True, help="Path to BED of SNPs of interest")
   parser.add_argument("-t", "--TSS", type=str, required=True, help="Path to BED of Transcription Start Sites of interest")
   parser.add_argument("-o", "--OutFile", type=str, required=True, help="Path to export the overlap BED of regulatory regions of interest with SNPs")
+  parser.add_argument("-e", "--ExpressionFile", type=str, required=False, help="Path to CSV of mean gene expression per eGene")
   args = parser.parse_args()
   
   main(args)
