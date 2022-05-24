@@ -87,7 +87,7 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
                            sum_dosage_GT.dosages
                     FROM snp, sum_dosage_GT
                     WHERE snp.chr = '%s' AND snp.pos_start >= %s AND snp.pos_end <= %s AND sum_dosage_GT.total_read_count_sum > %s 
-                            AND sum_dosage_GT.mutant_allele_read_count_sum > 0 AND snp.ID = sum_dosage_GT.snp_ID
+                            AND sum_dosage_GT.mutant_allele_read_count_sum > 0 AND snp.ID = sum_dosage_GT.snp_ID AND snp.TFBS = 1
                     GROUP BY sum_dosage_GT.snp_ID, sum_dosage_GT.donor_ID;
                     """ %
                     (str(chr), int(start_pos), int(end_pos), int(filter_num)))
