@@ -3,7 +3,7 @@
 #SBATCH --job-name=before_gene
 #SBATCH --output=before_gene.out
 #SBATCH --error=before_gene.err
-#SBATCH --time=50:59:59
+#SBATCH --time=60:59:59
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=96gb
 #SBATCH --nodes=1

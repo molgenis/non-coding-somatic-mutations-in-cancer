@@ -8,11 +8,11 @@ from config import get_config
 from collections import Counter
 
 
-def layer_run(df_variant, name_variant, df, path_save):    
+def layer_run(df_variant, name_variant, df, path_save, chr):    
     header_file = 'filter\tchr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
                 '\tdonor_count\tcancer_count\n'    
     # Make file
-    f = open(f'{path_save}{name_variant}_num_snps_ALL.tsv', 'w')
+    f = open(f'{path_save}{name_variant}_chr{chr}_num_snps_ALL.tsv', 'w')
     f.write(header_file)
     for index, row in df_variant.iterrows():
         print(index)
@@ -30,10 +30,20 @@ def layer_run(df_variant, name_variant, df, path_save):
 
     f.close()
 
+def run_code(config, df, chr):
+    # DNase
+    path_file = config['DNase']
+    df_variant = pd.read_csv(path_file, sep='\t', compression='gzip')
+    df_variant['#Chromosome'] = df_variant['#Chromosome'].str.replace('chr', '')
+    print(len(df_variant))
+    name_variant = 'DNase'
+    path_save = config["genes_eQTL_etc"]
+    layer_run(df_variant, name_variant, df, path_save, chr)
+
 
 def main():
     config = get_config()
-    path_db = config['database_TFBS']  #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
+    path_db = config['database_DNase'] #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
     db = Database(path_db)
 
@@ -45,14 +55,23 @@ def main():
                                 sum_dosage_GT.donor_project_ID = project.ID AND 
                                 (sum_dosage_GT.GT2 = 1 OR sum_dosage_GT.GT2 = 2) AND 
                                 sum_dosage_GT.total_read_count_sum >= 33 ;''', db.mydb_connection)
-    # TFBS
-    path_file = config['TFBS']
-    df_variant = pd.read_csv(path_file, sep='\t', compression='gzip')
-    df_variant['#Chromosome'] = df_variant['#Chromosome'].str.replace('chr', '')
-    print(len(df_variant))
-    name_variant = 'TFBS'
-    path_save = config["genes_eQTL_etc"]
-    layer_run(df_variant, name_variant, df, path_save)
+    chromosomes_list = list(set(df['chr']))
+    
+    cpus = mp.cpu_count()
+    arg_multi_list = []
+    for chrom in chromosomes_list:
+        df_chr = df[df['chr'] == chrom]
+        arg_multi_list.append((config, df_chr, chrom))
+
+    pool = Pool(processes=cpus)
+    pool.starmap(func=run_code, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
+
+
+
+    
+    
 
 
 

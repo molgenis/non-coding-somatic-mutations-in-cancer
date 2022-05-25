@@ -157,12 +157,12 @@ def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file):
     df['filter_snps_b'] = df['counts_breast']/ num_donor_b
     df['filter_snps_nb'] = df['counts_nonbreast']/ num_donor_nb
     
-    print('\nshapiro_test')
-    shapiro_test(df, 'counts_breast', 'filter_snps_b', path_file, type_analyse, type_df)
-    shapiro_test(df, 'counts_nonbreast', 'filter_snps_nb', path_file, type_analyse, type_df)
+    # print('\nshapiro_test')
+    # shapiro_test(df, 'counts_breast', 'filter_snps_b', path_file, type_analyse, type_df)
+    # shapiro_test(df, 'counts_nonbreast', 'filter_snps_nb', path_file, type_analyse, type_df)
     
-    print('\nmannwhitney')
-    mannwhitney(df, 'filter_snps_b', 'filter_snps_nb')
+    # print('\nmannwhitney')
+    # mannwhitney(df, 'filter_snps_b', 'filter_snps_nb')
     
     print('\ntests')
     df, S_C, n, S, C = chi_square_self(df, 'counts_breast', 'counts_nonbreast', num_donor_b, num_donor_nb)
@@ -172,10 +172,10 @@ def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file):
     df = log2_fc(df, n, S)
     df.to_csv(f"{path_file}{type_analyse}_{type_df}_both_0_TESTS.tsv", sep='\t', encoding='utf-8', index=False)
     
-    print('\nvolcano_plot')
-    volcano_plot(df, 'p_value_X2_self', path_file, type_analyse, type_df)
-    volcano_plot(df, 'p_value_X2', path_file, type_analyse, type_df)
-    volcano_plot(df, 'p_value_F', path_file, type_analyse, type_df)
+    # print('\nvolcano_plot')
+    # volcano_plot(df, 'p_value_X2_self', path_file, type_analyse, type_df)
+    # volcano_plot(df, 'p_value_X2', path_file, type_analyse, type_df)
+    # volcano_plot(df, 'p_value_F', path_file, type_analyse, type_df)
     
     return df
 

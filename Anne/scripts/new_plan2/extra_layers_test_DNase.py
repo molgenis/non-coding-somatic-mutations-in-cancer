@@ -9,7 +9,7 @@ from collections import Counter
 
 
 def layer_run(df_variant, name_variant, df, path_save):    
-    header_file = 'filter\tgene\tchr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
+    header_file = 'filter\tchr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
                 '\tdonor_count\tcancer_count\n'    
     # Make file
     f = open(f'{path_save}{name_variant}_num_snps_ALL.tsv', 'w')

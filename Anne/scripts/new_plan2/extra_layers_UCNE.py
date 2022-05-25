@@ -136,7 +136,7 @@ def make_file_extra_layers(df_variant, chr, name_variant, path_db, config, donor
     # f = open(f'{config["genes_eQTL_etc"]}{name_variant}_{chr}_num_snps.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
     # f.write(f"#Chromosome\tStart\tEnd\tnum_snps_region\n")
      # The header for the files before_gene_file and after_gene_file
-    header_file = 'filter\tgene\tchr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
+    header_file = 'filter\tchr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
                   '\tdonor_count\tcancer_count\n'
     
     # Make file

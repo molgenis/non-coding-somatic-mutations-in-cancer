@@ -85,10 +85,10 @@ def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
 
 
 def main():
-    path_R = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/'
+    path_R = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/' #'D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/all/'
     config = get_config()
     path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
-    path_file = config['analyse'] #'D:/Hanze_Groningen/STAGE/lastdb/'
+    path_file = config['analyse'] #config['analyse'] #'D:/Hanze_Groningen/STAGE/lastdb/'
     filter_par = False
     all_data(filter_par, path_file, path_db, f"{path_R}all_breast_ALL.tsv", f"{path_R}all_nonbreast_ALL.tsv")
     noncoding_data(filter_par, path_file, path_db, f"{path_R}noncoding_breast_ALL.tsv", f"{path_R}noncoding_nonbreast_ALL.tsv")

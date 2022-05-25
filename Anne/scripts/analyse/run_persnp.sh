@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=genotype
-#SBATCH --output=genotype.out
-#SBATCH --error=genotype.err
-#SBATCH --time=50:59:59
+#SBATCH --job-name=per_snp
+#SBATCH --output=per_snp.out
+#SBATCH --error=per_snp.err
+#SBATCH --time=60:59:59
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
@@ -16,4 +16,4 @@ source activate stage
 
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/analyse/
 
-python3 ${SCRIPT_PATH}genotype.py
+python3 ${SCRIPT_PATH}per_snp.py

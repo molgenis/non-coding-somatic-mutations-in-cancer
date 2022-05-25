@@ -54,16 +54,15 @@ def prep_file(path_file, path_save, type_bef_aft):
 def run_all(type_bef_aft, path_db, path_save):
     filter_par = False
    
-    path_file_save = f"{path_save}ALL_gene_{type_bef_aft}_2000_250.tsv"
-    # path_file = config['analyse'] #'D:/Hanze_Groningen/STAGE/lastdb/' #config['analyse']
+    path_file = f"{path_save}ALL_gene_{type_bef_aft}_2000_250.tsv"
 
-    df_b_nb = prep_file(path_file_save, path_save, type_bef_aft)
+    df_b_nb = prep_file(path_file, path_save, type_bef_aft)
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb = get_data.get_all_data(filter_par, path_save, path_db)
     tests_df = tests.all_test(df_b_nb, all_num_donor_b, all_num_donor_nb, 'NonCoding_Coding', f'{type_bef_aft}Gene', path_save)
 
 def main():
     config = get_config()
-    path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
+    path_db = '' #'D:/Hanze_Groningen/STAGE/db_laatste_copy.db' #config['database']
     path_save = config['analyse'] #'D:/Hanze_Groningen/STAGE/UMAP/'
     type_bef_aft = 'before'
     run_all(type_bef_aft, path_db, path_save)
