@@ -61,7 +61,8 @@ def all_data(filter_par, path_file, path_db):
     both_GT['GT_1_nb'].fillna(0,inplace=True)
     both_GT['GT_2_nb'].fillna(0,inplace=True)
     both_GT['GT_0_nb'].fillna(all_num_donor_nb,inplace=True)
-    both_GT = cochran_armitage(both_GT, path_file, 'ALL')
+    # both_GT = cochran_armitage(both_GT, path_file, 'ALL')
+    return both_GT
 
 
 
@@ -101,8 +102,12 @@ def main():
     path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
     path_file = 'D:/Hanze_Groningen/STAGE/lastdb/' #config['analyse'] 'D:/Hanze_Groningen/STAGE/lastdb/'
     filter_par = False
-    # all_data(filter_par, path_file, path_db)
-    noncoding_data(filter_par, path_file, path_db)
+    both_GT = all_data(filter_par, path_file, path_db)
+    print(len(both_GT))
+    print('WRITE')
+    both_GT.to_csv('D:/Hanze_Groningen/STAGE/GT2.tsv', sep='\t', encoding='utf-8')
+    print('DONE')
+    # noncoding_data(filter_par, path_file, path_db)
     # coding_data(filter_par, path_file, path_db)
 
 
