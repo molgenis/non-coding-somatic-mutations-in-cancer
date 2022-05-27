@@ -32,10 +32,10 @@ Uses:
 __title__ = "Template for a CLI python script" 
 __author__ = "Tijs van Lieshout"
 __created__ = "2022-05-04"
-__updated__ = "2022-05-04"
+__updated__ = "2022-05-27"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
-__version__ = 0.1
+__version__ = 0.2
 __license__ = "GPLv3"
 __description__ = f"""{__title__} is a python script created on {__created__} by {__author__}.
                       Last update (version {__version__}) was on {__updated__} by {__maintainer__}.
@@ -51,8 +51,8 @@ def main(args):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument("-e", "--example_input", type=str, required=True, help="Help goes here")
-  parser.add_argument("-b", "--example_bool", action="store_true", required=False, help="Help goes here") 
+  parser.add_argument("-i", "--inputPath", type=str, required=True, help="Help goes here") 
+  parser.add_argument("-o", "--outputPath", type=str, required=True, help="Help goes here")
   args = parser.parse_args()
   
   main(args)
