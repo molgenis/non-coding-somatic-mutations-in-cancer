@@ -169,7 +169,7 @@ def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file):
     df = log2_fc(df, n, S)
     df = fisher_test(S_C, df)
     df = log2_fc(df, n, S)
-    df.to_csv(f"{path_file}{type_analyse}_{type_df}_both_0_TESTS.tsv", sep='\t', encoding='utf-8', index=False)
+    df.to_csv(f"{path_file}new/{type_analyse}_{type_df}_both_0_TESTS.tsv", sep='\t', encoding='utf-8', index=False)
     
     # print('\nvolcano_plot')
     # volcano_plot(df, 'p_value_X2_self', path_file, type_analyse, type_df)

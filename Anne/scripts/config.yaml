@@ -6,6 +6,8 @@ all_genes: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_d
 all_specimen: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/self_made/all_specimen.tsv'
 allel_freq: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/vcf/allel_freq/'
 analyse: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/'
+analyse_new: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/new/'
+
 cancer_data_path: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/'
 checkGene: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/snp132_ucsc_hg19_checkGene.bed'
 chromosome_fa: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/unzip/'
