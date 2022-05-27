@@ -11,7 +11,6 @@ import time
 from scipy.special import factorial
 import scipy.stats as stats
 from scipy.stats import mannwhitneyu
-from fisher import pvalue_npy
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
 

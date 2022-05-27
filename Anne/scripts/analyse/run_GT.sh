@@ -3,7 +3,7 @@
 #SBATCH --job-name=genotype
 #SBATCH --output=genotype.out
 #SBATCH --error=genotype.err
-#SBATCH --time=60:59:59
+#SBATCH --time=100:59:59
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=96gb
 #SBATCH --nodes=1

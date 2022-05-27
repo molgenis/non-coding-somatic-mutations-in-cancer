@@ -6,13 +6,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from scipy.stats.distributions import chi2
-from bioinfokit import analys, visuz
 from scipy.stats import fisher_exact
 import time
 from scipy.special import factorial
 import scipy.stats as stats
 from scipy.stats import mannwhitneyu
-from fisher import pvalue_npy
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
@@ -20,7 +18,6 @@ from config import get_config
 
 import get_data as get_data
 import tests as tests
-import per_snp as per_snp
 
 def make_merge_df(path_breast, path_nonbreast):
     colnames=['index', 'counts_breast', 'chr', 'start_region', 'stop_region']
@@ -85,10 +82,10 @@ def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
 
 
 def main():
-    path_R = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/' #'D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/all/'
+    path_R = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/'
     config = get_config()
-    path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
-    path_file = config['analyse'] #config['analyse'] #'D:/Hanze_Groningen/STAGE/lastdb/'
+    path_db = ''
+    path_file = config['analyse'] 
     filter_par = False
     all_data(filter_par, path_file, path_db, f"{path_R}all_breast_ALL.tsv", f"{path_R}all_nonbreast_ALL.tsv")
     noncoding_data(filter_par, path_file, path_db, f"{path_R}noncoding_breast_ALL.tsv", f"{path_R}noncoding_nonbreast_ALL.tsv")

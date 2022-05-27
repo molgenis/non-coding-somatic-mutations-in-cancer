@@ -44,7 +44,7 @@ def set_value(db, ID_eQT, eQT, row):
                  be set to true when a snp matches an eQT exactly
     :param row:  Line from the eQT file with information about 1 eQT
     :return:
-    """ #TODO also alt and ref????
+    """
     # Add ID_eQTL and eQTL to snp that matches the matches in chr, pos_start, pos_end, ref and alt.
     db.cursor.execute(
             """UPDATE snp
@@ -120,15 +120,14 @@ def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region, config):
 def main():
     config = get_config()
     # Database file
-    db_path= config['database'] #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db"#"D:/Hanze_Groningen/STAGE/TEST_DEL/Database_internship_gene_long_NEW2.0 - kopie.db"
+    db_path= config['database'] 
     # File with eQTLs
-    eQTL_path = config['strong_eqtl_path'] #'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt'#"D:/Hanze_Groningen/STAGE/eQTL/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt"
-    # eQTM_path = "C:/Users/Anne_/Downloads/2019-12-11-cis-eQTLsFDR0.05-ProbeLevel-CohortInfoRemoved-BonferroniAdded.txt"
+    eQTL_path = config['strong_eqtl_path'] 
     # Database class
     db = Database(db_path) #sys.argv[1]
     # Read file
     eQTL_df = pd.read_csv(eQTL_path, sep='\t')
-    # eQTM_df = pd.read_csv(eQTL_path, sep='\t')
+    # Region before and after eQTL
     region = 3000
     add_value(db, 'ID_eQTL', 'eQTL', f'close_eQTL_{region}')
     # Add to database
