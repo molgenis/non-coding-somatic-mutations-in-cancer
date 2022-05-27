@@ -6,13 +6,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from scipy.stats.distributions import chi2
-from bioinfokit import analys, visuz
 from scipy.stats import fisher_exact
 import time
 from scipy.special import factorial
 import scipy.stats as stats
 from scipy.stats import mannwhitneyu
-from fisher import pvalue_npy
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
@@ -54,7 +52,7 @@ def prep_file(path_file, path_save, type_data):
 def run_all(type_data, path_db, path_save):
     filter_par = False
    
-    path_file = f"{path_save}{type_data}_chrALL.tsv"
+    path_file = f"{path_save}{type_data}_chrALL_num_snps.tsv"
 
     df_b_nb = prep_file(path_file, path_save, type_data)
     print(df_b_nb)
@@ -66,7 +64,7 @@ def run_all(type_data, path_db, path_save):
 def main():
     config = get_config()
     path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
-    path_save = config['analyse'] #config['analyse'] #'D:/Hanze_Groningen/STAGE/UMAP/'
+    path_save = config['analyse'] #'D:/Hanze_Groningen/STAGE/UMAP/'
     type_data = 'TFBS'
     run_all(type_data, path_db, path_save)
 

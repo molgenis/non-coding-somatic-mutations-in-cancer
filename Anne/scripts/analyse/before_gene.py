@@ -6,13 +6,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from scipy.stats.distributions import chi2
-from bioinfokit import analys, visuz
 from scipy.stats import fisher_exact
 import time
 from scipy.special import factorial
 import scipy.stats as stats
 from scipy.stats import mannwhitneyu
-from fisher import pvalue_npy
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
