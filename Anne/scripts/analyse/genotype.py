@@ -33,6 +33,7 @@ def make_GT_df(df, type_c, num_donors):
     return GT_df_0
 
 def cochran_armitage(both_GT, path_file, type_df):
+    both_GT.reset_index(inplace=True)
     p_value_cochran_armitage = list()
     for index, row in both_GT.iterrows():
         # pd.crosstab([a,d], [b, c, ], rownames=['breast', 'nonbreast'], colnames=['0', '1', '2'])

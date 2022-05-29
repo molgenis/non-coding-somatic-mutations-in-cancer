@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from statsmodels.sandbox.stats.multicomp import multipletests
+from Database import Database
 
 
 def run_multiple_testing_correction(df, alpha, method, type_test):
@@ -83,31 +84,40 @@ def get_overlap(self_X2_df, X2_df, F_df):
 
     return elements_in_all
 
-def get_significant_snps(list_significant_elements, df, f, type_test):
+def get_significant_snps(list_significant_elements, db, f, type_test):
     print(len(list_significant_elements))
-    significant_elements_df = df[df['info'].isin(list_significant_elements)]
-    significant_snps = list(set(','.join(list(significant_elements_df['snp_list'])).split(',')))
-    print(significant_snps)
-    print(len(significant_snps))
-    print()
-    f.write(f"{type_test}\t{','.join(map(str, list(significant_snps)))}\n")
-    return significant_snps
+    snp_id_list = list()
+    dict_snp = dict()
+    for sig_ele in list_significant_elements:
+        print(sig_ele)
+        db.cursor.execute("""
+                        SELECT ID
+                        FROM 'snp'
+                        WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s
+                        """ %
+                        (str(sig_ele.split('_')[0].replace('chr', '')), int(sig_ele.split('_')[1]), int(sig_ele.split('_')[2])))
+        results = db.cursor.fetchall()
+        # Make snp_id_list
+        list_element = list()
+        for res in results:
+            # Add ID to snp_id_list
+            snp_id_list.append(res['ID'])
+            list_element.append(res['ID'])
+        dict_snp[sig_ele] = list_element
+
+    f.write(f"{type_test}\t{','.join(map(str, list(set(snp_id_list))))}\t{dict_snp}\n")
 
 
 
-def run_all_corrections(path_analyse, type_file, non_coding, with_gene, path_search_snp):
+def run_all_corrections(path_analyse, type_file, non_coding, db, col1, col2):
+    print(type_file)
+    print(non_coding)
     path_file = f"{path_analyse}{type_file}_{non_coding}_both_0_TESTS.tsv"
     df = pd.read_csv(path_file, sep='\t')
-    print(df.head())
-    if with_gene:
-        df_select = df[['gene', 'chr', 'start_position_regio', 'end_position_regio', 'counts_breast', 'counts_nonbreast',
-                    'p_value_X2_self', 'p_value_X2', 'p_value_F']]
-        df_select['info'] = df_select['gene'].map(str) + '__' + df_select['chr'].map(str) + '__' + df_select['start_position_regio'].map(str) + '__' + df_select['end_position_regio'].map(str)
-    else:
-        df_select = df[['chr', 'start_position_regio', 'end_position_regio', 'counts_breast', 'counts_nonbreast',
-                    'p_value_X2_self', 'p_value_X2', 'p_value_F']]
-        df_select['info'] = df_select['chr'].map(str) + '__' + df_select['start_position_regio'].map(str) + '__' + df_select['end_position_regio'].map(str)
-    print(df_select)
+    print(df.columns)
+    df_select = df[['chr', col1, col2, 'counts_breast', 'counts_nonbreast',
+                'p_value_X2_self', 'p_value_X2', 'p_value_F']]
+    df_select['info'] = df_select['chr'].map(str) + '_' + df_select[col1].map(str) + '_' + df_select[col2].map(str)
 
     alpha=0.05
     method = 'bonferroni'
@@ -122,7 +132,7 @@ def run_all_corrections(path_analyse, type_file, non_coding, with_gene, path_sea
     print(df_select)
     print(len(df_select))
 
-    # df_select.to_csv(f"{path_analyse}{type_file}_{non_coding}_MTC.tsv", sep='\t', encoding='utf-8', index=False)
+    # df_select.to_csv(f"{path_analyse}correction/{type_file}_{non_coding}_MTC.tsv", sep='\t', encoding='utf-8', index=False)
 
     X2_self_sig_normal, X2_self_bon_sig, X2_self_bh_sig = get_significant(df_select, 'X2_self', alpha)
     X2_sig_normal, X2_bon_sig, X2_bh_sig = get_significant(df_select, 'X2', alpha)
@@ -137,43 +147,47 @@ def run_all_corrections(path_analyse, type_file, non_coding, with_gene, path_sea
     elements_snps_all_MTC = list(set.intersection(*map(set, [elements_in_all_normal, elements_in_all_bon, elements_in_all_bh])))
     print(elements_snps_all_MTC)
 
-    # path_search_snp = "D:/Hanze_Groningen/STAGE/analyse/stat/ALL_gene_before_2000_250.tsv"
-    snps_search = pd.read_csv(path_search_snp, sep='\t')
-    if with_gene:
-        snps_search['info'] = snps_search['gene'].map(str) + '__' + snps_search['chr'].map(str) + '__' + snps_search['start_position_regio'].map(str) + '__' + snps_search['end_position_regio'].map(str)
-    else:
-        snps_search['info'] = snps_search['chr'].map(str) + '__' + snps_search['start_position_regio'].map(str) + '__' + snps_search['end_position_regio'].map(str)
-    
+   
     # Open and create file
     f = open(f"{path_analyse}correction/{type_file}_{non_coding}_sig_snps.tsv", "a")
-    significant_snps_normal = get_significant_snps(elements_in_all_normal, snps_search, f, 'snps_normal')
-    significant_snps_bon = get_significant_snps(elements_in_all_bon, snps_search, f, 'snps_bon')
-    significant_snps_bh = get_significant_snps(elements_in_all_bh, snps_search, f, 'snps_bh')
-    significant_snps_all_MTC = get_significant_snps(elements_snps_all_MTC, snps_search, f, 'snps_all_MTC')
+    significant_snps_normal = get_significant_snps(elements_in_all_normal, db, f, 'snps_normal')
+    significant_snps_bon = get_significant_snps(elements_in_all_bon, db, f, 'snps_bon')
+    significant_snps_bh = get_significant_snps(elements_in_all_bh, db, f, 'snps_bh')
+    significant_snps_all_MTC = get_significant_snps(elements_snps_all_MTC, db, f, 'snps_all_MTC')
     f.close()
     
 
 def main():
+    path_db = 'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
+    db = Database(path_db)
     path_analyse = 'D:/Hanze_Groningen/STAGE/analyse/new/'
-    path_snp_ids = 'D:/Hanze_Groningen/STAGE/lagen/'
-    with_gene = False
-    # TFBS, UCNE, DNase
-    type_file = 'TFBS'
-    non_coding = 'NonCoding'
-    run_all_corrections(path_analyse, type_file, non_coding, with_gene, f'{path_snp_ids}{type_file}_chrALL_num_snps.tsv')
-    # # type_file = 'UCNE'
-    # # run_all_corrections(path_analyse, type_file, non_coding, with_gene, f'{path_snp_ids}{type_file}_chrALL_num_snps.tsv')
-    # # type_file = 'DNase'
-    # # run_all_corrections(path_analyse, type_file, non_coding, with_gene, f'{path_snp_ids}{type_file}_chrALL_num_snps.tsv')
-    
-    # AfterGene/BeforeGene
-    with_gene = True
-    type_file = 'afterGene'
-    non_coding = 'NonCoding_Coding'
-    run_all_corrections(path_analyse, type_file, non_coding, with_gene, f'{path_snp_ids}ALL_gene_after_2000_250.tsv')
-    type_file = 'beforeGene'
-    run_all_corrections(path_analyse, type_file, non_coding, with_gene, f'{path_snp_ids}ALL_gene_before_2000_250.tsv')
 
+    # per_snp
+    type_file = 'per_snp'
+    non_coding = 'ALL'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'pos_start', 'pos_end')
+    non_coding = 'Coding'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'pos_start', 'pos_end')
+    non_coding = 'NonCoding'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'pos_start', 'pos_end')
+
+    # Region 1000
+    type_file = 'Region_1000'
+    non_coding = 'ALL'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'start_region', 'stop_region')
+    non_coding = 'Coding'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'start_region', 'stop_region')
+    non_coding = 'NonCoding'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'start_region', 'stop_region')
+
+    # Region 2000
+    type_file = 'Region_2000'
+    non_coding = 'ALL'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'start_region', 'stop_region')
+    non_coding = 'Coding'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'start_region', 'stop_region')
+    non_coding = 'NonCoding'
+    run_all_corrections(path_analyse, type_file, non_coding, db, 'start_region', 'stop_region')
 
 
 
