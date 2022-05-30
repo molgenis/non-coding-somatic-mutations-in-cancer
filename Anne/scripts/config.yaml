@@ -25,6 +25,7 @@ donor_info: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_
 genes_eQTL_etc: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/'
 genoom_fa: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/chrall.dict'
 germline_resource: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GermlineResource/merge_af-only-gnomad.raw.sites.vcf'
+layers: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/layers/'
 new_plan2: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/new_plan2/'
 Number_and_none_values: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/Number_and_none_values.txt'
 panel_of_normals: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf'
