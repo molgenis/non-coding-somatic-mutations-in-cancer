@@ -1,14 +1,14 @@
 import pandas as pd
 import numpy as np
 import sys
-# sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
-# from config import get_config
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from config import get_config
 
 
 
 def search_gene(list_chr, path_analyse, type_file, non_coding, type_MTC, fc):
-    # config = get_config()
-    path_gene_file = "D:/Hanze_Groningen/STAGE/db/all_genes_new - kopie.tsv" #config['all_genes'] #"D:/Hanze_Groningen/STAGE/db/all_genes_new - kopie.tsv"
+    config = get_config()
+    path_gene_file = config['all_genes'] #config['all_genes'] #"D:/Hanze_Groningen/STAGE/db/all_genes_new - kopie.tsv"
     df = pd.read_csv(path_gene_file, sep='\t')
     print(df)
     print(df.columns)
