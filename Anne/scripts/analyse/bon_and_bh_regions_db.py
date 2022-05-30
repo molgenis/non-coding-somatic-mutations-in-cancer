@@ -46,7 +46,7 @@ def run_all_corrections(path_analyse, type_file, non_coding, db, col1, col2):
                 'p_value_X2_self', 'p_value_X2', 'p_value_F']]
     df_select['info'] = df_select['chr'].map(str) + '_' + df_select[col1].map(str) + '_' + df_select[col2].map(str)
 
-    elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse)
+    elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse, False)
     
 
     search_close_gene.search_gene(elements_in_all_normal, path_analyse, type_file, non_coding, 'normal')

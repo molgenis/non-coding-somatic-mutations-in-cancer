@@ -35,7 +35,7 @@ def run_all_corrections(path_analyse, type_file, non_coding, with_gene, path_sea
         df_select['info'] = df_select['chr'].map(str) + '_' + df_select['start_position_regio'].map(str) + '_' + df_select['end_position_regio'].map(str)
     print(df_select)
 
-    elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse)
+    elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse, False)
 
     # path_search_snp = "D:/Hanze_Groningen/STAGE/analyse/stat/ALL_gene_before_2000_250.tsv"
     snps_search = pd.read_csv(path_search_snp, sep='\t')

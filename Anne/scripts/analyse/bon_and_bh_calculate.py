@@ -83,7 +83,7 @@ def get_overlap(self_X2_df, X2_df, F_df):
     print(f'in X2 NOT in F ({len(dif_X2_F)})\n')
     return elements_in_all
 
-def search(df_select, type_file, non_coding, GT=False):
+def search(df_select, type_file, non_coding, path_analyse, GT=False):
     alpha=0.05
     if GT:
         method = 'bonferroni'
