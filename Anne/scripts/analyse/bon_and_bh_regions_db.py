@@ -35,6 +35,24 @@ def get_significant_snps_db(list_significant_elements, db, f, type_test):
     f.write(f"{type_test}\t{','.join(map(str, list(set(snp_id_list))))}\t{dict_snp}\n")
 
 
+def run_different_fc(df_select, type_file, non_coding, path_analyse, db, fc):
+    elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse, False, fc)
+    
+
+    search_close_gene.search_gene(elements_in_all_normal, path_analyse, type_file, non_coding, 'normal', fc)
+    search_close_gene.search_gene(elements_in_all_bon, path_analyse, type_file, non_coding, 'bon', fc)
+    search_close_gene.search_gene(elements_in_all_bh, path_analyse, type_file, non_coding, 'bh', fc)
+    search_close_gene.search_gene(elements_snps_all_MTC, path_analyse, type_file, non_coding, 'all_MTC', fc)
+
+   
+    # Open and create file
+    f = open(f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_sig_snps.tsv", "a")
+    significant_snps_normal = get_significant_snps_db(elements_in_all_normal, db, f, 'snps_normal')
+    significant_snps_bon = get_significant_snps_db(elements_in_all_bon, db, f, 'snps_bon')
+    significant_snps_bh = get_significant_snps_db(elements_in_all_bh, db, f, 'snps_bh')
+    significant_snps_all_MTC = get_significant_snps_db(elements_snps_all_MTC, db, f, 'snps_all_MTC')
+    f.close()
+
 
 def run_all_corrections(path_analyse, type_file, non_coding, db, col1, col2):
     print(type_file)
@@ -44,25 +62,17 @@ def run_all_corrections(path_analyse, type_file, non_coding, db, col1, col2):
     print(df.columns)
     df_select = df[['chr', col1, col2, 'counts_breast', 'counts_nonbreast',
                 'p_value_X2_self', 'p_value_X2', 'p_value_F']]
-    df_select['info'] = df_select['chr'].map(str) + '_' + df_select[col1].map(str) + '_' + df_select[col2].map(str)
+    df_select['foldchange'] = df_select['counts_breast']/df_select['counts_nonbreast']
+    df_select['info'] = df_select['chr'].map(str) + '_' + df_select[col1].map(str) + '_' + df_select[col2].map(str) + '_' + df_select['foldchange'].map(str)
 
-    elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse, False)
-    
+    run_different_fc(df_select, type_file, non_coding, path_analyse, db, 'ALL')
 
-    search_close_gene.search_gene(elements_in_all_normal, path_analyse, type_file, non_coding, 'normal')
-    search_close_gene.search_gene(elements_in_all_bon, path_analyse, type_file, non_coding, 'bon')
-    search_close_gene.search_gene(elements_in_all_bh, path_analyse, type_file, non_coding, 'bh')
-    search_close_gene.search_gene(elements_snps_all_MTC, path_analyse, type_file, non_coding, 'all_MTC')
+    df_breast = df_select[df_select['foldchange'] > 1]
+    run_different_fc(df_breast, type_file, non_coding, path_analyse, db, 'breast')
 
-   
-    # Open and create file
-    f = open(f"{path_analyse}correction/{type_file}_{non_coding}_sig_snps.tsv", "a")
-    significant_snps_normal = get_significant_snps_db(elements_in_all_normal, db, f, 'snps_normal')
-    significant_snps_bon = get_significant_snps_db(elements_in_all_bon, db, f, 'snps_bon')
-    significant_snps_bh = get_significant_snps_db(elements_in_all_bh, db, f, 'snps_bh')
-    significant_snps_all_MTC = get_significant_snps_db(elements_snps_all_MTC, db, f, 'snps_all_MTC')
-    f.close()
-    
+    df_nonbreast = df_select[df_select['foldchange'] <= 1]
+    run_different_fc(df_nonbreast, type_file, non_coding, path_analyse, db, 'nonbreast')
+
 
 def main():
     config = get_config()
