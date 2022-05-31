@@ -112,16 +112,16 @@ def search(df_select, type_file, non_coding, path_analyse, GT):
 
         # # df_select.to_csv(f"{path_analyse}{type_file}_{non_coding}_MTC.tsv", sep='\t', encoding='utf-8', index=False)
 
-        # X2_self_sig_normal, X2_self_bon_sig, X2_self_bh_sig = get_significant(df_select, 'X2_self', alpha)
-        # X2_sig_normal, X2_bon_sig, X2_bh_sig = get_significant(df_select, 'X2', alpha)
-        # F_sig_normal, F_bon_sig, F_bh_sig = get_significant(df_select, 'F', alpha)
+        X2_self_sig_normal, X2_self_bon_sig, X2_self_bh_sig = get_significant(df_select, 'X2_self', alpha)
+        X2_sig_normal, X2_bon_sig, X2_bh_sig = get_significant(df_select, 'X2', alpha)
+        F_sig_normal, F_bon_sig, F_bh_sig = get_significant(df_select, 'F', alpha)
 
-        # print('\nNORMAL')
-        # elements_in_all_normal = get_overlap(X2_self_sig_normal, X2_sig_normal, F_sig_normal) #[:top_num]
-        # print('\nBON')
-        # elements_in_all_bon = get_overlap(X2_self_bon_sig, X2_bon_sig, F_bon_sig)
-        # print('\nBH')
-        # elements_in_all_bh = get_overlap(X2_self_bh_sig, X2_bh_sig, F_bh_sig)
-        # elements_snps_all_MTC = list(set.intersection(*map(set, [elements_in_all_normal, elements_in_all_bon, elements_in_all_bh])))
-        # print(elements_snps_all_MTC)
-        # return elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC
+        print('\nNORMAL')
+        elements_in_all_normal = get_overlap(X2_self_sig_normal, X2_sig_normal, F_sig_normal) #[:top_num]
+        print('\nBON')
+        elements_in_all_bon = get_overlap(X2_self_bon_sig, X2_bon_sig, F_bon_sig)
+        print('\nBH')
+        elements_in_all_bh = get_overlap(X2_self_bh_sig, X2_bh_sig, F_bh_sig)
+        elements_snps_all_MTC = list(set.intersection(*map(set, [elements_in_all_normal, elements_in_all_bon, elements_in_all_bh])))
+        print(elements_snps_all_MTC)
+        return elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC

@@ -38,7 +38,7 @@ def benjamini_hochberg_correction(df, alpha, type_test):
 def get_significant(df, type_test):
     df_select = df[['info', f'p_value_{type_test}', f'bonferroni_{type_test}', f'fdr_bh_{type_test}']]
     print(f'---------{type_test}--------')
-    normal_p = df_select[df_select[f'p_value_{type_test}'] == True]
+    normal_p = df_select[df_select[f'p_value_{type_test}'] <= 0.05]
     genes_sig = normal_p['info']
     print(f'nomal: {len(genes_sig)}')
 

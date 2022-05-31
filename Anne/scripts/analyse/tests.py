@@ -13,6 +13,7 @@ import scipy.stats as stats
 from scipy.stats import mannwhitneyu
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
+from scipy.stats.contingency import relative_risk
 
 
 def chi_square_self(df, colname_b, colname_nb, num_donor_b, num_donor_nb):
@@ -136,9 +137,28 @@ def volcano_plot(df, p_value_column, path_file, type_analyse, type_df):
     plt.title(f"{type_analyse} - {type_df} nonbreast")
     plt.savefig(f'{path_file}volcano_{p_value_column}_{type_analyse}_{type_df}_both.png')
     plt.clf()
+
+def calculate_relative_risk(S_C, df):
+    relative_risk_values = list()
+    confidence_interval = list()
+    one_in_interval = list()
+    for index, value in enumerate(S_C):
+        result = relative_risk(value[0], (value[0] + value[2]), value[1], (value[1] + value[3]))
+        relative_risk_values.append(result.relative_risk)
+        con_interval = result.confidence_interval(confidence_level=0.95)
+        confidence_interval.append(f'{con_interval[0]}-{con_interval[1]}')
+        if con_interval[0] < 1 and con_interval[1] > 1:
+            one_in_interval.append(True)
+        else:
+            one_in_interval.append(False)
+    df['relative_risk_values'] = relative_risk_values
+    df['confidence_interval'] = confidence_interval
+    df['one_in_interval'] = one_in_interval
+    return df
+    
     
 
-def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file):
+def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, select_chrom):
     """
     
     """
@@ -169,7 +189,8 @@ def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file):
     df = log2_fc(df, n, S)
     df = fisher_test(S_C, df)
     df = log2_fc(df, n, S)
-    df.to_csv(f"{path_file}new/{type_analyse}_{type_df}_both_0_TESTS.tsv", sep='\t', encoding='utf-8', index=False)
+    df = calculate_relative_risk(S_C, df)
+    df.to_csv(f"{path_file}new/{type_analyse}_{type_df}_both_0_TESTS_{select_chrom}.tsv", sep='\t', encoding='utf-8', index=False)
     
     # print('\nvolcano_plot')
     # volcano_plot(df, 'p_value_X2_self', path_file, type_analyse, type_df)

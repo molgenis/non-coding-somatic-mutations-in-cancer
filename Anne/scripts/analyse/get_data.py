@@ -124,7 +124,7 @@ def get_all_data(filter_par, path_file, path_db):
     num_donor_b = len(list(set(all_breast['donor_ID'])))
     num_donor_nb = len(list(set(all_nonbreast['donor_ID'])))
 
-    return all_breast, all_nonbreast, num_donor_b, num_donor_nb
+    return all_breast, all_nonbreast, num_donor_b, num_donor_nb, len(all_breast), len(all_nonbreast)
 
 def get_noncoding_data(filter_par, path_file, path_db):
     if filter_par:
@@ -136,7 +136,7 @@ def get_noncoding_data(filter_par, path_file, path_db):
     num_donor_b = len(list(set(noncoding_breast['donor_ID'])))
     num_donor_nb = len(list(set(noncoding_nonbreast['donor_ID'])))
 
-    return noncoding_breast, noncoding_nonbreast, num_donor_b, num_donor_nb
+    return noncoding_breast, noncoding_nonbreast, num_donor_b, num_donor_nb, len(noncoding_breast), len(noncoding_nonbreast)
 
 def get_coding_data(filter_par, path_file, path_db):
     if filter_par:
@@ -148,7 +148,7 @@ def get_coding_data(filter_par, path_file, path_db):
     num_donor_b = len(list(set(coding_breast['donor_ID'])))
     num_donor_nb = len(list(set(coding_nonbreast['donor_ID'])))
 
-    return coding_breast, coding_nonbreast, num_donor_b, num_donor_nb
+    return coding_breast, coding_nonbreast, num_donor_b, num_donor_nb, len(coding_breast), len(coding_nonbreast)
 
 def main():
     config = get_config()

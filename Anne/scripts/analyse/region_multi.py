@@ -19,13 +19,15 @@ from config import get_config
 import get_data as get_data
 import tests as tests
 
-def make_merge_df(path_breast, path_nonbreast):
+def make_merge_df(path_breast, path_nonbreast, select_chrom):
     colnames=['index', 'counts_breast', 'chr', 'start_region', 'stop_region']
     breast = pd.read_csv(path_breast, sep='\t', header=None, names=colnames)
+    breast = breast[breast['chr'] == select_chrom]
     breast.sort_values(['chr', 'start_region'], inplace=True)
     
     colnames=['index', 'counts_nonbreast', 'chr', 'start_region', 'stop_region']
-    nonbreast = pd.read_csv(path_nonbreast, sep='\t', header=None, names=colnames)   
+    nonbreast = pd.read_csv(path_nonbreast, sep='\t', header=None, names=colnames)
+    nonbreast = nonbreast[nonbreast['chr'] == select_chrom]
     nonbreast.sort_values(['chr', 'start_region'], inplace=True)
     
     merged_df = breast.merge(nonbreast, on=['chr', 'start_region', 'stop_region'], how='outer')
@@ -58,27 +60,27 @@ def make_df_2000(merge_df):
 
 
 
-def all_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
+def all_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom):
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
-    merge_df = make_merge_df(path_R_b, path_R_nb)
-    df_1000_tests = tests.all_test(merge_df, all_snps_b, all_snps_nb, 'ALL', 'Region_1000', path_file)
+    merge_df = make_merge_df(path_R_b, path_R_nb, select_chrom)
+    df_1000_tests = tests.all_test(merge_df, all_snps_b, all_snps_nb, 'ALL', 'Region_1000', path_file, select_chrom)
     df_2000 = make_df_2000(merge_df)
-    df_2000_tests = tests.all_test(df_2000, all_snps_b, all_snps_nb, 'ALL', 'Region_2000', path_file)
+    df_2000_tests = tests.all_test(df_2000, all_snps_b, all_snps_nb, 'ALL', 'Region_2000', path_file, select_chrom)
 
 
-def noncoding_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
+def noncoding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom):
     noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
-    nc_merge_df = make_merge_df(path_R_b, path_R_nb)
-    nc_df_1000_tests = tests.all_test(nc_merge_df, all_snps_b, all_snps_nb, 'NonCoding', 'Region_1000', path_file)
+    nc_merge_df = make_merge_df(path_R_b, path_R_nb, select_chrom)
+    nc_df_1000_tests = tests.all_test(nc_merge_df, all_snps_b, all_snps_nb, 'NonCoding', 'Region_1000', path_file, select_chrom)
     nc_df_2000 = make_df_2000(nc_merge_df)
-    nc_df_2000_tests = tests.all_test(nc_df_2000, all_snps_b, all_snps_nb, 'NonCoding', 'Region_2000', path_file)
+    nc_df_2000_tests = tests.all_test(nc_df_2000, all_snps_b, all_snps_nb, 'NonCoding', 'Region_2000', path_file, select_chrom)
 
-def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
+def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom):
     coding_breast, coding_nonbreast, coding_num_donor_b, coding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
-    c_merge_df = make_merge_df(path_R_b, path_R_nb)
-    c_df_1000_tests = tests.all_test(c_merge_df, all_snps_b, all_snps_nb, 'Coding', 'Region_1000', path_file)
+    c_merge_df = make_merge_df(path_R_b, path_R_nb, select_chrom)
+    c_df_1000_tests = tests.all_test(c_merge_df, all_snps_b, all_snps_nb, 'Coding', 'Region_1000', path_file, select_chrom)
     c_df_2000 = make_df_2000(c_merge_df)
-    c_df_2000_tests = tests.all_test(c_df_2000, all_snps_b, all_snps_nb, 'Coding', 'Region_2000', path_file)
+    c_df_2000_tests = tests.all_test(c_df_2000, all_snps_b, all_snps_nb, 'Coding', 'Region_2000', path_file, select_chrom)
 
 
 def main():
@@ -87,9 +89,10 @@ def main():
     path_db = ''
     path_file = config['analyse'] 
     filter_par = False
-    all_data(filter_par, path_file, path_db, f"{path_R}all_breast_ALL.tsv", f"{path_R}all_nonbreast_ALL.tsv")
-    noncoding_data(filter_par, path_file, path_db, f"{path_R}noncoding_breast_ALL.tsv", f"{path_R}noncoding_nonbreast_ALL.tsv")
-    coding_data(filter_par, path_file, path_db, f"{path_R}coding_breast_ALL.tsv", f"{path_R}coding_nonbreast_ALL.tsv")
+    select_chrom = sys.argv[1]
+    all_data(filter_par, path_file, path_db, f"{path_R}all_breast_ALL.tsv", f"{path_R}all_nonbreast_ALL.tsv", select_chrom)
+    noncoding_data(filter_par, path_file, path_db, f"{path_R}noncoding_breast_ALL.tsv", f"{path_R}noncoding_nonbreast_ALL.tsv", select_chrom)
+    coding_data(filter_par, path_file, path_db, f"{path_R}coding_breast_ALL.tsv", f"{path_R}coding_nonbreast_ALL.tsv", select_chrom)
     
 if __name__ == '__main__':
     main()

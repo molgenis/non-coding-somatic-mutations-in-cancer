@@ -21,8 +21,9 @@ from config import get_config
 import get_data as get_data
 import tests as tests
 
-def make_snp_df(df, type_df, type_c, path_file):
+def make_snp_df(df, type_df, type_c, path_file, select_chrom):
     print('----------')
+    df = df[df['chr'] == select_chrom]
     df['snp'] = df['chr'].map(str) + '_' + df['pos_start'].map(str) + '_' + df['pos_end'].map(str)
     print(len(list(set(df['donor_ID']))))
     num_donor = len(list(set(df['donor_ID'])))
@@ -44,43 +45,43 @@ def make_snp_df(df, type_df, type_c, path_file):
     
     df_R = sort_snp_count_df.reset_index().drop([f'counts_{type_c}', 'index'], 1)
     df_R['chr'] ='chr' + df_R['chr'].astype(str)
-    df_R.to_csv(f"{path_file}R/{type_df}_{type_c}.tsv", sep='\t', encoding='utf-8', header=None)
+    df_R.to_csv(f"{path_file}R/{type_df}_{type_c}_{select_chrom}.tsv", sep='\t', encoding='utf-8', header=None)
     return num_donor, sort_snp_count_df
 
 
-def run_snp_tests(df_breast, df_nonbreast, type_df, type_analyse, path_file):
+def run_snp_tests(df_breast, df_nonbreast, type_df, type_analyse, path_file, select_chrom):
     print('\nset snps')
-    num_donor_b, sort_snp_count_breast = make_snp_df(df_breast, type_df, 'breast', path_file)
-    num_donor_nb, sort_snp_count_nonbreast = make_snp_df(df_nonbreast, type_df, 'nonbreast', path_file)
+    num_donor_b, sort_snp_count_breast = make_snp_df(df_breast, type_df, 'breast', path_file, select_chrom)
+    num_donor_nb, sort_snp_count_nonbreast = make_snp_df(df_nonbreast, type_df, 'nonbreast', path_file, select_chrom)
     
     print('\nmerge dfs')
     sort_snp_count_both = sort_snp_count_breast.merge(sort_snp_count_nonbreast, on=['chr', 'pos_start', 'pos_end'], how='outer')
     sort_snp_count_both_0 = sort_snp_count_both.fillna(0)
-    sort_snp_count_both_0.to_csv(f"{path_file}{type_analyse}_{type_df}_both_0.tsv", sep='\t', encoding='utf-8', index=False)
+    sort_snp_count_both_0.to_csv(f"{path_file}{type_analyse}_{type_df}_both_0_{select_chrom}.tsv", sep='\t', encoding='utf-8', index=False)
     
-    sort_snp_count_both_0 = tests.all_test(sort_snp_count_both_0, num_donor_b, num_donor_nb, type_df, type_analyse, path_file)
+    sort_snp_count_both_0 = tests.all_test(sort_snp_count_both_0, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, select_chrom)
     return sort_snp_count_both_0, num_donor_b, num_donor_nb
 
 
-def all_data(filter_par, path_file, path_db):    
+def all_data(filter_par, path_file, path_db, select_chrom):    
     all_breast, all_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
 
-    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = run_snp_tests(all_breast, all_nonbreast, 'ALL', 'per_snp', path_file)
+    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = run_snp_tests(all_breast, all_nonbreast, 'ALL', 'per_snp', path_file, select_chrom)
     return sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb
 
 
 
-def noncoding_data(filter_par, path_file, path_db):
+def noncoding_data(filter_par, path_file, path_db, select_chrom):
     noncoding_breast, noncoding_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
 
-    sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = run_snp_tests(noncoding_breast, noncoding_nonbreast, 'NonCoding', 'per_snp', path_file)
+    sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = run_snp_tests(noncoding_breast, noncoding_nonbreast, 'NonCoding', 'per_snp', path_file, select_chrom)
     return sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb
 
 
-def coding_data(filter_par, path_file, path_db):
+def coding_data(filter_par, path_file, path_db, select_chrom):
     coding_breast, coding_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
 
-    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = run_snp_tests(coding_breast, coding_nonbreast, 'Coding', 'per_snp', path_file)
+    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = run_snp_tests(coding_breast, coding_nonbreast, 'Coding', 'per_snp', path_file, select_chrom)
     return sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb
 
 
@@ -90,9 +91,10 @@ def main():
     path_db = '' #config['database']
     path_file = config['analyse']
     filter_par = False
-    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = all_data(filter_par, path_file, path_db)
-    sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = noncoding_data(filter_par, path_file, path_db)
-    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = coding_data(filter_par, path_file, path_db)
+    select_chrom = sys.argv[1].replace('chr', '')
+    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = all_data(filter_par, path_file, path_db, select_chrom)
+    sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = noncoding_data(filter_par, path_file, path_db, select_chrom)
+    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = coding_data(filter_par, path_file, path_db, select_chrom)
 
 if __name__ == '__main__':
     main()

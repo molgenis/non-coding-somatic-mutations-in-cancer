@@ -19,7 +19,7 @@ from config import get_config
 
 import get_data as get_data
 
-def make_GT_df(df, type_c, num_donors):
+def make_GT_df(df, type_c, num_donors, select_chrom):
     select_df = df[['GT2', 'snp_ID', 'chr', 'pos_start', 'pos_end']]
     select_1_df = select_df[select_df['GT2'] == 1]
     select_2_df = select_df[select_df['GT2'] == 2]
@@ -30,9 +30,10 @@ def make_GT_df(df, type_c, num_donors):
     GT_df_0[f'GT_2_{type_c}'] = GT_df_0[f'GT_2_{type_c}'] /2
     GT_df_0.sort_values(by=['chr', 'pos_start'], inplace = True)
     GT_df_0[f'GT_0_{type_c}'] = num_donors - (GT_df_0[f'GT_1_{type_c}']+GT_df_0[f'GT_2_{type_c}'])
+    GT_df_0 = GT_df_0[GT_df_0['chr'] == select_chrom]
     return GT_df_0
 
-def cochran_armitage(both_GT, path_file, type_df):
+def cochran_armitage(both_GT, path_file, type_df, select_chrom):
     both_GT.reset_index(inplace=True)
     p_value_cochran_armitage = list()
     for index, row in both_GT.iterrows():
@@ -45,11 +46,11 @@ def cochran_armitage(both_GT, path_file, type_df):
         print(p_value)
         p_value_cochran_armitage.append(p_value)
     both_GT['p_value_cochran_armitage'] = p_value_cochran_armitage
-    both_GT.to_csv(f"{path_file}GT_{type_df}_cochran_armitage.tsv", sep='\t', encoding='utf-8', index=False)
+    both_GT.to_csv(f"{path_file}GT_{type_df}_{select_chrom}_cochran_armitage.tsv", sep='\t', encoding='utf-8', index=False)
     return both_GT
 
 
-def all_data(filter_par, path_file, path_db):
+def all_data(filter_par, path_file, path_db, select_chrom):
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
     breast_GT = make_GT_df(all_breast, 'b', all_num_donor_b)
     nonbreast_GT = make_GT_df(all_nonbreast, 'nb', all_num_donor_nb)
@@ -60,11 +61,11 @@ def all_data(filter_par, path_file, path_db):
     both_GT['GT_1_nb'].fillna(0,inplace=True)
     both_GT['GT_2_nb'].fillna(0,inplace=True)
     both_GT['GT_0_nb'].fillna(all_num_donor_nb,inplace=True)
-    both_GT = cochran_armitage(both_GT, path_file, 'ALL')
+    both_GT = cochran_armitage(both_GT, path_file, 'ALL', select_chrom)
 
 
 
-def noncoding_data(filter_par, path_file, path_db):
+def noncoding_data(filter_par, path_file, path_db, select_chrom):
     noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
     breast_GT = make_GT_df(noncoding_breast, 'b', noncoding_num_donor_b)
     nonbreast_GT = make_GT_df(noncoding_nonbreast, 'nb', noncoding_num_donor_nb)
@@ -75,12 +76,12 @@ def noncoding_data(filter_par, path_file, path_db):
     both_GT['GT_1_nb'].fillna(0,inplace=True)
     both_GT['GT_2_nb'].fillna(0,inplace=True)
     both_GT['GT_0_nb'].fillna(noncoding_num_donor_nb,inplace=True)       
-    both_GT = cochran_armitage(both_GT, path_file, 'NonCoding')
+    both_GT = cochran_armitage(both_GT, path_file, 'NonCoding', select_chrom)
     
 
 
 
-def coding_data(filter_par, path_file, path_db):
+def coding_data(filter_par, path_file, path_db, select_chrom):
     coding_breast, coding_nonbreast, coding_num_donor_b, coding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
     breast_GT = make_GT_df(coding_breast, 'b', coding_num_donor_b)
     nonbreast_GT = make_GT_df(coding_nonbreast, 'nb', coding_num_donor_nb)
@@ -91,7 +92,7 @@ def coding_data(filter_par, path_file, path_db):
     both_GT['GT_1_nb'].fillna(0,inplace=True)
     both_GT['GT_2_nb'].fillna(0,inplace=True)
     both_GT['GT_0_nb'].fillna(coding_num_donor_nb,inplace=True)
-    both_GT = cochran_armitage(both_GT, path_file, 'Coding')
+    both_GT = cochran_armitage(both_GT, path_file, 'Coding', select_chrom)
 
 
 
@@ -100,9 +101,10 @@ def main():
     path_db = '' 
     path_file = config['analyse'] #config['analyse'] 'D:/Hanze_Groningen/STAGE/lastdb/'
     filter_par = False
-    all_data(filter_par, path_file, path_db)
-    noncoding_data(filter_par, path_file, path_db)
-    coding_data(filter_par, path_file, path_db)
+    select_chrom = sys.argv[1].replace('chr', '')
+    all_data(filter_par, path_file, path_db, select_chrom)
+    noncoding_data(filter_par, path_file, path_db, select_chrom)
+    coding_data(filter_par, path_file, path_db, select_chrom)
 
 
 if __name__ == '__main__':

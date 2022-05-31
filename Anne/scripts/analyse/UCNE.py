@@ -59,8 +59,11 @@ def run_all(type_data, path_db, path_save):
     print(df_b_nb.head())
     print(set(df_b_nb['counts_breast']))
     print(set(df_b_nb['counts_nonbreast']))    
-    all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb = get_data.get_all_data(filter_par, path_save, path_db)
-    tests_df = tests.all_test(df_b_nb, all_num_donor_b, all_num_donor_nb, 'NonCoding', f'{type_data}', path_save)
+    all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_save, path_db)
+    tests_df_all = tests.all_test(df_b_nb, all_num_donor_b, all_num_donor_nb, 'NonCoding', f'{type_data}', path_save)
+
+    noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
+    tests_df_NC = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_NC', f'{type_data}', path_save)
 
 def main():
     config = get_config()
