@@ -73,6 +73,10 @@ def run_all(type_bef_aft, path_db, path_save, select_chrom):
     # pool.join()
     tests_df = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_Coding', f'{type_bef_aft}Gene', path_save, select_chrom)
 
+
+    noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
+    tests_df_NC = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_Coding_NC', f'{type_bef_aft}Gene', path_save, select_chrom)
+
 def main():
     config = get_config()
     path_db = '' #'D:/Hanze_Groningen/STAGE/db_laatste_copy.db' #config['database']
