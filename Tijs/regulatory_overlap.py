@@ -45,16 +45,19 @@ Uses:
 
 
 ./regulatory_overlap.py -s ../../ICGC_blood_data/tested_and_verified/2022-05-12_non-coding_tested_and_verified_blood_snps.bed -r ../../chromatin_states/2022-05-12_healthy_blood_H3K4me1.bed -o 2022-05-13_overlap_somatic_snps_H3K4me1.bed -c ../../GREEN_DB/2022-05-02_eqtl_v1013_lead_snp_gene_with_info.bed --sortSNPs
+
+
+./regulatory_overlap.py -s ../../GREEN_DB/2022-05-19_eqtl_v1013_lead_snp_gene_symbol_added.bed -r ../../GREEN_DB/2022-04-13_GRCh37_TFBS.merged.bed.gz -o 2022-05-30_overlap_stratified_eqtl_snps_TFBS.bed -e ../../GREEN_DB/2022-05-19_cis-eGenes_sorted_on_expr.tsv --sortSNPs
 """
 
 # Metadata
 __title__ = "Calculate the overlap between SNPs and regulatory regions" 
 __author__ = "Tijs van Lieshout"
 __created__ = "2022-04-25"
-__updated__ = "2022-05-14"
+__updated__ = "2022-05-31"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
-__version__ = 1.3
+__version__ = 1.4
 __license__ = "GPLv3"
 __description__ = f"""{__title__} is a python script created on {__created__} by {__author__}.
                       Last update (version {__version__}) was on {__updated__} by {__maintainer__}.
@@ -72,6 +75,7 @@ from scipy.stats import chi2_contingency
 
 from utilities import preprocess_bed_file
 
+
 def main(args):
   snps_bed = preprocess_bed_file(args.SNPs) 
   reg_bed = preprocess_bed_file(args.RegRegion, True)
@@ -86,6 +90,16 @@ def main(args):
   if args.sortRegRegion:
     reg_bed = reg_bed.sort()
 
+  if args.ExpressionFile:
+    snps_df = add_mean_gene_expression(snps_bed.to_dataframe(), args.ExpressionFile)
+    for q in np.sort(pd.unique(snps_df['quantile'])):
+      subset_df = snps_df[snps_df['quantile'] == q]
+      print(q)
+      subset_bed = bt.from_dataframe(subset_df[['chrom', 'start', 'end']]).sort()
+      overlap, jaccard = compute_jaccard(subset_bed, reg_bed)
+      print('\n')
+    return
+
   overlap, jaccard = compute_jaccard(snps_bed, reg_bed)
   compute_overlap(snps_bed, reg_bed, args.OutFile, args.RegRegion)
 
@@ -98,9 +112,25 @@ def main(args):
                                  args.ComparisonSNPs, args.RegRegion, args.OutFile, p_value)
 
 
+def add_mean_gene_expression(df, expr_path):
+  expr_df = pd.read_csv(expr_path, sep='\t') 
+  if 'score' in df.columns:
+    column_name  = 'score'
+  else:
+    column_name = 'name'
+  df = df[df[column_name].isin(expr_df['gene_symbol'])]
+  merged_df = df.merge(expr_df, left_on=column_name, right_on='gene_symbol')
+
+  # highest expressions are found in Quantile 1
+  merged_df['quantile'] = pd.qcut(merged_df['mean_exp'], 4, labels=['Q4', 'Q3', 'Q2', 'Q1'])
+  
+  return merged_df
+
+
 def compute_jaccard(snps_bed, reg_bed):
   jaccard = snps_bed.jaccard(reg_bed)
   overlap =(jaccard['n_intersections'] / len(snps_bed)) * 100
+
   print("Resulting overlap between SNPs and regulatory region:")
   for k, v in jaccard.items():
     print(f"{k:>15}{v:>15}")
@@ -110,7 +140,7 @@ def compute_jaccard(snps_bed, reg_bed):
 
 
 def compute_overlap(snps_bed, reg_bed, output_path, reg_path):
-  overlap = snps_bed.intersect(reg_bed)
+  overlap = snps_bed.intersect(reg_bed, wa=True, wb=True, filenames=True)
   overlap.saveas(output_path)
 
   venn2_unweighted(subsets = (len(snps_bed), len(reg_bed), len(overlap)),
@@ -166,6 +196,7 @@ if __name__ == '__main__':
   parser.add_argument("--sortSNPs", action="store_true", required=False, help="Sort the BED of SNPs of interest LEXOGRAPHICALLY") 
   parser.add_argument("--sortRegRegion", action="store_true", required=False, help="Sort the BED of regulatory regions of interest LEXOGRAPHICALLY")
   parser.add_argument("-c", "--ComparisonSNPs", type=str, required=False, help="Path to BED of SNPs of interest to compare against")
+  parser.add_argument("-e", "--ExpressionFile", type=str, required=False, help="Path to CSV of mean gene expression per eGene")
   args = parser.parse_args()
   
   main(args)
