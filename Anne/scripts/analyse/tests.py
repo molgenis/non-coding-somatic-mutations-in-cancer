@@ -158,18 +158,18 @@ def calculate_relative_risk(S_C, df):
     
     
 
-def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, select_chrom):
+def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, select_chrom, i):
     """
     
     """
     print('\nboxplot')
     df.boxplot(column=['counts_breast'], grid=False)
     plt.title(f"{type_analyse} - {type_df} Breast")
-    plt.savefig(f'{path_file}boxplot_{type_analyse}_{type_df}_breast.png')
+    plt.savefig(f'{path_file}boxplot_{type_analyse}_{type_df}_breast_{select_chrom}_{i}.png')
     plt.clf()
     df.boxplot(column=['counts_nonbreast'], grid=False)
     plt.title(f"{type_analyse} - {type_df} nonbreast")
-    plt.savefig(f'{path_file}boxplot_{type_analyse}_{type_df}_nonbreast.png')
+    plt.savefig(f'{path_file}boxplot_{type_analyse}_{type_df}_nonbreast_{select_chrom}_{i}.png')
     plt.clf()
     
     print('\nfilter columns (divide by max)')
@@ -190,7 +190,7 @@ def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, se
     df = fisher_test(S_C, df)
     df = log2_fc(df, n, S)
     df = calculate_relative_risk(S_C, df)
-    df.to_csv(f"{path_file}new/{type_analyse}_{type_df}_both_0_TESTS_{select_chrom}.tsv", sep='\t', encoding='utf-8', index=False)
+    df.to_csv(f"{path_file}new/{type_analyse}_{type_df}_both_0_TESTS_{select_chrom}_{i}.tsv", sep='\t', encoding='utf-8', index=False)
     
     # print('\nvolcano_plot')
     # volcano_plot(df, 'p_value_X2_self', path_file, type_analyse, type_df)

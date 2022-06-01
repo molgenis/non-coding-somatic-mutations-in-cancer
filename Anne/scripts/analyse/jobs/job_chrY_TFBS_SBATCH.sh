@@ -2,7 +2,7 @@
 #SBATCH --job-name='job_chrY_TFBS'
 #SBATCH --output='/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/analyse/jobs/job_chrY_TFBS.out'
 #SBATCH --error='/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/analyse/jobs/job_chrY_TFBS.err'
-#SBATCH --time='100:59:59'
+#SBATCH --time='167:59:59'
 #SBATCH --cpus-per-task='8'
 #SBATCH --mem='64'GB
 #SBATCH --nodes=1
