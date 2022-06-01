@@ -141,6 +141,7 @@ def volcano_plot(df, p_value_column, path_file, type_analyse, type_df):
 def calculate_relative_risk(S_C, df):
     relative_risk_values = list()
     confidence_interval = list()
+    confidence_interval_bon = list()
     one_in_interval = list()
     list_values_RR = list()
     for index, value in enumerate(S_C):
@@ -149,12 +150,16 @@ def calculate_relative_risk(S_C, df):
         relative_risk_values.append(result.relative_risk)
         con_interval = result.confidence_interval(confidence_level=0.95)
         confidence_interval.append(f'{con_interval[0]}-{con_interval[1]}')
+        con_interval_bon = result.confidence_interval(confidence_level=1-(0.05/len(df)))
+        confidence_interval_bon.append(f'{con_interval_bon[0]}-{con_interval_bon[1]}')
+
         if con_interval[0] < 1 and con_interval[1] > 1:
-            one_in_interval.append(True)
+            one_in_interval.append(True) # TODO
         else:
             one_in_interval.append(False)
     df['relative_risk_values'] = relative_risk_values
     df['confidence_interval'] = confidence_interval
+    df['confidence_interval_bon'] = confidence_interval_bon
     df['one_in_interval'] = one_in_interval
     df['list_values_RR'] = list_values_RR
     return df
