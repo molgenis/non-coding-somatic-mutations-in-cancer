@@ -143,6 +143,7 @@ def calculate_relative_risk(S_C, df):
     confidence_interval = list()
     confidence_interval_bon = list()
     one_in_interval = list()
+    one_in_interval_bon = list()
     list_values_RR = list()
     for index, value in enumerate(S_C):
         result = relative_risk(value[0], (value[0] + value[2]), value[1], (value[1] + value[3]))
@@ -150,17 +151,24 @@ def calculate_relative_risk(S_C, df):
         relative_risk_values.append(result.relative_risk)
         con_interval = result.confidence_interval(confidence_level=0.95)
         confidence_interval.append(f'{con_interval[0]}-{con_interval[1]}')
+        if con_interval[0] < 1 and con_interval[1] > 1:
+            one_in_interval.append(False)
+        else:
+            one_in_interval.append(True)
+
         con_interval_bon = result.confidence_interval(confidence_level=1-(0.05/len(df)))
         confidence_interval_bon.append(f'{con_interval_bon[0]}-{con_interval_bon[1]}')
-
-        if con_interval[0] < 1 and con_interval[1] > 1:
-            one_in_interval.append(True) # TODO
+        if con_interval_bon[0] < 1 and con_interval_bon[1] > 1:
+            one_in_interval_bon.append(False)
         else:
-            one_in_interval.append(False)
+            one_in_interval_bon.append(True)
+
+        
     df['relative_risk_values'] = relative_risk_values
-    df['confidence_interval'] = confidence_interval
-    df['confidence_interval_bon'] = confidence_interval_bon
+    df['confidence_interval'] = confidence_interval    
     df['one_in_interval'] = one_in_interval
+    df['confidence_interval_bon'] = confidence_interval_bon
+    df['one_in_interval_bon'] = one_in_interval_bon
     df['list_values_RR'] = list_values_RR
     return df
     
