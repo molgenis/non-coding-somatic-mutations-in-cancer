@@ -54,7 +54,7 @@ Uses:
 __title__ = "Calculate the overlap between SNPs and regulatory regions" 
 __author__ = "Tijs van Lieshout"
 __created__ = "2022-04-25"
-__updated__ = "2022-05-31"
+__updated__ = "2022-06-01"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
 __version__ = 1.4
