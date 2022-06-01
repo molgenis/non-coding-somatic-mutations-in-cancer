@@ -49,7 +49,7 @@ def prep_file(path_file, path_save, type_data):
     df_b_nb.to_csv(f"{path_save}b_nb_{type_data}.tsv", sep='\t', encoding='utf-8', index=False)
     return df_b_nb
 
-def run_all(type_data, path_db, path_save):
+def run_all(type_data, path_db, path_save, select_chrom, i):
     filter_par = False
    
     path_file = f"{path_save}{type_data}_chrALL_num_snps.tsv"
@@ -59,17 +59,19 @@ def run_all(type_data, path_db, path_save):
     print(df_b_nb.head())
     print(set(df_b_nb['counts_breast']))
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_save, path_db)
-    tests_df_all = tests.all_test(df_b_nb, all_num_donor_b, all_num_donor_nb, 'NonCoding', f'{type_data}', path_save)
+    tests_df_all = tests.all_test(df_b_nb, all_num_donor_b, all_num_donor_nb, 'NonCoding', f'{type_data}', path_save, select_chrom, i)
 
     noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
-    tests_df_NC = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_NC', f'{type_data}', path_save)
+    tests_df_NC = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_NC', f'{type_data}', path_save, select_chrom, i)
 
 def main():
     config = get_config('gearshift')
     path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
     path_save = config['analyse'] #'D:/Hanze_Groningen/STAGE/UMAP/'
     type_data = 'TFBS'
-    run_all(type_data, path_db, path_save)
+    select_chrom = 'chr0'
+    i = '0'
+    run_all(type_data, path_db, path_save, select_chrom, i)
 
 
 

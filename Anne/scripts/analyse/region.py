@@ -58,38 +58,40 @@ def make_df_2000(merge_df):
 
 
 
-def all_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
+def all_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom, i):
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
     merge_df = make_merge_df(path_R_b, path_R_nb)
-    df_1000_tests = tests.all_test(merge_df, all_snps_b, all_snps_nb, 'ALL', 'Region_1000', path_file)
+    df_1000_tests = tests.all_test(merge_df, all_snps_b, all_snps_nb, 'ALL', 'Region_1000', path_file, select_chrom, i)
     df_2000 = make_df_2000(merge_df)
-    df_2000_tests = tests.all_test(df_2000, all_snps_b, all_snps_nb, 'ALL', 'Region_2000', path_file)
+    df_2000_tests = tests.all_test(df_2000, all_snps_b, all_snps_nb, 'ALL', 'Region_2000', path_file, select_chrom, i)
 
 
-def noncoding_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
+def noncoding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom, i):
     noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
     nc_merge_df = make_merge_df(path_R_b, path_R_nb)
-    nc_df_1000_tests = tests.all_test(nc_merge_df, all_snps_b, all_snps_nb, 'NonCoding', 'Region_1000', path_file)
+    nc_df_1000_tests = tests.all_test(nc_merge_df, all_snps_b, all_snps_nb, 'NonCoding', 'Region_1000', path_file, select_chrom, i)
     nc_df_2000 = make_df_2000(nc_merge_df)
-    nc_df_2000_tests = tests.all_test(nc_df_2000, all_snps_b, all_snps_nb, 'NonCoding', 'Region_2000', path_file)
+    nc_df_2000_tests = tests.all_test(nc_df_2000, all_snps_b, all_snps_nb, 'NonCoding', 'Region_2000', path_file, select_chrom, i)
 
-def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
+def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom, i):
     coding_breast, coding_nonbreast, coding_num_donor_b, coding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
     c_merge_df = make_merge_df(path_R_b, path_R_nb)
-    c_df_1000_tests = tests.all_test(c_merge_df, all_snps_b, all_snps_nb, 'Coding', 'Region_1000', path_file)
+    c_df_1000_tests = tests.all_test(c_merge_df, all_snps_b, all_snps_nb, 'Coding', 'Region_1000', path_file, select_chrom, i)
     c_df_2000 = make_df_2000(c_merge_df)
-    c_df_2000_tests = tests.all_test(c_df_2000, all_snps_b, all_snps_nb, 'Coding', 'Region_2000', path_file)
+    c_df_2000_tests = tests.all_test(c_df_2000, all_snps_b, all_snps_nb, 'Coding', 'Region_2000', path_file, select_chrom, i)
 
 
 def main():
-    path_R = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/'
-    config = get_config('gearshift')
+    config = get_config('calculon')
+    path_R = config['path_R']
     path_db = ''
     path_file = config['analyse'] 
     filter_par = False
-    all_data(filter_par, path_file, path_db, f"{path_R}all_breast_ALL.tsv", f"{path_R}all_nonbreast_ALL.tsv")
-    noncoding_data(filter_par, path_file, path_db, f"{path_R}noncoding_breast_ALL.tsv", f"{path_R}noncoding_nonbreast_ALL.tsv")
-    coding_data(filter_par, path_file, path_db, f"{path_R}coding_breast_ALL.tsv", f"{path_R}coding_nonbreast_ALL.tsv")
+    select_chrom = 'chr0'
+    i = '0'
+    all_data(filter_par, path_file, path_db, f"{path_R}all_breast_ALL.tsv", f"{path_R}all_nonbreast_ALL.tsv", select_chrom, i)
+    noncoding_data(filter_par, path_file, path_db, f"{path_R}noncoding_breast_ALL.tsv", f"{path_R}noncoding_nonbreast_ALL.tsv", select_chrom, i)
+    coding_data(filter_par, path_file, path_db, f"{path_R}coding_breast_ALL.tsv", f"{path_R}coding_nonbreast_ALL.tsv", select_chrom, i)
     
 if __name__ == '__main__':
     main()
