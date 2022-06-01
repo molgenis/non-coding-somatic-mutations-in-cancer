@@ -3,7 +3,7 @@ import sys
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
-config = get_config()
+config = get_config('gearshift')
 gene_path = config['all_genes'] #'D:/Hanze_Groningen/STAGE/db/all_genes_new - kopie.tsv'
 gene_df = pd.read_csv(gene_path, sep='\t')
 print(gene_df.columns)

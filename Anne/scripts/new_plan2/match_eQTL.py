@@ -25,7 +25,7 @@ def compare_eQTL_files(df_eQTL, df_strong_eQTL, config):
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     # Path to all significant eQTLs
     path_eQTL = config['all_sig_eqtl']
     # Read file

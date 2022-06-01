@@ -59,7 +59,7 @@ def run_all(type_bef_aft, path_db, path_save):
     tests_df = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_Coding', f'{type_bef_aft}Gene', path_save)
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     path_db = '' #'D:/Hanze_Groningen/STAGE/db_laatste_copy.db' #config['database']
     path_save = config['analyse'] #'D:/Hanze_Groningen/STAGE/UMAP/'
     type_bef_aft = 'before'

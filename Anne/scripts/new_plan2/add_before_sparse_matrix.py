@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-from Database import Database
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
 import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
@@ -39,7 +40,7 @@ def merge_sparce_matrix(save_path, whole_numpy_array):
               compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     # Path of the database
     path_db = config['database']
     # Database connection

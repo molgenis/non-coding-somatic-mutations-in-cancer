@@ -86,7 +86,7 @@ def main():
 
     :return:
     """
-    config = get_config()
+    config = get_config('gearshift')
     # the path to the file
     path_file = config['sample_file']
     # Main path to where the file will be saved

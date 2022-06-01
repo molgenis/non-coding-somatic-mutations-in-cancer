@@ -1,6 +1,7 @@
-from Database import Database
 import pandas as pd
 import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
@@ -43,7 +44,7 @@ def set_value(db, row, name_variant):
     
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     #
     path_db = config['database']  #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
     # Database connection

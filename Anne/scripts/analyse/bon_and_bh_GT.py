@@ -1,10 +1,11 @@
 import pandas as pd
 import numpy as np
 from statsmodels.sandbox.stats.multicomp import multipletests
-from Database import Database
 import search_close_gene as search_close_gene
 import bon_and_bh_calculate as bon_and_bh_calculate
 import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
@@ -63,7 +64,7 @@ def run_all_corrections(path_analyse, type_file, non_coding):
     
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     path_analyse = config['analyse_new']
 
     # per_snp

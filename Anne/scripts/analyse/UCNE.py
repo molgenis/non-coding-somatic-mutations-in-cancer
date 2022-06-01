@@ -66,7 +66,7 @@ def run_all(type_data, path_db, path_save):
     tests_df_NC = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_NC', f'{type_data}', path_save)
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
     path_save = config['analyse'] #config['analyse'] #'D:/Hanze_Groningen/STAGE/UMAP/'
     type_data = 'UCNE'

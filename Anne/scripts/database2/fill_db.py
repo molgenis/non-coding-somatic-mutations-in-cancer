@@ -5,6 +5,7 @@ import sys
 import math # nan
 import numpy as np
 
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
@@ -239,7 +240,7 @@ def fill_tissue(specimen_df, db):
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     # Path to file with project ID and kind of cancer
     site_path = config['site'] # "E:/STAGE/Site/site.csv"
     site_df = pd.read_csv(site_path, sep=';')

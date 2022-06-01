@@ -1,14 +1,6 @@
-# from Database import Database
 import pandas as pd
 from collections import Counter
-# # Python program to create
-# # sparse matrix using csr_matrix()
-# # Import required package
-# import numpy as np
-# from scipy.sparse import csr_matrix
-# from multiprocessing import Pool, Queue
-# import multiprocessing as mp
-# import math 
+
 
 
 def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_list, gene_name_list, sparse_matrix_region,

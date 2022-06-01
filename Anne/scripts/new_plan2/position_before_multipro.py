@@ -1,4 +1,3 @@
-from Database import Database
 import pandas as pd
 from collections import Counter
 # Python program to create
@@ -8,10 +7,12 @@ import numpy as np
 from scipy.sparse import csr_matrix
 # from matplotlib import pyplot as plt
 from search_snps_between import close_to, write_sparse_matrix
-import sys
 from multiprocessing import Pool, Queue
 import multiprocessing as mp
 
+import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
@@ -113,7 +114,7 @@ def loop_over_genes(config, gene_df, position_out_gene, position_in_gene, donor_
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     # Path of the database
     path_db = config['database'] #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" 
     # Database connection

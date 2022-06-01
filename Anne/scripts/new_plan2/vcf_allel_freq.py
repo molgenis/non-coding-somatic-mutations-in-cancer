@@ -38,7 +38,7 @@ def calculate_all_freq(df, all_freq_path, all_freq_vcf):
     
 
 def main():    
-    config = get_config()
+    config = get_config('gearshift')
     path = config['vcf_path'] 
     path_files = f"{path}*.vcf.gz"
     # Loop over all files in path that ends with .tsv

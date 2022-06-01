@@ -1,4 +1,3 @@
-from Database import Database
 import sys
 # import multiprocessing as mp
 import pandas as pd
@@ -14,6 +13,8 @@ import scipy.stats as stats
 from scipy.stats import mannwhitneyu
 from scipy.stats import chi2_contingency
 from scipy.stats import uniform, randint
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
@@ -151,7 +152,7 @@ def get_coding_data(filter_par, path_file, path_db):
     return coding_breast, coding_nonbreast, num_donor_b, num_donor_nb, len(coding_breast), len(coding_nonbreast)
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     path_file = config['analyse']
     path_db = config['database_get_data']
     df_whole = get_data_db(True, path_file, path_db)

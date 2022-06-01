@@ -1,4 +1,3 @@
-from Database import Database
 import pandas as pd
 from collections import Counter
 # Python program to create
@@ -10,6 +9,8 @@ from multiprocessing import Pool, Queue
 import multiprocessing as mp
 import math
 import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
@@ -291,7 +292,7 @@ def split_dict(d, n, chr_length):
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     # Path of the database
     path_db = config['database'] 
     # Database connection

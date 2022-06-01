@@ -2,7 +2,9 @@ import sys
 # import multiprocessing as mp
 import pandas as pd
 import numpy as np
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+# sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+sys.path.append('/groups/umcg-wijmenga/tmp04/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
 from config import get_config
 from multiprocessing import Pool
 import multiprocessing as mp
@@ -75,7 +77,7 @@ def run_all(type_data, path_db, path_save, select_chrom):
 
 
 def main():
-    config = get_config()
+    config = get_config('calculon')
     path_db = '' #'D:/Hanze_Groningen/STAGE/lastdb/db_laatste_copy.db' #config['database']
     path_save = config['analyse'] #config['analyse'] #'D:/Hanze_Groningen/STAGE/UMAP/'
     type_data = 'UCNE'

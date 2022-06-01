@@ -75,7 +75,7 @@ def run_all_corrections(path_analyse, type_file, non_coding, with_gene, path_sea
     
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     path_analyse = config['analyse_new'] #'D:/Hanze_Groningen/STAGE/analyse/new/' #config['analyse_new']
     path_snp_ids = config['layers'] #config['layers'] #'D:/Hanze_Groningen/STAGE/lagen/'
     with_gene = False

@@ -5,13 +5,14 @@ import sys
 import math # nan
 import numpy as np
 
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     # Make Database object
     db = Database(config['database']) #'/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db'
     projectset = set()

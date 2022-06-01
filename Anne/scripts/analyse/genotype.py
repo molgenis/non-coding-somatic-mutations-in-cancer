@@ -96,7 +96,7 @@ def coding_data(filter_par, path_file, path_db):
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     path_db = '' 
     path_file = config['analyse'] #config['analyse'] 'D:/Hanze_Groningen/STAGE/lastdb/'
     filter_par = False

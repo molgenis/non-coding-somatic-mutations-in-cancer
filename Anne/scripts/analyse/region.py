@@ -83,7 +83,7 @@ def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb):
 
 def main():
     path_R = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/'
-    config = get_config()
+    config = get_config('gearshift')
     path_db = ''
     path_file = config['analyse'] 
     filter_par = False

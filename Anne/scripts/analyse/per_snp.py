@@ -86,7 +86,7 @@ def coding_data(filter_par, path_file, path_db):
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     path_db = '' #config['database']
     path_file = config['analyse']
     filter_par = False

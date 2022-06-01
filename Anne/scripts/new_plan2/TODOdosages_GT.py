@@ -1,5 +1,6 @@
-from Database import Database
 import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 import matplotlib.pyplot as plt
 import seaborn as sns
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
@@ -289,7 +290,7 @@ def get_min_max_snpID(db):
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     # Path of the database
     path_db = config['database'] #"D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db" 
     # Database connection

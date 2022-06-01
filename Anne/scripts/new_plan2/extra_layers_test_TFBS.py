@@ -1,8 +1,9 @@
-from Database import Database
 import pandas as pd
 from multiprocessing import Pool
 import multiprocessing as mp
 import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 from collections import Counter
@@ -32,7 +33,7 @@ def layer_run(df_variant, name_variant, df, path_save):
 
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     path_db = config['database_TFBS']  #"/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydb_L.db"  # /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/new_db/copydatabase_C.db
     # Database connection
     db = Database(path_db)

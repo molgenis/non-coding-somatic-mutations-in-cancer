@@ -4,9 +4,8 @@ import os
 
 # Also takes the folder 1 higher, so that I can do the import after
 # sys.path.append("..")
-sys.path.append(
-    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
-from database.Database import Database
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
@@ -80,7 +79,7 @@ def main():
     """
 
     """
-    config = get_config()
+    config = get_config('gearshift')
     # Path to database
     path_db = "D:/Hanze_Groningen/STAGE/TEST_DEL/test3.db"
     # Path to where the plots should be saved

@@ -2,7 +2,9 @@ import sys
 # import multiprocessing as mp
 import pandas as pd
 import numpy as np
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+# sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+sys.path.append('/groups/umcg-wijmenga/tmp04/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
 from config import get_config
 from multiprocessing import Pool
 import multiprocessing as mp
@@ -97,7 +99,7 @@ def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chro
 
 
 def main():
-    config = get_config()
+    config = get_config('calculon')
     path_R = config['path_R']
     path_db = ''
     path_file = config['analyse'] 

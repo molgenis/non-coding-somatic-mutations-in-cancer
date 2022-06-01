@@ -1,8 +1,9 @@
-from Database import Database
 import pandas as pd
 from multiprocessing import Pool
 import multiprocessing as mp
 import sys
+sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 from collections import Counter
@@ -153,7 +154,7 @@ def make_file_extra_layers(df_variant, chr, name_variant, path_db, config, donor
     
 
 def main():
-    config = get_config()
+    config = get_config('gearshift')
     #
     path_db = config['database_UCNE'] #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
     # Database connection

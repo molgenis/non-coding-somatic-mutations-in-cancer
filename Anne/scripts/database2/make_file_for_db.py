@@ -70,7 +70,7 @@ def main():
     """
 
     """
-    config = get_config()
+    config = get_config('gearshift')
     # The path to the data
     path = config['cancer_data_path']
     # The path where the new data should be stored
