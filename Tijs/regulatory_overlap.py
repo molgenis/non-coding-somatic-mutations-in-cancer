@@ -72,6 +72,7 @@ from matplotlib import pyplot as plt
 from matplotlib_venn import venn2_unweighted, venn2_circles
 from textwrap import wrap
 from scipy.stats import chi2_contingency
+import statsmodels.api as sm
 
 from utilities import preprocess_bed_file
 
@@ -92,12 +93,22 @@ def main(args):
 
   if args.ExpressionFile:
     snps_df = add_mean_gene_expression(snps_bed.to_dataframe(), args.ExpressionFile)
+    
+    contingency_df = pd.DataFrame()
     for q in np.sort(pd.unique(snps_df['quantile'])):
       subset_df = snps_df[snps_df['quantile'] == q]
       print(q)
       subset_bed = bt.from_dataframe(subset_df[['chrom', 'start', 'end']]).sort()
       overlap, jaccard = compute_jaccard(subset_bed, reg_bed)
       print('\n')
+
+      n_overlap = jaccard['n_intersections']
+      n_no_overlap = len(subset_bed) - jaccard['n_intersections']
+      contingency_df[q] = [n_overlap, n_no_overlap]
+    
+    contingency_table = sm.stats.Table(contingency_df.values)
+    CA_pvalue = contingency_table.test_ordinal_association().pvalue
+    print(f"CA trend test p-value: {CA_pvalue:.2e}")
     return
 
   overlap, jaccard = compute_jaccard(snps_bed, reg_bed)
