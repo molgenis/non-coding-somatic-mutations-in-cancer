@@ -142,8 +142,10 @@ def calculate_relative_risk(S_C, df):
     relative_risk_values = list()
     confidence_interval = list()
     one_in_interval = list()
+    list_values_RR = list()
     for index, value in enumerate(S_C):
         result = relative_risk(value[0], (value[0] + value[2]), value[1], (value[1] + value[3]))
+        list_values_RR.append([value[0], (value[0] + value[2]), value[1], (value[1] + value[3])])
         relative_risk_values.append(result.relative_risk)
         con_interval = result.confidence_interval(confidence_level=0.95)
         confidence_interval.append(f'{con_interval[0]}-{con_interval[1]}')
@@ -154,6 +156,7 @@ def calculate_relative_risk(S_C, df):
     df['relative_risk_values'] = relative_risk_values
     df['confidence_interval'] = confidence_interval
     df['one_in_interval'] = one_in_interval
+    df['list_values_RR'] = list_values_RR
     return df
     
     
