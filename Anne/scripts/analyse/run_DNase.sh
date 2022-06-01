@@ -3,7 +3,7 @@
 #SBATCH --job-name=DNase_test
 #SBATCH --output=DNase_test.out
 #SBATCH --error=DNase_test.err
-#SBATCH --time=160:59:59
+#SBATCH --time=20:59:59
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=96gb
 #SBATCH --nodes=1

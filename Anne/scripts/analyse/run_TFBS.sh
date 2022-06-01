@@ -3,7 +3,7 @@
 #SBATCH --job-name=TFBS_test
 #SBATCH --output=TFBS_test.out
 #SBATCH --error=TFBS_test.err
-#SBATCH --time=160:59:59
+#SBATCH --time=20:59:59
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
