@@ -35,7 +35,7 @@ __created__ = "2022-06-01"
 __updated__ = "2022-06-01"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
-__version__ = 0.1
+__version__ = 1.0
 __license__ = "GPLv3"
 __description__ = f"""{__title__} is a python script created on {__created__} by {__author__}.
                       Last update (version {__version__}) was on {__updated__} by {__maintainer__}.
@@ -46,6 +46,7 @@ import argparse
 
 import pandas as pd
 from pybedtools import BedTool as bt
+import numpy as np
 
 
 def main(args):
@@ -57,6 +58,9 @@ def main(args):
   df = df[['chromosome_name', 'chromosome_position']].dropna()
   df['chromosome_position'] = df['chromosome_position'].astype(int)
   df['chromEnd'] = df['chromosome_position'] + 1
+  df[df.columns[0]] = np.where(df[df.columns[0]].str.contains("chr"), 
+                               df[df.columns[0]], 
+                               'chr' + df[df.columns[0]])
   output_bt = bt.from_dataframe(df.rename(columns={'chromosome_name': '#chrom', 'chromosome_position': 'chromStart',}),
                                           header=True)
   output_bt.sort().saveas(args.outputPath)

@@ -10,6 +10,7 @@ __author__ = "Tijs van Lieshout"
 # Imports
 import argparse
 
+import numpy as np
 from pybedtools import BedTool as bt
 import pandas as pd
 from tqdm import tqdm
@@ -36,7 +37,7 @@ def convert_txt2bed(input_path, output_path, output_minimal, sort_lexo, isContro
     minimal_df = pd.DataFrame()
     minimal_df['chrom'] = input_df['SNPChr']
     minimal_df['chromStart'] = input_df['SNPPos']
-    minimal_df['chromEnd'] = input_df['SNPPos']
+    minimal_df['chromEnd'] = input_df['SNPPos'] + 1
     minimal_df['name'] = input_df['SNP']
 
     # sorting is required for many bedtools steps
@@ -48,6 +49,9 @@ def convert_txt2bed(input_path, output_path, output_minimal, sort_lexo, isContro
       minimal_df['chrom'] = 'chr'+minimal_df['chrom'].astype(str)
 
     minimal_df = minimal_df.drop_duplicates()
+    minimal_df[minimal_df.columns[0]] = np.where(minimal_df[minimal_df.columns[0]].str.contains("chr"), 
+                                                 minimal_df[minimal_df.columns[0]], 
+                                                 'chr' + minimal_df[minimal_df.columns[0]])
     input_bt = bt.from_dataframe(minimal_df.rename(columns={'chrom': '#chrom'}), header=True)
 
   else:
