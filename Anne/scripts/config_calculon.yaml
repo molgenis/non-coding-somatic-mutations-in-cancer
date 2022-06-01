@@ -32,6 +32,7 @@ panel_of_normals: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/P
 path_genoom: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/'
 pipeline_path: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/pipeline/'
 pipeline_jobs: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/pipeline/jobs/'
+path_R: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/'
 sample_file: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/EGAD00001000292_metadata/delimited_maps/Sample_File.map'
 sample_folder: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/'
 save_extra_layers: '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/genes_eQTL_etc/{name_variant}_num_snps.tsv'

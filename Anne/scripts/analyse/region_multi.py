@@ -1,20 +1,11 @@
 import sys
 # import multiprocessing as mp
 import pandas as pd
-from collections import Counter
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from scipy.stats.distributions import chi2
-from scipy.stats import fisher_exact
-import time
-from scipy.special import factorial
-import scipy.stats as stats
-from scipy.stats import mannwhitneyu
-from scipy.stats import chi2_contingency
-from scipy.stats import uniform, randint
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
+from multiprocessing import Pool
+import multiprocessing as mp
 
 import get_data as get_data
 import tests as tests
@@ -59,33 +50,55 @@ def make_df_2000(merge_df):
     return df
 
 
+def multiprocess(df, all_snps_b, all_snps_nb, type_df, type_analyse, path_file, select_chrom):
+    parts_df_b_nb = np.array_split(df, 20)
+    cpus = mp.cpu_count()
+
+    arg_multi_list = []
+    for i, df_part in enumerate(parts_df_b_nb):
+        arg_multi_list.append((df_part, all_snps_b, all_snps_nb, type_df, type_analyse, path_file, select_chrom))
+
+    pool = Pool(processes=cpus)
+    pool.starmap(func=tests.all_test, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
+
 
 def all_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom):
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
     merge_df = make_merge_df(path_R_b, path_R_nb, select_chrom)
-    df_1000_tests = tests.all_test(merge_df, all_snps_b, all_snps_nb, 'ALL', 'Region_1000', path_file, select_chrom)
+    # df_1000_tests = tests.all_test(merge_df, all_snps_b, all_snps_nb, 'ALL', 'Region_1000', path_file, select_chrom)
+    multiprocess(merge_df, all_snps_b, all_snps_nb, 'ALL', 'Region_1000', path_file, select_chrom)
     df_2000 = make_df_2000(merge_df)
-    df_2000_tests = tests.all_test(df_2000, all_snps_b, all_snps_nb, 'ALL', 'Region_2000', path_file, select_chrom)
+    # df_2000_tests = tests.all_test(df_2000, all_snps_b, all_snps_nb, 'ALL', 'Region_2000', path_file, select_chrom)
+    multiprocess(df_2000, all_snps_b, all_snps_nb, 'ALL', 'Region_2000', path_file, select_chrom)
+
 
 
 def noncoding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom):
     noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
     nc_merge_df = make_merge_df(path_R_b, path_R_nb, select_chrom)
-    nc_df_1000_tests = tests.all_test(nc_merge_df, all_snps_b, all_snps_nb, 'NonCoding', 'Region_1000', path_file, select_chrom)
+    # nc_df_1000_tests = tests.all_test(nc_merge_df, all_snps_b, all_snps_nb, 'NonCoding', 'Region_1000', path_file, select_chrom)
+    multiprocess(nc_merge_df, all_snps_b, all_snps_nb, 'NonCoding', 'Region_1000', path_file, select_chrom)
     nc_df_2000 = make_df_2000(nc_merge_df)
-    nc_df_2000_tests = tests.all_test(nc_df_2000, all_snps_b, all_snps_nb, 'NonCoding', 'Region_2000', path_file, select_chrom)
+    # nc_df_2000_tests = tests.all_test(nc_df_2000, all_snps_b, all_snps_nb, 'NonCoding', 'Region_2000', path_file, select_chrom)
+    multiprocess(nc_df_2000, all_snps_b, all_snps_nb, 'NonCoding', 'Region_2000', path_file, select_chrom)
+
 
 def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom):
     coding_breast, coding_nonbreast, coding_num_donor_b, coding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
     c_merge_df = make_merge_df(path_R_b, path_R_nb, select_chrom)
-    c_df_1000_tests = tests.all_test(c_merge_df, all_snps_b, all_snps_nb, 'Coding', 'Region_1000', path_file, select_chrom)
+    # c_df_1000_tests = tests.all_test(c_merge_df, all_snps_b, all_snps_nb, 'Coding', 'Region_1000', path_file, select_chrom)
+    multiprocess(c_merge_df, all_snps_b, all_snps_nb, 'Coding', 'Region_1000', path_file, select_chrom)
     c_df_2000 = make_df_2000(c_merge_df)
-    c_df_2000_tests = tests.all_test(c_df_2000, all_snps_b, all_snps_nb, 'Coding', 'Region_2000', path_file, select_chrom)
+    # c_df_2000_tests = tests.all_test(c_df_2000, all_snps_b, all_snps_nb, 'Coding', 'Region_2000', path_file, select_chrom)
+    multiprocess(c_df_2000, all_snps_b, all_snps_nb, 'Coding', 'Region_2000', path_file, select_chrom)
+
 
 
 def main():
-    path_R = '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/cancer_data/analyse/R/'
     config = get_config()
+    path_R = config['path_R']
     path_db = ''
     path_file = config['analyse'] 
     filter_par = False

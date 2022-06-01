@@ -2,21 +2,11 @@ import sys
 # import multiprocessing as mp
 import pandas as pd
 from collections import Counter
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from scipy.stats.distributions import chi2
-from bioinfokit import analys, visuz
-from scipy.stats import fisher_exact
-import time
-from scipy.special import factorial
-import scipy.stats as stats
-from scipy.stats import mannwhitneyu
-from fisher import pvalue_npy
-from scipy.stats import chi2_contingency
-from scipy.stats import uniform, randint
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
+from multiprocessing import Pool
+import multiprocessing as mp
 
 import get_data as get_data
 import tests as tests
@@ -59,30 +49,45 @@ def run_snp_tests(df_breast, df_nonbreast, type_df, type_analyse, path_file, sel
     sort_snp_count_both_0 = sort_snp_count_both.fillna(0)
     sort_snp_count_both_0.to_csv(f"{path_file}{type_analyse}_{type_df}_both_0_{select_chrom}.tsv", sep='\t', encoding='utf-8', index=False)
     
-    sort_snp_count_both_0 = tests.all_test(sort_snp_count_both_0, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, select_chrom)
-    return sort_snp_count_both_0, num_donor_b, num_donor_nb
+    # sort_snp_count_both_0 = tests.all_test(sort_snp_count_both_0, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, select_chrom)
+    # return sort_snp_count_both_0, num_donor_b, num_donor_nb
+    parts_df_b_nb = np.array_split(sort_snp_count_both_0, 20)
+    cpus = mp.cpu_count()
+
+    arg_multi_list = []
+    for i, df_part in enumerate(parts_df_b_nb):
+        arg_multi_list.append((df_part, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, select_chrom))
+
+
+    pool = Pool(processes=cpus)
+    pool.starmap(func=tests.all_test, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
+
+
+
 
 
 def all_data(filter_par, path_file, path_db, select_chrom):    
     all_breast, all_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
 
-    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = run_snp_tests(all_breast, all_nonbreast, 'ALL', 'per_snp', path_file, select_chrom)
-    return sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb
+    run_snp_tests(all_breast, all_nonbreast, 'ALL', 'per_snp', path_file, select_chrom)
+    # return sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb
 
 
 
 def noncoding_data(filter_par, path_file, path_db, select_chrom):
     noncoding_breast, noncoding_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
 
-    sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = run_snp_tests(noncoding_breast, noncoding_nonbreast, 'NonCoding', 'per_snp', path_file, select_chrom)
-    return sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb
+    run_snp_tests(noncoding_breast, noncoding_nonbreast, 'NonCoding', 'per_snp', path_file, select_chrom)
+    # return sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb
 
 
 def coding_data(filter_par, path_file, path_db, select_chrom):
     coding_breast, coding_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
 
-    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = run_snp_tests(coding_breast, coding_nonbreast, 'Coding', 'per_snp', path_file, select_chrom)
-    return sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb
+    run_snp_tests(coding_breast, coding_nonbreast, 'Coding', 'per_snp', path_file, select_chrom)
+    # return sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb
 
 
 
@@ -92,9 +97,9 @@ def main():
     path_file = config['analyse']
     filter_par = False
     select_chrom = sys.argv[1].replace('chr', '')
-    sort_snp_count_all_both_0, all_num_donor_b, all_num_donor_nb = all_data(filter_par, path_file, path_db, select_chrom)
-    sort_snp_count_noncoding_both_0, noncoding_num_donor_b, noncoding_num_donor_nb = noncoding_data(filter_par, path_file, path_db, select_chrom)
-    sort_snp_count_coding_both_0, coding_num_donor_b, coding_num_donor_nb = coding_data(filter_par, path_file, path_db, select_chrom)
+    all_data(filter_par, path_file, path_db, select_chrom)
+    noncoding_data(filter_par, path_file, path_db, select_chrom)
+    coding_data(filter_par, path_file, path_db, select_chrom)
 
 if __name__ == '__main__':
     main()

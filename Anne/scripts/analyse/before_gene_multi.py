@@ -1,21 +1,10 @@
 import sys
 # import multiprocessing as mp
 import pandas as pd
-from collections import Counter
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from scipy.stats.distributions import chi2
-from scipy.stats import fisher_exact
-import time
-from scipy.special import factorial
-import scipy.stats as stats
-from scipy.stats import mannwhitneyu
-from scipy.stats import chi2_contingency
-from scipy.stats import uniform, randint
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
-from multiprocessing import Pool, Queue
+from multiprocessing import Pool
 import multiprocessing as mp
 
 import ast
@@ -59,23 +48,27 @@ def run_all(type_bef_aft, path_db, path_save, select_chrom):
 
     df_b_nb = prep_file(path_file, path_save, type_bef_aft, select_chrom)
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_save, path_db)
+    noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, nc_snps_b, nc_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
 
-    # parts_df_b_nb = np.array_split(df_b_nb, 20)
-    # cpus = mp.cpu_count()
+    parts_df_b_nb = np.array_split(df_b_nb, 20)
+    cpus = mp.cpu_count()
 
-    # arg_multi_list = []
-    # for i, df_part in enumerate(parts_df_b_nb):
-    #     arg_multi_list.append((df_part, all_snps_b, all_snps_nb, 'NonCoding_Coding', f'{type_bef_aft}Gene', path_save, select_chrom))
-
-    # pool = Pool(processes=cpus)
-    # pool.starmap(func=tests.all_test, iterable=arg_multi_list)
-    # pool.close()
-    # pool.join()
-    tests_df = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_Coding', f'{type_bef_aft}Gene', path_save, select_chrom)
+    arg_multi_list = []
+    for i, df_part in enumerate(parts_df_b_nb):
+        arg_multi_list.append((df_part, all_snps_b, all_snps_nb, 'NonCoding_Coding', f'{type_bef_aft}Gene', path_save, select_chrom, i))
+        arg_multi_list.append((df_part, nc_snps_b, nc_snps_nb, 'NonCoding_Coding_NC', f'{type_bef_aft}Gene', path_save, select_chrom, i))
 
 
-    noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
-    tests_df_NC = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_Coding_NC', f'{type_bef_aft}Gene', path_save, select_chrom)
+    pool = Pool(processes=cpus)
+    pool.starmap(func=tests.all_test, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
+    
+    
+    # tests_df = tests.all_test(df_b_nb, all_snps_b, all_snps_nb, 'NonCoding_Coding', f'{type_bef_aft}Gene', path_save, select_chrom)
+
+    
+    # tests_df_NC = tests.all_test(df_b_nb, nc_snps_b, nc_snps_nb, 'NonCoding_Coding_NC', f'{type_bef_aft}Gene', path_save, select_chrom)
 
 def main():
     config = get_config()

@@ -1,21 +1,12 @@
 import sys
 # import multiprocessing as mp
 import pandas as pd
-from collections import Counter
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from scipy.stats.distributions import chi2
-from scipy.stats import fisher_exact
-import time
-from scipy.special import factorial
-import scipy.stats as stats
-from scipy.stats import mannwhitneyu
-from scipy.stats import chi2_contingency
-from scipy.stats import uniform, randint
 import statsmodels.api as sm
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
+from multiprocessing import Pool
+import multiprocessing as mp
 
 import get_data as get_data
 
@@ -33,7 +24,7 @@ def make_GT_df(df, type_c, num_donors, select_chrom):
     GT_df_0 = GT_df_0[GT_df_0['chr'] == select_chrom]
     return GT_df_0
 
-def cochran_armitage(both_GT, path_file, type_df, select_chrom):
+def cochran_armitage(both_GT, path_file, type_df, select_chrom, i):
     both_GT.reset_index(inplace=True)
     p_value_cochran_armitage = list()
     for index, row in both_GT.iterrows():
@@ -46,8 +37,21 @@ def cochran_armitage(both_GT, path_file, type_df, select_chrom):
         print(p_value)
         p_value_cochran_armitage.append(p_value)
     both_GT['p_value_cochran_armitage'] = p_value_cochran_armitage
-    both_GT.to_csv(f"{path_file}GT_{type_df}_{select_chrom}_cochran_armitage.tsv", sep='\t', encoding='utf-8', index=False)
-    return both_GT
+    both_GT.to_csv(f"{path_file}GT_{type_df}_{select_chrom}_{i}_cochran_armitage.tsv", sep='\t', encoding='utf-8', index=False)
+    # return both_GT
+
+def multiprocess(df, path_file, group, select_chrom):
+    parts_df_b_nb = np.array_split(df, 20)
+    cpus = mp.cpu_count()
+
+    arg_multi_list = []
+    for i, df_part in enumerate(parts_df_b_nb):
+        arg_multi_list.append((df_part, path_file, group, select_chrom, i))
+
+    pool = Pool(processes=cpus)
+    pool.starmap(func=cochran_armitage, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
 
 
 def all_data(filter_par, path_file, path_db, select_chrom):
@@ -61,7 +65,10 @@ def all_data(filter_par, path_file, path_db, select_chrom):
     both_GT['GT_1_nb'].fillna(0,inplace=True)
     both_GT['GT_2_nb'].fillna(0,inplace=True)
     both_GT['GT_0_nb'].fillna(all_num_donor_nb,inplace=True)
-    both_GT = cochran_armitage(both_GT, path_file, 'ALL', select_chrom)
+    # both_GT = cochran_armitage(both_GT, path_file, 'ALL', select_chrom)
+    multiprocess(both_GT, path_file, 'ALL', select_chrom)
+
+    
 
 
 
@@ -76,7 +83,9 @@ def noncoding_data(filter_par, path_file, path_db, select_chrom):
     both_GT['GT_1_nb'].fillna(0,inplace=True)
     both_GT['GT_2_nb'].fillna(0,inplace=True)
     both_GT['GT_0_nb'].fillna(noncoding_num_donor_nb,inplace=True)       
-    both_GT = cochran_armitage(both_GT, path_file, 'NonCoding', select_chrom)
+    # both_GT = cochran_armitage(both_GT, path_file, 'NonCoding', select_chrom)
+    multiprocess(both_GT, path_file, 'NonCoding', select_chrom)
+
     
 
 
@@ -92,7 +101,9 @@ def coding_data(filter_par, path_file, path_db, select_chrom):
     both_GT['GT_1_nb'].fillna(0,inplace=True)
     both_GT['GT_2_nb'].fillna(0,inplace=True)
     both_GT['GT_0_nb'].fillna(coding_num_donor_nb,inplace=True)
-    both_GT = cochran_armitage(both_GT, path_file, 'Coding', select_chrom)
+    # both_GT = cochran_armitage(both_GT, path_file, 'Coding', select_chrom)
+    multiprocess(both_GT, path_file, 'Coding', select_chrom)
+
 
 
 
