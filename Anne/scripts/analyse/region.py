@@ -82,7 +82,7 @@ def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chro
 
 
 def main():
-    config = get_config('calculon')
+    config = get_config('gearshift')
     path_R = config['path_R']
     path_db = ''
     path_file = config['analyse'] 
