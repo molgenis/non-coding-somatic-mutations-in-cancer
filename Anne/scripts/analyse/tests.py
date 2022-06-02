@@ -146,7 +146,7 @@ def calculate_relative_risk(S_C, df):
     one_in_interval_bon = list()
     list_values_RR = list()
     for index, value in enumerate(S_C):
-        result = relative_risk(round(value[0]), round(value[0] + value[2]), round(value[1]), round(value[1] + value[3]))
+        result = relative_risk(int(round(value[0])), int(round(value[0] + value[2])), int(round(value[1])), int(round(value[1] + value[3])))
         list_values_RR.append([value[0], (value[0] + value[2]), value[1], (value[1] + value[3])])
         relative_risk_values.append(result.relative_risk)
         con_interval = result.confidence_interval(confidence_level=0.95)
@@ -205,6 +205,7 @@ def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, se
     df = log2_fc(df, n, S)
     df = fisher_test(S_C, df)
     df = log2_fc(df, n, S)
+    df.to_csv(f"{path_file}new/{type_analyse}_{type_df}_both_0_TESTS_{select_chrom}_{i}_NO_RR.tsv", sep='\t', encoding='utf-8', index=False)
     df = calculate_relative_risk(S_C, df)
     df.to_csv(f"{path_file}new/{type_analyse}_{type_df}_both_0_TESTS_{select_chrom}_{i}.tsv", sep='\t', encoding='utf-8', index=False)
     
