@@ -3,7 +3,7 @@
 #SBATCH --job-name=MTC_layers
 #SBATCH --output=MTC_layers.out
 #SBATCH --error=MTC_layers.err
-#SBATCH --time=20:59:59
+#SBATCH --time=40:59:59
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
