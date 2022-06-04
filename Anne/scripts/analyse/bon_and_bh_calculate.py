@@ -37,21 +37,29 @@ def benjamini_hochberg_correction(df, alpha, type_test):
     
 
 
-def get_significant(df, type_test):
-    df_select = df[['info', f'p_value_{type_test}', f'bonferroni_{type_test}', f'fdr_bh_{type_test}']]
-    print(f'---------{type_test}--------')
-    normal_p = df_select[df_select[f'p_value_{type_test}'] <= 0.05]
-    genes_sig = normal_p['info']
-    print(f'nomal: {len(genes_sig)}')
+def get_significant(df, type_test, alpha, RR):
+    if RR:
+        print(f'---------RR--------')
+        df_select = df[['info', f'{type_test}']]
+        RR_p = df_select[df_select[f'{type_test}'] == True]
+        RR_sig = RR_p['info']
+        print(f'RR: {len(RR_sig)}')
+        return RR_sig
+    else:
+        df_select = df[['info', f'p_value_{type_test}', f'bonferroni_{type_test}', f'check_bh_{type_test}']]
+        print(f'---------{type_test}--------')
+        normal_p = df_select[df_select[f'p_value_{type_test}'] <= alpha]
+        genes_sig = normal_p['info']
+        print(f'nomal: {len(genes_sig)}')
 
-    bon_p = df_select[df_select[f'bonferroni_{type_test}'] == True]
-    bon_sig = bon_p['info']
-    print(f'bonferroni: {len(bon_sig)}')
+        bon_p = df_select[df_select[f'bonferroni_{type_test}'] == True]
+        bon_sig = bon_p['info']
+        print(f'bonferroni: {len(bon_sig)}')
 
-    bh_p = df_select[df_select[f'fdr_bh_{type_test}'] == True]
-    bh_sig = bh_p['info']
-    print(f'fdr_bh: {len(bh_sig)}')
-    return genes_sig, bon_sig, bh_sig
+        bh_p = df_select[df_select[f'check_bh_{type_test}'] == True]
+        bh_sig = bh_p['info']
+        print(f'check_bh: {len(bh_sig)}')
+        return genes_sig, bon_sig, bh_sig
 
 
 def get_overlap(self_X2_df, X2_df, F_df):
@@ -116,8 +124,8 @@ def search(df_select, type_file, non_coding, path_analyse, GT, fc):
         df_select = benjamini_hochberg_correction(df_select, alpha, 'cochran_armitage')
         
         # df_select.to_csv(f"{path_analyse}{type_file}_{non_coding}_{fc}_MTC.tsv", sep='\t', encoding='utf-8', index=False)
-
-        cochran_armitage_sig_normal, cochran_armitage_bon_sig, cochran_armitage_bh_sig = get_significant(df_select, 'cochran_armitage', alpha)
+        RR = False
+        cochran_armitage_sig_normal, cochran_armitage_bon_sig, cochran_armitage_bh_sig = get_significant(df_select, 'cochran_armitage', alpha, RR)
         elements_snps_all_MTC = list(set.intersection(*map(set, [cochran_armitage_sig_normal, cochran_armitage_bon_sig, cochran_armitage_bh_sig])))
         return cochran_armitage_sig_normal, cochran_armitage_bon_sig, cochran_armitage_bh_sig, elements_snps_all_MTC
     else:
@@ -134,11 +142,14 @@ def search(df_select, type_file, non_coding, path_analyse, GT, fc):
         print(df_select.shape)
         print(len(df_select))
 
-        # df_select.to_csv(f"{path_analyse}{type_file}_{non_coding}_{fc}_MTC.tsv", sep='\t', encoding='utf-8', index=False)
+        df_select.to_csv(f"{path_analyse}{type_file}_{non_coding}_{fc}_MTC.tsv", sep='\t', encoding='utf-8', index=False)
+        RR = False
+        X2_self_sig_normal, X2_self_bon_sig, X2_self_bh_sig = get_significant(df_select, 'X2_self', alpha, RR)
+        X2_sig_normal, X2_bon_sig, X2_bh_sig = get_significant(df_select, 'X2', alpha, RR)
+        F_sig_normal, F_bon_sig, F_bh_sig = get_significant(df_select, 'F', alpha, RR)
+        RR = True
+        RR_sig = get_significant(df_select, 'one_in_interval_bon', alpha, RR)
 
-        X2_self_sig_normal, X2_self_bon_sig, X2_self_bh_sig = get_significant(df_select, 'X2_self', alpha)
-        X2_sig_normal, X2_bon_sig, X2_bh_sig = get_significant(df_select, 'X2', alpha)
-        F_sig_normal, F_bon_sig, F_bh_sig = get_significant(df_select, 'F', alpha)
 
         print('\nNORMAL')
         elements_in_all_normal = get_overlap(X2_self_sig_normal, X2_sig_normal, F_sig_normal) #[:top_num]
