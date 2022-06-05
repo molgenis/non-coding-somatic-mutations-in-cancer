@@ -53,8 +53,8 @@ def loop_over_genes(config, gene_df, position_out_gene, position_in_gene, donor_
     header_file = 'filter\tgene\tchr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
                   '\tdonor_count\tcancer_count\n'
     # Make file
-    before_gene_file = open(f'{save_path}{part_num}_gene_before_{position_out_gene}_{position_in_gene}.tsv', 'w')
-    after_gene_file = open(f'{save_path}{part_num}_gene_after_{position_out_gene}_{position_in_gene}.tsv', 'w')
+    before_gene_file = open(f'{save_path}{part_num}_gene_before_{position_out_gene}_{position_in_gene}_NEW.tsv', 'w')
+    after_gene_file = open(f'{save_path}{part_num}_gene_after_{position_out_gene}_{position_in_gene}_NEW.tsv', 'w')
     # Write header
     before_gene_file.write(header_file)
     after_gene_file.write(header_file)
