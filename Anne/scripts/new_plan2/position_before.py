@@ -347,49 +347,6 @@ def loop_over_genes(db, gene_df, position_out_gene, position_in_gene, donor_dict
                         donor_cancer_list, total_read)
 
 
-def check_filter(db):
-    db.cursor.execute("""
-                    SELECT snp_ID, donor_ID, total_read_count, dosages, mutant_allele_read_count
-                    FROM 'donor_has_snp'
-                    WHERE total_read_count > 800 AND mutant_allele_read_count > 0;
-                    """)
-    results = db.cursor.fetchall()
-    total_read_list = list()
-    total_read_set = set()
-    snp_set = set()
-    for res in results:
-        total_read_list.append(int(res['mutant_allele_read_count']))
-        total_read_set.add(int(res['mutant_allele_read_count']))
-        snp_set.add(int(res['snp_ID']))
-
-    print(len(total_read_list))
-    print(len(total_read_set))
-    print(min(list(total_read_set)))
-    print(max(list(total_read_set)))
-    print('snp: ', len(snp_set))
-    # count_read = dict(Counter(snp_set))
-    # names = list(count_read.keys())
-    # values = list(count_read.values())
-    # plt.bar(range(len(count_read)), values, tick_label=names)
-    # # plt.show()
-
-    # # plt.hist(total_read_list, 50)#pd.Series(donor_list).hist()
-    # plt.tight_layout()
-    # pd.Series(total_read_list).plot.bar()
-    # distribution = pd.Series(total_read_list).value_counts().sort_index()
-    # print(distribution.head())
-    
-    # # distribution.plot.bar()
-    # # distribution.head(200).plot.bar()
-    # # distribution.iloc[:74].plot.bar()
-    # # plt.tight_layout()
-    # plt.savefig("D:/Hanze_Groningen/STAGE/DATAB/dist_var_0-74.png")
-    # print(np.percentile(total_read_list, [25, 50, 75]))
-    # print(pd.Series(total_read_list).describe())
-    # print(pd.Series(total_read_list).quantile([0.25,0.5,0.75]))
-    # print(pd.Series(total_read_list).quantile([0.05]))
-
-
 
 def main():
     config = get_config('gearshift')
@@ -398,7 +355,6 @@ def main():
     # Database connection
     db = Database(path_db)
     
-    # check_filter(db)
     # Path of the genes and there positions
     gene_path = config['all_genes'] #'D:/Hanze_Groningen/STAGE/db/all_genes_new.tsv' # snp132_ucsc_hg19_checkGene - kopie.bed , snp132_ucsc_hg19_checkGene.bed
     # Path to save files

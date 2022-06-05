@@ -46,7 +46,7 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
                            sum_dosage_GT.dosages
                     FROM snp, sum_dosage_GT
                     WHERE snp.chr = '%s' AND snp.pos_start >= %s AND snp.pos_end <= %s AND sum_dosage_GT.total_read_count_sum > %s 
-                            AND sum_dosage_GT.mutant_allele_read_count_sum > 0 AND snp.ID = sum_dosage_GT.snp_ID
+                            AND sum_dosage_GT.mutant_allele_read_count_sum > 0 AND (sum_dosage_GT.GT2 = 1 OR sum_dosage_GT.GT2 = 2) AND snp.ID = sum_dosage_GT.snp_ID
                     GROUP BY sum_dosage_GT.snp_ID, sum_dosage_GT.donor_ID;
                     """ %
                     (str(chr), int(start_pos), int(end_pos), int(filter_num)))
@@ -127,7 +127,7 @@ def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, po
     # Makes the donor_ids column the index of the data frame
     df.set_index('donor_id', inplace=True)
     # Write the dataframe to a compressed .tsv file
-    df.to_csv(f'{save_path}{part_num}_sparsematrix_{pos}.tsv.gz', sep="\t", index=True, encoding='utf-8',
+    df.to_csv(f'{save_path}{part_num}_sparsematrix_{pos}_NEW.tsv.gz', sep="\t", index=True, encoding='utf-8',
               compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 
