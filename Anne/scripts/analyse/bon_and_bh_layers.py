@@ -9,7 +9,9 @@ from config import get_config
 
 
 
-def get_significant_snps(df, list_significant_elements, snps_search, f, type_test):    
+def get_significant_snps(df, list_significant_elements, snps_search, path_analyse, type_test, type_file, non_coding, fc):  
+    path_new_file = f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_{type_test}_sig_snps.tsv"
+    snp_DF = pd.DataFrame(columns=[f'snp_IDs_{type_test}'])    
     if len(list_significant_elements) > 0:
         info_chr_list = list(df[df['info'].isin(list_significant_elements)]['info_chr'])
         print(len(info_chr_list))
@@ -19,10 +21,14 @@ def get_significant_snps(df, list_significant_elements, snps_search, f, type_tes
         print(significant_snps)
         print(len(significant_snps))
         print()
-        f.write(f"{type_test}\t{','.join(map(str, list(significant_snps)))}\n")
+        # f.write(f"{type_test}\t{','.join(map(str, list(significant_snps)))}\n")
+        snp_DF['snp_IDs_{type_test}'] = significant_snps
+        snp_DF.to_csv(path_new_file, sep='\t', encoding='utf-8', index=False)  
         return significant_snps
     else:
-        f.write(f"{type_test}\t-\n")
+        # f.write(f"{type_test}\t-\n")
+        snp_DF['snp_IDs_{type_test}'] = ['NONE']
+        snp_DF.to_csv(path_new_file, sep='\t', encoding='utf-8', index=False) 
         return []
     
 
@@ -45,12 +51,13 @@ def run_different_fc(df_select, type_file, non_coding, path_analyse, fc, path_se
 
     
     # Open and create file
-    f = open(f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_sig_snps.tsv", "a")
-    significant_snps_normal = get_significant_snps(df_select, elements_in_all_normal, snps_search, f, 'snps_normal')
-    significant_snps_bon = get_significant_snps(df_select, elements_in_all_bon, snps_search, f, 'snps_bon')
-    significant_snps_bh = get_significant_snps(df_select, elements_in_all_bh, snps_search, f, 'snps_bh')
-    significant_snps_all_MTC = get_significant_snps(df_select, elements_snps_all_MTC, snps_search, f, 'snps_all_MTC')
-    f.close()
+    # f = open(f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_sig_snps.tsv", "a")
+    
+    significant_snps_normal = get_significant_snps(df_select, elements_in_all_normal, snps_search, path_analyse, 'snps_normal', type_file, non_coding, fc)
+    significant_snps_bon = get_significant_snps(df_select, elements_in_all_bon, snps_search, path_analyse, 'snps_bon', type_file, non_coding, fc)
+    significant_snps_bh = get_significant_snps(df_select, elements_in_all_bh, snps_search, path_analyse, 'snps_bh', type_file, non_coding, fc)
+    significant_snps_all_MTC = get_significant_snps(df_select, elements_snps_all_MTC, snps_search, path_analyse, 'snps_all_MTC', type_file, non_coding, fc)
+    # f.close()
 
 def calculate_fc(df):
     """

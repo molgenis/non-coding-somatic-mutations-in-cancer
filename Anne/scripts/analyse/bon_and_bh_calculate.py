@@ -123,7 +123,7 @@ def search(df_select, type_file, non_coding, path_analyse, GT, fc):
         method = 'fdr_bh'
         df_select = benjamini_hochberg_correction(df_select, alpha, 'cochran_armitage')
         
-        # df_select.to_csv(f"{path_analyse}{type_file}_{non_coding}_{fc}_MTC.tsv", sep='\t', encoding='utf-8', index=False)
+        df_select.to_csv(f"{path_analyse}{type_file}_{non_coding}_{fc}_MTC.tsv", sep='\t', encoding='utf-8', index=False)
         RR = False
         cochran_armitage_sig_normal, cochran_armitage_bon_sig, cochran_armitage_bh_sig = get_significant(df_select, 'cochran_armitage', alpha, RR)
         elements_snps_all_MTC = list(set.intersection(*map(set, [cochran_armitage_sig_normal, cochran_armitage_bon_sig, cochran_armitage_bh_sig])))
