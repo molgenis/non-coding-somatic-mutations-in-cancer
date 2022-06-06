@@ -22,12 +22,12 @@ def get_significant_snps(df, list_significant_elements, snps_search, path_analys
         print(len(significant_snps))
         print()
         # f.write(f"{type_test}\t{','.join(map(str, list(significant_snps)))}\n")
-        snp_DF['snp_IDs_{type_test}'] = significant_snps
+        snp_DF[f'snp_IDs_{type_test}'] = significant_snps
         snp_DF.to_csv(path_new_file, sep='\t', encoding='utf-8', index=False)  
         return significant_snps
     else:
         # f.write(f"{type_test}\t-\n")
-        snp_DF['snp_IDs_{type_test}'] = ['NONE']
+        snp_DF[f'snp_IDs_{type_test}'] = ['NONE']
         snp_DF.to_csv(path_new_file, sep='\t', encoding='utf-8', index=False) 
         return []
     
