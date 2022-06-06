@@ -40,14 +40,14 @@ def run_different_fc(df_select, type_file, non_coding, path_analyse, db, fc):
     elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse, False, fc)
     
 
-    search_close_gene.search_gene(elements_in_all_normal, path_analyse, type_file, non_coding, 'normal', fc)
-    search_close_gene.search_gene(elements_in_all_bon, path_analyse, type_file, non_coding, 'bon', fc)
-    search_close_gene.search_gene(elements_in_all_bh, path_analyse, type_file, non_coding, 'bh', fc)
-    search_close_gene.search_gene(elements_snps_all_MTC, path_analyse, type_file, non_coding, 'all_MTC', fc)
+    search_close_gene.search_gene(elements_in_all_normal, path_analyse, type_file, non_coding, 'normal_NEW', fc)
+    search_close_gene.search_gene(elements_in_all_bon, path_analyse, type_file, non_coding, 'bon_NEW', fc)
+    search_close_gene.search_gene(elements_in_all_bh, path_analyse, type_file, non_coding, 'bh_NEW', fc)
+    search_close_gene.search_gene(elements_snps_all_MTC, path_analyse, type_file, non_coding, 'all_MTC_NEW', fc)
 
    
     # Open and create file
-    f = open(f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_sig_snps.tsv", "a")
+    f = open(f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_sig_snps_NEW.tsv", "a")
     significant_snps_normal = get_significant_snps_db(elements_in_all_normal, db, f, 'snps_normal')
     significant_snps_bon = get_significant_snps_db(elements_in_all_bon, db, f, 'snps_bon')
     significant_snps_bh = get_significant_snps_db(elements_in_all_bh, db, f, 'snps_bh')

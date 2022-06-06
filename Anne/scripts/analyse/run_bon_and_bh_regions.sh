@@ -3,7 +3,7 @@
 #SBATCH --job-name=MTC_region
 #SBATCH --output=MTC_region.out
 #SBATCH --error=MTC_region.err
-#SBATCH --time=40:59:59
+#SBATCH --time=165:59:59
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
