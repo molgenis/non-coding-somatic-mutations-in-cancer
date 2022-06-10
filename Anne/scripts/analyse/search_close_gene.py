@@ -19,12 +19,12 @@ def search_gene(list_chr, path_analyse, type_file, non_coding, type_MTC, fc):
         for pos in list_chr:
             print()
             print(pos)
-            if len(pos.split('__')) == 5:
+            if len(pos.split('_')) == 5:
                 chr, pos_begin, pos_end, fc, bigger = pos.split('_')
                 snp_ID = '-'
             elif len(pos.split('__')) == 6:
                 print('yooo')
-                snp_ID, chr, pos_begin, pos_end, fc, bigger = pos.split('_')
+                snp_ID, chr, pos_begin, pos_end, fc, bigger = pos.split('__')
 
             if chr.startswith("chr"):
                 df_select = df.loc[df['hg19.knownGene.chrom'] == chr].reset_index(drop=True)
