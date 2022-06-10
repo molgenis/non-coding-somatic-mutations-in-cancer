@@ -44,20 +44,20 @@ def run_different_fc(df_select, type_file, non_coding, path_analyse, fc, path_se
     else:
         snps_search['info_chr'] = snps_search['chr'].map(str) + '_' + snps_search['start_position_regio'].map(str) + '_' + snps_search['end_position_regio'].map(str)
     
-        search_close_gene.search_gene(elements_in_all_normal, path_analyse, type_file, non_coding, 'normal', fc)
-        search_close_gene.search_gene(elements_in_all_bon, path_analyse, type_file, non_coding, 'bon', fc)
-        search_close_gene.search_gene(elements_in_all_bh, path_analyse, type_file, non_coding, 'bh', fc)
-        search_close_gene.search_gene(elements_snps_all_MTC, path_analyse, type_file, non_coding, 'all_MTC', fc)
+    search_close_gene.search_gene(elements_in_all_normal, path_analyse, type_file, non_coding, 'normal', fc)
+    search_close_gene.search_gene(elements_in_all_bon, path_analyse, type_file, non_coding, 'bon', fc)
+    search_close_gene.search_gene(elements_in_all_bh, path_analyse, type_file, non_coding, 'bh', fc)
+    search_close_gene.search_gene(elements_snps_all_MTC, path_analyse, type_file, non_coding, 'all_MTC', fc)
 
     
-    # Open and create file
-    # f = open(f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_sig_snps.tsv", "a")
+    # # Open and create file
+    # # f = open(f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_sig_snps.tsv", "a")
     
-    significant_snps_normal = get_significant_snps(df_select, elements_in_all_normal, snps_search, path_analyse, 'snps_normal', type_file, non_coding, fc)
-    significant_snps_bon = get_significant_snps(df_select, elements_in_all_bon, snps_search, path_analyse, 'snps_bon', type_file, non_coding, fc)
-    significant_snps_bh = get_significant_snps(df_select, elements_in_all_bh, snps_search, path_analyse, 'snps_bh', type_file, non_coding, fc)
-    significant_snps_all_MTC = get_significant_snps(df_select, elements_snps_all_MTC, snps_search, path_analyse, 'snps_all_MTC', type_file, non_coding, fc)
-    # f.close()
+    # significant_snps_normal = get_significant_snps(df_select, elements_in_all_normal, snps_search, path_analyse, 'snps_normal', type_file, non_coding, fc)
+    # significant_snps_bon = get_significant_snps(df_select, elements_in_all_bon, snps_search, path_analyse, 'snps_bon', type_file, non_coding, fc)
+    # significant_snps_bh = get_significant_snps(df_select, elements_in_all_bh, snps_search, path_analyse, 'snps_bh', type_file, non_coding, fc)
+    # significant_snps_all_MTC = get_significant_snps(df_select, elements_snps_all_MTC, snps_search, path_analyse, 'snps_all_MTC', type_file, non_coding, fc)
+    # # f.close()
 
 def calculate_fc(df):
     """
@@ -121,7 +121,7 @@ def main():
     path_analyse = config['analyse_new'] #'D:/Hanze_Groningen/STAGE/analyse/new/' #config['analyse_new']
     path_snp_ids = config['layers'] #config['layers'] #'D:/Hanze_Groningen/STAGE/lagen/'
     
-    for type_file in ['TFBS', 'UCNE', 'DNase', 'afterGene', 'beforeGene']:
+    for type_file in ['afterGene', 'beforeGene']: #'TFBS', 'UCNE', 'DNase', 
         if 'Gene' in type_file:
             # AfterGene/BeforeGene
             with_gene = True
