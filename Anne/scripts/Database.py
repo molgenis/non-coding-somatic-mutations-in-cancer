@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+
+# Imports
 import sqlite3
 
 
 class Database:
     """
-    
+    Create Database object
     """
 
     def __init__(self, db_name):
@@ -14,7 +16,6 @@ class Database:
         """
         self.name = db_name
         self.mydb_connection = self.connect()
-        # print(self.mydb_connection)
         self.mydb_connection.row_factory = sqlite3.Row
         self.cursor = self.mydb_connection.cursor()
 
@@ -29,7 +30,7 @@ class Database:
             print("Error while connecting to sqlite", er)
             pass
 
-    def close(self):  # __del__
+    def close(self):  
         """
         Close the connections of the cursor and mydb_connection
         :return: 

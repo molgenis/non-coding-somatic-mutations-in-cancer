@@ -1,29 +1,14 @@
 #!/usr/bin/env python3
+
+# Imports
 import pandas as pd
 import sys
 import os
 import glob
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
-
-# Also takes the folder 1 higher, so that I can do the import after
-# sys.path.append("..")
 sys.path.append(
     '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
-from vcf_reader import read_vcf
-
-
-# def make_plot_format_vcf(path, basename):
-#     """
-#
-#     :param db:  the database object
-#     :return:
-#     """
-#     basename = basename.split('.')[0]
-#     # Read vcf file
-#     df = read_vcf(path)  # (sys.argv[1].strip())
-#     print(df.head())
-#     print(df.columns)
 
 
 def make_plot_format_other(path, basename, out_path):
@@ -39,7 +24,7 @@ def make_plot_format_other(path, basename, out_path):
     # List of selected columns
     select_columns = ['icgc_donor_id', 'project_code', 'icgc_specimen_id', 'icgc_sample_id', 'chromosome', 'chromosome_start',
                       'chromosome_end', 'assembly_version', 'reference_genome_allele', 'mutated_to_allele',
-                      'total_read_count', 'platform',  'sequencing_strategy', 'mutant_allele_read_count']  ##'mutant_allele_read_count', 'gene_affected', 'transcript_affected',
+                      'total_read_count', 'platform',  'sequencing_strategy', 'mutant_allele_read_count']
     # Select the columns out of the dataframe
     select_df = df[select_columns]
     # Rename columns
@@ -49,27 +34,20 @@ def make_plot_format_other(path, basename, out_path):
                               'assembly_version': 'genome_version', 'reference_genome_allele': 'ref',
                               'mutated_to_allele': 'alt', 'total_read_count': 'total_read_count', 'platform': 'platform',
                               'sequencing_strategy': 'seq_strategy', 'mutant_allele_read_count':'mutant_allele_read_count'}, inplace=True)
-    # If depth is not entered, fill in with 0. #TODO
-    # select_df['depth'].fillna(0, inplace=True)
     # Change type or some columns
-    select_df = select_df.astype({'pos_start': 'int64', 'pos_end': 'int64'}) #'depth': 'int64'
+    select_df = select_df.astype({'pos_start': 'int64', 'pos_end': 'int64'})
     # Add chr to the column CHROM. 1 > chr1 etc.
-    # select_df['chr'] = 'chr' + select_df['CHROM'].astype(str)
-    # Add column ID #TODO
-    # select_df["ID"] = ""
-
+    select_df['chr'] = 'chr' + select_df['CHROM'].astype(str)
     # replace field that's entirely space (or empty) with NULL
-    # select_df = select_df['total_read_count'].replace(r'^\s*$', 'NULL', regex=True)
-    # select_df = select_df['mutant_allele_read_count'].replace(r'^\s*$', 'NULL', regex=True)
+    select_df = select_df['total_read_count'].replace(r'^\s*$', 'NULL', regex=True)
+    select_df = select_df['mutant_allele_read_count'].replace(r'^\s*$', 'NULL', regex=True)
     # Save dataframe
     select_df.to_csv(f'{out_path}{basename}_db_NEW.tsv.gz', sep="\t", index=False, encoding='utf-8', 
                 compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 
 def main():
-    """
-
-    """
+    # Call get_config
     config = get_config('gearshift')
     # The path to the data
     path = config['cancer_data_path']
@@ -81,14 +59,8 @@ def main():
     for filename in glob.glob(path_files):
         # Basename of file
         basename = os.path.basename(filename).split('%2F')[3]
-        print(basename)
-        type_file = 'other'
-        if type_file == 'vcf':
-            print('hoi')
-            # make_plot_format_vcf(filename, basename, out_path)
-        else:
-            # Call make_plot_format_other
-            make_plot_format_other(filename, basename, out_path)
+        # Call make_plot_format_other
+        make_plot_format_other(filename, basename, out_path)
 
 
 if __name__ == '__main__':

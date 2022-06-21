@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+#Call make_file_for_db.py, which makes the files so that they can be put into the database more easily.
+
 #SBATCH --job-name=db_test
 #SBATCH --output=db_test.out
 #SBATCH --error=db_test.err
@@ -14,9 +16,6 @@
 ml Anaconda3/5.3.0
 source activate stage
 
-source /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/read_yaml.sh
-YAML_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/config.yaml
-
-SCRIPT_PATH=$(yaml $YAML_PATH "['database_scripts']")
+SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/database/
 
 python3 ${SCRIPT_PATH}make_file_for_db.py

@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
-from os import sep
+
+# Imports
 import pandas as pd
 import sys
-import math # nan
 import numpy as np
-
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
-
-
 def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, last_id_donor):
     """
     Fill the database table `snp`, `donor_has_snp` with the info in the df
-    :param db:  The database object
-    :param select_donor:  Dataframe with only one (selected) donor
-    :param specimen_df: File with specimen_type (Normal or tumor tissue)
+    :param db:              The database object
+    :param select_donor:    Dataframe with only one (selected) donor
+    :param specimen_df:     File with specimen_type (Normal or tumor tissue)
     :param last_id_project: ID in the database of (selected) project
-    :param last_id_donor: ID in the database of (selected) donor
+    :param last_id_donor:   ID in the database of (selected) donor
     :return:
     """
     # Loop over rows in dataframe (select_donor)
@@ -117,12 +114,6 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
         check_donor = db.cursor.fetchall()
         # If the donor does not exist add it to the database
         if not check_donor:
-            # print(f"{donor_id} donor_sex - {donor_info['donor_sex'][donor_id]}")
-            # print(f"{donor_id} donor_vital_status - {donor_info['donor_vital_status'][donor_id]}")
-            # print(f"{donor_id} donor_age_at_diagnosis - {donor_info['donor_age_at_diagnosis'][donor_id]}")
-            # print(f"{donor_id} donor_age_at_last_followup- {donor_info['donor_age_at_last_followup'][donor_id]}")
-            # print(f"{donor_id} disease_status_last_followup- {donor_info['disease_status_last_followup'][donor_id]}")
-            # print('-----------')
             # Fill donor table
             db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
                                                     age_at_last_followup, disease_status_last_followup)
@@ -240,14 +231,15 @@ def fill_tissue(specimen_df, db):
 
 
 def main():
+    # Call get_config
     config = get_config('gearshift')
     # Path to file with project ID and kind of cancer
-    site_path = config['site'] # "E:/STAGE/Site/site.csv"
+    site_path = config['site']
     site_df = pd.read_csv(site_path, sep=';')
     # Make dictionary of site_df, and get only the column cancer
     project_cancer = site_df.set_index('project_ID').to_dict('dict')['cancer']
     # Path to file with donor information like age, sex etc.
-    donor_info_path = config['donor_info'] # "E:/STAGE/WGS/donor.tsv"
+    donor_info_path = config['donor_info']
     donor_info_df = pd.read_csv(donor_info_path, sep='\t')
     # Make of gender (sex) and vital status a boolean
     donor_info_df['donor_sex'] = donor_info_df['donor_sex'].map({'male': 'FALSE', 'female': 'TRUE'})
@@ -259,7 +251,7 @@ def main():
     # Make dictionary of donor_info_df
     donor_info = donor_info_df.set_index('icgc_donor_id').to_dict('dict')
     # Path to file with specimen_type (Normal or tumor tissue)
-    specimen_path = config['all_specimen'] # "E:/STAGE/WGS/all_specimen.tsv"
+    specimen_path = config['all_specimen']
     specimen_df = pd.read_csv(specimen_path, sep='\t')
     # Make Database object
     db = Database(sys.argv[1])

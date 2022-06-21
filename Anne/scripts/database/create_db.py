@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import pandas as pd
+
+# Imports
 import sys
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
@@ -8,7 +9,7 @@ from Database import Database
 def create_db(db):
     """
     Create the database
-    :param db:  the database object
+    :param db:  The database object
     :return:
     """
     # Create tables
@@ -58,7 +59,6 @@ def create_db(db):
         ON CONFLICT REPLACE
     )
     """)
-    print('HAI')
     db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `tissue`
@@ -69,7 +69,6 @@ def create_db(db):
         `type` BOOLEAN DEFAULT(FALSE)
     )
     """)
-    print('HALLO')
     db.cursor.execute("""
     -- -----------------------------------------------------
     -- Table `donor_has_snp`
@@ -96,10 +95,6 @@ def create_db(db):
 
 
 def main():
-    """
-
-    :return:
-    """
     # Make Database object
     db = Database(sys.argv[1])
     # Call create_db

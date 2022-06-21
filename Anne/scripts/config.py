@@ -1,8 +1,13 @@
+#!/usr/bin/env python3
+
+# Imports
 import yaml
 
 def get_config(cluster_name):
     '''
     Get the conficuration of perzonalized variable definitions
+    :param cluster_name: Name of the cluster
+    :return: config:     Dictionary with as keys the name of the paths and as value the paths
     '''
     # gearshift
     if cluster_name == 'gearshift':
