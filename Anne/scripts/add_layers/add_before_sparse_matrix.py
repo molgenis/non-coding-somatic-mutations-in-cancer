@@ -1,25 +1,26 @@
 #!/usr/bin/env python3
+
+#Imports
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
 import sys
+import glob
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
-import glob
+
 
 def merge_sparce_matrix(save_path, whole_numpy_array):
     """
-
+    Adds the sparce matrices together
     :param save_path: string with path of where the file should be saved.
     :param whole_numpy_array: empty sparce array of len(donor_list) at len(gene_name_list)+1
     :return:
     """
     path = f"{save_path}*_sparsematrix_bef_overall.tsv.gz"
     for fname in glob.glob(path):
-        print(fname)
         df = pd.read_csv(fname, sep='\t', compression='gzip')
         cancer_list = df['cancer']
         donor_id = df['donor_id']
@@ -27,6 +28,7 @@ def merge_sparce_matrix(save_path, whole_numpy_array):
         df.set_index('donor_id', inplace=True)
         df.drop(['cancer'], axis=1, inplace=True)
         numpy_array = df.to_numpy()
+        # add matrices
         whole_numpy_array = whole_numpy_array + numpy_array
     # Make dataframe of numpy array
     df_whole = pd.DataFrame(data=whole_numpy_array, columns=columns_name)
@@ -40,6 +42,7 @@ def merge_sparce_matrix(save_path, whole_numpy_array):
               compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
 def main():
+    # Call get_config
     config = get_config('gearshift')
     # Path of the database
     path_db = config['database']

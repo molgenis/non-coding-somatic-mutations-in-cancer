@@ -4,8 +4,7 @@ cd /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals
 # Load packages
 ml BCFtools/1.11-GCCcore-7.3.0
 
-#FILE="somatic-b37_Mutect2-WGS-panel-b37.vcf"
-FILE="somatic-hg38_1000g_pon.hg38.vcf"
+FILE="somatic-b37_Mutect2-WGS-panel-b37.vcf"
 
 # https://www.biostars.org/p/160863/
 # Convert all chromosomes that are only called by a number to chr with the number so for example 1 now becomes chr1

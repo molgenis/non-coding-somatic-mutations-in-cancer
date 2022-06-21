@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+#Imports
 import pandas as pd
 import sys
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
@@ -44,7 +46,7 @@ def set_value(db, ID_eQT, eQT, row):
     :param eQT:  String. This is the name of the parameter in the database that will 
                  be set to true when a snp matches an eQT exactly
     :param row:  Line from the eQT file with information about 1 eQT
-    :return:
+    :return: the length of the results
     """
     # Add ID_eQTL and eQTL to snp that matches the matches in chr, pos_start, pos_end, ref and alt.
     db.cursor.execute(
@@ -73,7 +75,7 @@ def set_value_close_to(db, row, close_eQT, region):
     :param close_eQT:  String. This is the name of the parameter in the database that is set 
                        to true when a snp falls within a certain region (before or after) a known eQT
     :param region:  Region (front or back) an eQT, within which snps are searched.
-    :return:
+    :return:   the length of the results
     """
     db.cursor.execute(
             """UPDATE snp
@@ -106,10 +108,9 @@ def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region, config):
     :param region: Region (front or back) an eQT, within which snps are searched.
     :return:
     """
-    f = open(f'{config["genes_eQTL_etc"]}eQTL_num_snps_{region}.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
+    f = open(f'{config["genes_eQTL_etc"]}eQTL_num_snps_{region}.tsv', 'w') 
     f.write(f"eQTL\tchr\tStart\tEnd\texact\tclose\n")
     for index, row in eQTL_df.iterrows():
-        print(index)
         exact_results = set_value(db, ID_eQT, eQT, row)
         close_results = set_value_close_to(db, row, close_eQT, region)
         f.write(f"{str(row['SNP'])}\t{str(row['SNPChr'])}\t{int(row['SNPPos'])}\t{int(row['SNPPos'])}\t{exact_results}\t{close_results}\n")
@@ -119,13 +120,14 @@ def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region, config):
 
 
 def main():
+    # Call get_config
     config = get_config('gearshift')
     # Database file
     db_path= config['database'] 
     # File with eQTLs
     eQTL_path = config['strong_eqtl_path'] 
     # Database class
-    db = Database(db_path) #sys.argv[1]
+    db = Database(db_path)
     # Read file
     eQTL_df = pd.read_csv(eQTL_path, sep='\t')
     # Region before and after eQTL

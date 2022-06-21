@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# Imports
 import sys
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
@@ -13,7 +15,6 @@ def get_min_max_snpID(db):
     :return: max_snp_id: The highest snp id
              min_snp_id: The lowest snp id
     """
-    print('GET SNPS')
     # MAX
     db.cursor.execute("""
                     SELECT MAX(ID) 
@@ -63,7 +64,6 @@ def cal_AF(db):
     :param db:  The database object
     :return:
     """
-
     db.cursor.execute(
             """UPDATE snp
             SET AF = cal_AF.AF
@@ -77,6 +77,7 @@ def cal_AF(db):
 
 
 def main():
+    # Call get_config
     config = get_config('gearshift')
     # Path of the database
     path_db = config['database']

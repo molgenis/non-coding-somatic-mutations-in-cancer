@@ -1,3 +1,5 @@
+
+#Import
 import pandas as pd
 import sys
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
@@ -24,8 +26,11 @@ def add_value(db, name_variant):
 def set_value(db, row, name_variant):
     """
     
+    :param db: The database object      
+            row: The row out of the layer file
+            name_variant: The name of the layer
+    :return: length of the results
     """
-    print(row['#Chromosome'], row['Start'], row['End'])
     # Update in_transcript
     db.cursor.execute(
         """UPDATE snp
@@ -44,22 +49,23 @@ def set_value(db, row, name_variant):
     
 
 def main():
+    # Call get_config
     config = get_config('gearshift')
-    #
-    path_db = config['database']  #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
+    # Path to databas
+    path_db = config['database'] 
     # Database connection
     db = Database(path_db)
-    #
-    path_file = config['DNase'] #'D:/Hanze_Groningen/STAGE/lagen/2022-04-13_GRCh37_UCNE.bed'
+    # DNase file
+    path_file = config['DNase']
     name_variant = 'DNase'
     df_variant = pd.read_csv(path_file, sep='\t', compression='gzip')
-    print(len(df_variant))
-
+    # Call add_value
     add_value(db, name_variant)
 
-    f = open(f'{config["genes_eQTL_etc"]}{name_variant}_num_snps.tsv', 'w') #D:/Hanze_Groningen/STAGE/lagen/
+    f = open(f'{config["genes_eQTL_etc"]}{name_variant}_num_snps.tsv', 'w') 
     f.write(f"#Chromosome\tStart\tEnd\tnum_snps_region\n")
     for index, row in df_variant.iterrows():
+        # Call set_value
         num_snps_region = set_value(db, row, name_variant)
         print(index)
         f.write(f"{str(row['#Chromosome'].replace('chr', ''))}\t{int(row['Start'])}\t{int(row['End'])}\t{num_snps_region}\n")

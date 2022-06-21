@@ -1,4 +1,8 @@
+
+# Imports
 import pandas as pd
+from multiprocessing import Pool
+import multiprocessing as mp
 import sys
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
@@ -6,98 +10,76 @@ sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non
 from config import get_config
 
 
-def search_snp(db, row, region):
-    """
-    
-    """
-    # Count snps in region
-    db.cursor.execute(
-        """SELECT ID, pos_start, chr
-            FROM snp
-            WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-        (str(row['SNPChr']), int(row['SNPPos']-region), int(row['SNPPos']+region)))
-    
-    results = db.cursor.fetchall()
-    return results
 
-def closest_snp(results, row):
+def multiprocess_search_close_snp(df_strong_eQTL, region, path_save_file, config):
     """
-    
+    Sees which SNPs are within a specific region of an eQTL
+    :param df_strong_eQTL: Df with strongest eQTLs
+            region: Region from which it looks at a distance from an eQTL if there are SNPs within that region
+            path_save_file: Path where the file is saved
+            config: Dictionary with as keys the name of the paths and as value the paths           
+    :return: 
     """
-    for res in results:
-        if res['pos_start'] < distance_eQTL:
-            distance_eQTL = res['pos_start']
-            distance_snp_ID = f"{row['ID']}_{row['chr']}_{row['pos_start']}"
-    return distance_snp_ID, distance_eQTL
-
-def change_range(db, row, region):
-    """
-    
-    """
-    results = search_snp(db, row, region)
-    if len(results) > 0:
-        distance_snp_ID, distance_eQTL = closest_snp(results, row)
-        return distance_snp_ID, distance_eQTL
-    else:
-        return 0, ''
-
-
-def search_close_snp(db, df_strong_eQTL, config):
-    """
-    
-    """
-    f = open(config['distance_eqtl_path'], 'w') #D:/Hanze_Groningen/STAGE/eQTL/
-    f.write(f"SNP_eQTL\chr\pos\Gene\tsnp_ID\tchr_snp\tpos_snp\tdistance\n")
-    for index, row in df_strong_eQTL.iterrows():
-        distance_eQTL = 100000
-        for region in range(1000, 1000000, 1000):
-            distance_snp_ID, distance_eQTL = change_range(db, row, region)
-            if distance_snp_ID != 0:
-                break
-        if distance_snp_ID != 0:
-            info_distance_snp_ID = distance_snp_ID.split('_')
-            f.write(f"{str(row['SNP'])}\t{int(row['SNPChr'])}\t{int(row['SNPPos'])}\t{row['Gene']}\t{info_distance_snp_ID[0]}\t{info_distance_snp_ID[1]}\t{info_distance_snp_ID[2]}\t{distance_eQTL}\n")
-        else:
-            f.write(f"{str(row['SNP'])}\t{int(row['SNPChr'])}\t{int(row['SNPPos'])}\t{row['Gene']}\t-\t-\t-\t-\n")
-    f.close()
-
-
-    # results = search_snp(db, row, 100)
-        # if len(results) > 0:
-        #     distance_snp_ID, distance_eQTL = closest_snp(results, row)
-        # else:
-        #     results = search_snp(db, row, 500)
-        #     if len(results) > 0:
-        #         distance_snp_ID, distance_eQTL = closest_snp(results, row)
-        #     else:
-        #         results = search_snp(db, row, 1000)
-        #         if len(results) > 0:
-        #             distance_snp_ID, distance_eQTL = closest_snp(results, row)
-        #         else:
-        #             pass  
-
-def main():
-    config = get_config('gearshift')
-    #
-    path_db = config['database'] #'D:/Hanze_Groningen/STAGE/DATAB/copydatabase_C.db'
+    path_db = config['database']
     # Database connection
     db = Database(path_db)
-    path_strong_eQTL = config['strong_eqtl_path'] #"D:/Hanze_Groningen/STAGE/eQTL/eqtl_v1013_lead_snp_gene_with_info.txt"
+    f = open(path_save_file, 'w')
+    f.write(f"SNP_eQTL\tchr\tpos\tGene\tsnp_ID\tchr_snp\tpos_snp\tdistance\n")
+    # Loop over file
+    for index, row in df_strong_eQTL.iterrows():
+        db.cursor.execute(
+        """SELECT ID, chr, pos_start, abs(CAST(%s AS REAL) - CAST(pos_start AS REAL)) AS distance_eQTL
+            FROM snp
+            WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s
+            ORDER BY distance_eQTL
+            LIMIT 1;""" %
+        (int(row['SNPPos']), str(row['SNPChr']), int(row['SNPPos']-region), int(row['SNPPos']+region)))
+    
+        results = db.cursor.fetchall()
+        if len(results) != 0:
+            for res in results:
+                f.write(f"{str(row['SNP'])}\t{int(row['SNPChr'])}\t{int(row['SNPPos'])}\t{row['Gene']}\t{res[0]}\t{res[1]}\t{res[2]}\t{res[3]}\n")
+        else:
+            db.cursor.execute(
+            """SELECT ID, chr, pos_start, abs(CAST(%s AS REAL) - CAST(pos_start AS REAL)) AS distance_eQTL
+                FROM snp
+                WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s
+                ORDER BY distance_eQTL
+                LIMIT 1;""" %
+            (int(row['SNPPos']), str(row['SNPChr']), int(row['SNPPos']-1000000), int(row['SNPPos']+1000000)))
+        
+            results = db.cursor.fetchall()
+            if len(results) != 0:
+                for res in results:
+                    f.write(f"{str(row['SNP'])}\t{int(row['SNPChr'])}\t{int(row['SNPPos'])}\t{row['Gene']}\t{res[0]}\t{res[1]}\t{res[2]}\t{res[3]}\n")
+            else:
+                f.write(f"{str(row['SNP'])}\t{int(row['SNPChr'])}\t{int(row['SNPPos'])}\t{row['Gene']}\t-\t-\t-\t-\n")
+    f.close()
+
+def main():
+    # Call get_config
+    config = get_config('gearshift')
+    # Get path
+    path_strong_eQTL = config['strong_eqtl_path']
     df_strong_eQTL = pd.read_csv(path_strong_eQTL, sep='\t')
-    search_close_snp(db, df_strong_eQTL, config)
+    # Region from which it looks at a distance from an eQTL if there are SNPs within that region
+    region = 10000
+    # Multiprocess
+    cpus = mp.cpu_count()
+    list_paths_save = list()
+    arg_multi_list = []
+    for i in range(0, len(df_strong_eQTL)+1000, 1000):
+        df = df_strong_eQTL.iloc[i:i+1000]
+        path_save_file = f'{config["genes_eQTL_etc"]}distance_eqtl_{i}.tsv'
+        list_paths_save.append(path_save_file)
+        # add parameters needed to run multiprocess_search_close_snp function
+        arg_multi_list.append((df, region, path_save_file, config))
 
-
+    pool = Pool(processes=cpus)
+    pool.starmap(func=multiprocess_search_close_snp, iterable=arg_multi_list)
+    pool.close()
+    pool.join()
 
 
 if __name__ == '__main__':
     main()
-
-
-# loop over file met sterkste eQTL
-# zoek 100 bp voor en na een eQTL
-# snps
-    # ja
-        # loop over snps en kijk welke de kleinste afstand heeft tot eQTL
-    # nee
-        # Maak van de afstand 500
-        # etc

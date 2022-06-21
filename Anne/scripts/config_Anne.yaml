@@ -1,0 +1,3 @@
+distance_eqtl_ALL: 'D:/Hanze_Groningen/STAGE/eQTL/distance_eqtl_ALL.tsv'
+eQTL_zero_distance: 'D:/Hanze_Groningen/STAGE/R/eQTL_zero_distance.tsv'
+database: 'D:/Hanze_Groningen/STAGE/db_laatste_copy.db'

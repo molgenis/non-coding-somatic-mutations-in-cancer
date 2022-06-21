@@ -1,3 +1,5 @@
+
+# Imports
 import pandas as pd
 from multiprocessing import Pool
 import multiprocessing as mp
@@ -29,13 +31,12 @@ def set_value(db, row, name_variant):
     """
     
     """
-    print(row['#Chromosome'], row['Start'], row['End'])
-    # Update in_transcript
-    # db.cursor.execute(
-    #     """UPDATE snp
-    #         SET %s = TRUE
-    #         WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-    #     (str(name_variant), str(row['#Chromosome'].replace('chr', '')), int(row['Start']), int(row['End'])))
+    # Update
+    db.cursor.execute(
+        """UPDATE snp
+            SET %s = TRUE
+            WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
+        (str(name_variant), str(row['#Chromosome'].replace('chr', '')), int(row['Start']), int(row['End'])))
     # Count snps in region
     db.cursor.execute(
         """SELECT ID
@@ -51,7 +52,6 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
     Selects all snps that occur in a specific region on a specific chromosome.
     And writes a line with certain information in the file (gene_file).
     :param db:                The database object
-    :param gene:              The name of the gene
     :param chr:               Chromosome number or letter (without chr)
     :param start_pos:         The starting position or a particular region
     :param end_pos:           The stop position of a particular region
@@ -67,13 +67,7 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
     :return: sparse_matrix_region:   A matrix which contains very few non-zero elements. It contains the counts of a specific
                               region-donor combination.
              gene_name_list:  List of gene names (to be used later as columns in the sparse matrix)
-    """
-    # # Get index of the gene name in the list
-    # gene_index = gene_name_list.index(gene)
-    # if with_type == 'genes':
-    #     # Replace the name with gene_name:chromosoom:start_pos-end_pos
-    #     gene_name_list[gene_index] = f'{gene}:chr{chr}:{int(start_pos)}-{int(end_pos)}'
-    
+    """ 
     #
     donor_read_count = dict()
     # Make donor_list_snp. List because double donors count
@@ -99,8 +93,6 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
             print(f'{res[0]} - {res[1]} - {res[2]} - {res[3]} - {res[4]}')
             donor_list_snp.append(donor_dict[res['donor_ID']])
             snp_ID_list.append(res['snp_ID'])
-            # donor_index = donor_list.index(res['sum_dosage_GT.donor_ID'])
-            # sparse_matrix_overall[donor_index, gene_index] += 1
             if donor_dict[res['donor_ID']] in donor_read_count:
                 donor_read_count[donor_dict[res['donor_ID']]][0] += res['total_read_count_sum']
                 donor_read_count[donor_dict[res['donor_ID']]][1] += res['dosages']
@@ -114,8 +106,6 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
         cancer_list = list()
         for donor in donor_list_snp:
             donor_index = donor_list.index(donor)
-            # Adds +1 to the sparse_matrix at the position of donor region
-            # sparse_matrix_overall[donor_index, gene_index] += 1
             cancer_list.append(donor_cancer_list[donor_index])
         # Creates a dictionary from the list with as key the name (cancer type or donor ID) and
         # as value how often that name occurs in the list.
