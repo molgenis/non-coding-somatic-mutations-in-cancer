@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# Script to create different jobs
 
 # The samples
 SAMPLES=(S1 S2 S3 S4 S5 S6)
@@ -6,8 +7,8 @@ SAMPLES=(S1 S2 S3 S4 S5 S6)
 TISSUE=( '4094  4099  4104' '4109  4113  4114  4118  4119' '4123  4124  4129' '4128  4133  4134' '4139  4138  5041' '5043  5042  5044')
 
 # The choosen align method
-METHOD_BIG=bowtie #bowtie,   bwa_aln, bwa_mem
-CHROM_CHOOSEN=chr21
+METHOD_BIG=bwa_mem #bowtie, bwa_aln, bwa_mem
+CHROM_CHOOSEN=chr22
 
 # Passes different things to the variable VARIABLE and METH_FILE_BIG, 
 # depending on the variable METHOD_BIG
@@ -58,11 +59,9 @@ do
     echo "ml FastQC/0.11.8-Java-11-LTS" >> "${JOB_FILE}"
     echo "ml GATK/4.1.4.1-Java-8-LTS" >> "${JOB_FILE}"
     echo "ml Java/11-LTS" >> "${JOB_FILE}"
-    echo "#ml libjpeg-turbo/2.0.2-GCCcore-7.3.0 #?" >> "${JOB_FILE}"
     echo "ml picard/2.20.5-Java-11-LTS" >> "${JOB_FILE}"
-    #
     echo "" >> "${JOB_FILE}"
-    echo "#Chrom" >> "${JOB_FILE}"
+    echo "# Chosen chromosome" >> "${JOB_FILE}"
     echo "CHROM=${CHROM_CHOOSEN}" >> "${JOB_FILE}"
     echo "# The path to the file of the reference genome that will be used." >> "${JOB_FILE}"
     echo 'if [ "${CHROM}" != "chrall" ]; then' >> "${JOB_FILE}"
@@ -71,6 +70,7 @@ do
     echo "  PATH_GENOOM=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/chr/ #chrall" >> "${JOB_FILE}"
     echo "fi" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
+    echo "Unzip chromosome file" >> "${JOB_FILE}"
     echo 'GENOOM=${PATH_GENOOM}${CHROM}.fa' >> "${JOB_FILE}"
     echo 'if [ ! -f ${GENOOM} ]; then' >> "${JOB_FILE}"
     echo '    gunzip -c ${GENOOM}.gz > ${GENOOM}' >> "${JOB_FILE}"
@@ -92,18 +92,20 @@ do
     echo "# Sample numbers" >> "${JOB_FILE}"
     echo "SAMPLE="${SAMPLES[i]}"" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
-    echo "METHOD=${METHOD_BIG} #bowtie,   bwa_aln, bwa_mem" >> "${JOB_FILE}"
-    echo "METH_FILE=${METH_FILE_BIG} #bowtie2, aln, mem" >> "${JOB_FILE}"
+    echo "METHOD=${METHOD_BIG}" >> "${JOB_FILE}"
+    echo "METH_FILE=${METH_FILE_BIG}" >> "${JOB_FILE}"
     echo 'TYPE_ALN=mutect_${METHOD}' >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
+    echo "# Path to the sample files" >> "${JOB_FILE}"
     echo "GENERAL_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/samples/" >> "${JOB_FILE}"
+    echo "# Path to scripts" >> "${JOB_FILE}"
     echo "SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/pipeline_variant_calling/" >> "${JOB_FILE}"
     echo "# Path to the file of the panel of normals (PoN)" >> "${JOB_FILE}"
     echo "PON=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/PanelOfNormals/merge_somatic-b37_Mutect2-WGS-panel-b37.vcf" >> "${JOB_FILE}"
     echo "# Path to the file of the germline resource (GR)" >> "${JOB_FILE}"
     echo "GR=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/GermlineResource/merge_af-only-gnomad.raw.sites.vcf" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
-    echo "# for python file parameters: automatic_script_ob.py" >> "${JOB_FILE}"
+    echo "# For python file parameters: automatic_script_ob.py" >> "${JOB_FILE}"
     echo "# Number of tumors you want to combine while running Mutect2." >> "${JOB_FILE}"
     echo "NUMBER_OF_TUMORS_py=1" >> "${JOB_FILE}"
     echo "# Number of hc you want to combine while running Mutect2" >> "${JOB_FILE}"
@@ -112,7 +114,7 @@ do
     echo "TYPE_SAMPLE_py='both'" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
     # PIPELINE
-    echo "# load conda and activate to execute python script" >> "${JOB_FILE}"
+    echo "# Load conda and activate to execute python script" >> "${JOB_FILE}"
     echo "ml Anaconda3/5.3.0" >> "${JOB_FILE}"
     echo "source activate stage" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
@@ -131,7 +133,7 @@ do
     echo "echo 'change_sample_name'" >> "${JOB_FILE}"
     echo 'source ${SCRIPT_PATH}change_sample_name.sh' >> "${JOB_FILE}"
     echo "# RUN: variant_calling_arguments.sh" >> "${JOB_FILE}"
-    echo "# mutect2" >> "${JOB_FILE}"
+    echo "# Mutect2" >> "${JOB_FILE}"
     echo "echo 'variant_calling_arguments.sh'" >> "${JOB_FILE}"
     echo 'source ${SCRIPT_PATH}variant_calling_arguments.sh' >> "${JOB_FILE}"
     echo "# RUN: compare_vcf.sh" >> "${JOB_FILE}"
@@ -158,5 +160,5 @@ do
     echo "# rm ${GENOOM}.ann" >> "${JOB_FILE}"
     echo "# rm ${GENOOM}.pac" >> "${JOB_FILE}"
     echo "" >> "${JOB_FILE}"
-    echo "echo 'THE END END END END'" >> "${JOB_FILE}"
+    echo "echo 'THE END'" >> "${JOB_FILE}"
 done

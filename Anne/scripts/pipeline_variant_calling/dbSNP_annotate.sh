@@ -1,5 +1,9 @@
 #!/usr/bin/bash
 
+# The two merged VCFs are compared to the dbSNP using BCFtools.
+# The SNPs that match the dbSNP are removed, because these might be already
+# present germline mutations.
+
 #SBATCH --job-name=annotate
 #SBATCH --output=annotate.out
 #SBATCH --error=annotate.err

@@ -46,7 +46,3 @@ umap_path: '/groups/umcg-wijmenga/tmp04/projects/lude_vici_2021/rawdata/cancer_d
 vcf_path: '/groups/umcg-wijmenga/tmp04/projects/lude_vici_2021/rawdata/cancer_data/vcf/'
 vcf_all: '/groups/umcg-wijmenga/tmp04/projects/lude_vici_2021/rawdata/cancer_data/vcf/ALL.vcf.gz'
 vcf_allel_freq: '/groups/umcg-wijmenga/tmp04/projects/lude_vici_2021/rawdata/cancer_data/vcf/vcf_allel_freq/'
-
-# database: "D:/Hanze_Groningen/STAGE/db_laatste_copy.db"
-# all_genes: "D:/Hanze_Groningen/STAGE/db/all_genes_new.tsv"
-# umap_path: "D:/Hanze_Groningen/STAGE/UMAP/"

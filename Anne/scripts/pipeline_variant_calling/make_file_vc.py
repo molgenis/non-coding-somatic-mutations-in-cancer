@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
+
+# Imports
 import pandas as pd
 from itertools import combinations
 import sys
-
 from Sample import Sample
 sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
-
-
 
 
 def filter_file(path_file):
@@ -36,13 +35,13 @@ def make_objects(df_selection):
     :param df_selection:    the custom data frame from which to create objects and a dictionary
     :return:                a dictionary containing the sample_num as key and as value Sample objects
     """
-    # Empty dict:
+    # Empty dict
     dict_samples = dict()
     # Loop over lines in data frame
     for index, row in df_selection.iterrows():
         # Checked if a key is already in the dictionary or not
         if row['sample_num'] in dict_samples.keys():
-            # update object Sample
+            # Update object Sample
             dict_samples[row['sample_num']].set_category(row)
         else:
             # Make object Sample
@@ -53,25 +52,25 @@ def make_objects(df_selection):
 
 
 def arguments_to_file(dict_samples, head_path, chrom, number_of_tumors=None, number_of_hc=None, type_sample='both',
-                      type_aln='bowtie', type_aln2='bowtie2'):
+                      type_aln='bwa_mem', type_aln2='mem'):
     """
     Ensures that all arguments are created and written.
     :param dict_samples:     a dictionary containing the sample_num as key and as value Sample objects
-    :param head_path:       Main path to where the file will be saved
+    :param head_path:        Main path to where the file will be saved
     :param number_of_tumors: Number of hc you want to combine while running Mutect2
-    :param number_of_hc:    Number of hc you want to combine while running Mutect2
-    :param type_sample:     What type of tumor you want to have ("both", "tFL" or "FL")
-    :param type_aln:
-    :param type_aln2:
+    :param number_of_hc:     Number of hc you want to combine while running Mutect2
+    :param type_sample:      What type of tumor you want to have ("both", "tFL" or "FL")
+    :param type_aln:         Type of alignment
+    :param type_aln2:        Type of alignment (for file name)
     :return:
     """
+    # Create files
     compare_hc_tum = open(f'{head_path}{chrom}_compare_hc_tumor_{type_aln}_{type_sample}.txt', "w")
     manual_comparison = open(f'{head_path}{chrom}_manual_comparison_{type_aln}_{type_sample}.txt', "w")
     mutect2_comparison = open(f'{head_path}{chrom}_mutect2_comparison_{type_aln}_{type_sample}.txt', "w")
 
     # Loop over keys from dict_sample
     for key in dict_samples:
-        # dict_samples[key] > Sample()
         dict_samples[key].get_arguments(head_path, chrom, compare_hc_tum, manual_comparison, mutect2_comparison,
                                         number_of_tumors, number_of_hc,
                                         type_sample, type_aln,
@@ -82,12 +81,9 @@ def arguments_to_file(dict_samples, head_path, chrom, number_of_tumors=None, num
 
 
 def main():
-    """
-
-    :return:
-    """
+    # Call config
     config = get_config('gearshift')
-    # the path to the file
+    # The path to the file
     path_file = config['sample_file']
     # Main path to where the file will be saved
     head_path = sys.argv[1]
@@ -107,7 +103,7 @@ def main():
     df_selection = filter_file(path_file)
     # Make objects for all samples/participants
     dict_samples = make_objects(df_selection)
-
+    # Call arguments_to_file
     arguments_to_file(dict_samples, head_path, chrom, number_of_tumors, number_of_hc, type_sample, type_aln, type_aln2)
 
 

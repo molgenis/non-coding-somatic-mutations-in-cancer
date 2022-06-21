@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+# Gets the arguments for running Mutect from files and forwards them to 
+# another bash file that Mutect2 eventually runs
+
 #SBATCH --job-name=calling
 #SBATCH --output=calling.out
 #SBATCH --error=calling.err

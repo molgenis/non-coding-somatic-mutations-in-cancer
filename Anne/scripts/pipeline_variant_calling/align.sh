@@ -1,5 +1,9 @@
 #!/usr/bin/bash
 
+# The bam file (selected chromosome) is aligned against the reference human genome GRCh37 (hg19)
+# It is a paired end alignment.
+# Three different alignment methods can be performed: Burrows-Wheeler Aligner (BWA)-aln, BWA-mem or bowtie2.
+
 #SBATCH --job-name=job_aln
 #SBATCH --output=job_aln.out
 #SBATCH --error=job_aln.err
@@ -22,11 +26,9 @@ do
     FILE_NUM=SS600${NUMBER}  
     # The path where the file is located
     PATH_DIR=${GENERAL_PATH}${SAMPLE}/
-    
+    # Checked if the output file already exists, if so the alignment is not re-executed.
     if [ ! -s ${PATH_DIR}${NUMBER}/${CHROM}/${METHOD}/*_${FILE_NUM}.DR.bam  ] ; then
-
-        echo "BEGIN"
-        echo $NUMBER
+        echo "START ${NUMBER}"
         # Creates a specific folder
         mkdir -p ${PATH_DIR}${NUMBER}/${CHROM}/${METHOD}/
         cd ${PATH_DIR}${NUMBER}
@@ -44,7 +46,6 @@ do
             # Index bam file
             samtools index ${1}_sort.bam
             # Adding Read Group tags and indexing bam files
-            # ml picard/2.20.5-Java-11-LTS
             java -jar /apps/software/picard/2.20.5-Java-11-LTS/picard.jar  AddOrReplaceReadGroups INPUT= ${1}_sort.bam OUTPUT= ${1}.RG.bam RGID=rg_id RGLB=lib_id RGPL=platform RGPU=plat_unit RGSM=sam_id VALIDATION_STRINGENCY=LENIENT
             rm ${1}_sort.bam
             rm ${1}_sort.bam.bai
@@ -70,7 +71,6 @@ do
             rm ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.sai
         elif [ "${METHOD}" == "bwa_mem" ]; then
             #BWA = Burrows-Wheeler Aligner
-            #https://ucdavis-bioinformatics-training.github.io/2017-August-Variant-Analysis-Workshop/wednesday/alignment.html
             # Paired-end alignment BWA-mem
             bwa mem ${GENOOM} ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq > ${PATH_DIR}${NUMBER}/${CHROM}/${METHOD}/mem_${FILE_NUM}.sam
             align_last_steps ${PATH_DIR}${NUMBER}/${CHROM}/${METHOD}/mem_${FILE_NUM}   
@@ -85,8 +85,8 @@ do
         fi
     
         # Remove files
-        #rm ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq
-        #rm ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq
+        rm ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq
+        rm ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq
     
         echo "EIND job align ${METHOD} - ${NUMBER}"
     fi

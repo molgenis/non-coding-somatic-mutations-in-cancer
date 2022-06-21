@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+# Changes the sample names in the bam file
+
 #SBATCH --job-name=change_sname
 #SBATCH --output=change_sname.out
 #SBATCH --error=change_sname.err
@@ -23,8 +25,7 @@ do
     # The path where the file is located
     PATH_DICT=${GENERAL_PATH}${SAMPLE}/${NUMBER}/${CHROM}/${METHOD}/
 
-    echo "BEGIN"
-    echo $NUMBER
+    echo "START $NUMBER"
     # Function that changed the sample names
     change_sample_name() {
         ml SAMtools/1.9-foss-2018b
@@ -33,8 +34,6 @@ do
         rm ${2}${1}.bam
         rm ${2}${1}.bam.bai
     }
-
-    #source /groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/datasets/EGAD00001000292/chr22/make_vcf.sh
     change_sample_name ${METH_FILE}_${FILE_NUM}.DR ${PATH_DICT} #1=file
 
     echo "EIND change sample name - ${NUMBER}"

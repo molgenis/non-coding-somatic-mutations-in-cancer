@@ -98,7 +98,7 @@ COMP_TYPE=mutect2 # manual, mutect2
 echo 'merge_vcf1'
 source ${SCRIPT_PATH}merge_vcf.sh
 COMP_TYPE=manual # manual, mutect2
-echo 'vmerge_vcf2'
+echo 'merge_vcf2'
 source ${SCRIPT_PATH}merge_vcf.sh
 # RUN: dbSNP_annotate.sh
 # filteren van dbSNP (annoteren)

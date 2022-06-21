@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# All vcf files are merged into 1 big vcf files
+
 #SBATCH --job-name=vcf_merge
 #SBATCH --output=vcf_merge.out
 #SBATCH --error=vcf_merge.err
@@ -13,7 +15,7 @@
 
 # Path of the file that will be used
 FILE_PATH=${GENERAL_PATH}${CHROM}_${COMP_TYPE}_comparison_${METHOD}_both.txt
-# TODO TODO
+# Here the line is extracted and stored as argument/variable.
 MERGE_COM=$(sed '1q;d' ${FILE_PATH})
 echo ${MERGE_COM}
 mkdir -p ${GENERAL_PATH}merge_vcf/${CHROM}/

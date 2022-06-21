@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Then each VCF file of a tumor is compared
+# with that of the corresponding germline variant using BCFtools. 
+# This results in three files: 1) with unique SNPs from the tumor, 
+#                              2) with unique SNPs from the germline and 
+#                              3) with SNPs shared by both (overlap). 
+# This was done with the goal of seeing if we got the same results
+# using a tumor filtered by the germline variation, as we did by running it with one tumor and one
+# germline variant together. 
+
 #SBATCH --job-name=vcf_compare
 #SBATCH --output=vcf_compare.out
 #SBATCH --error=vcf_compare.err

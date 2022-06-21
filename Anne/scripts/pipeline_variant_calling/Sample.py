@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+
+# Imports
 from itertools import combinations
 from Run import Run
 
 
 class Sample:
     """
-
+    Create Sample object
     """
 
     def __init__(self):
@@ -19,7 +21,7 @@ class Sample:
     def set_category(self, row):
         """
         Adds runs to the tumors or hc lists, depending on whether the run is a tumor tissue or a healthy control
-        :param row:         the row from the data frame
+        :param row:    The row from the data frame
         :return:
         """
         # Make run objects
@@ -35,24 +37,26 @@ class Sample:
     def set_info(self, hc_or_tum, arg_hc_or_tum, head_path, chrom, type_aln, type_aln2, arg_mutect2_hc_or_tumor,
                  category):
         """
-
-        :param hc_or_tum:
-        :param arg_hc_or_tum:
-        :param head_path:
-        :param chrom:
-        :param type_aln:
-        :param type_aln2:
-        :param arg_mutect2_hc_or_tumor:
-        :param category:
-        :return:
+        Set the info about the samle
+        :param hc_or_tum:               Indicates whether the sample is a tumor or germline (healthy control (hc))
+        :param arg_hc_or_tum:           The beginning of the Mutect2 run command
+        :param head_path:               Main path to where the file will be saved
+        :param chrom:                   The chosen chromosome
+        :param type_aln:                Type of alignment
+        :param type_aln2:               Type of alignment (for file name)
+        :param arg_mutect2_hc_or_tumor: Argument what goes with running Mutect2 for a tumor or hc
+        :param category:                To which category the sample belongs (tumor or hc)
+        :return:  arg_hc_or_tum:            The beginning of the Mutect2 run command
+                  arg_mutect2_hc_or_tumor:  The last part of the command to run Mutect2, specific to the sample
+                  number_hc_or_tum:         Number of sample without SS600
         """
         # Add hc to arg (file name/directory name)
         arg_hc_or_tum += f'{hc_or_tum.name}_'
         # For example, makes SS6005042 -> 5042
         number_hc_or_tum = hc_or_tum.name.replace("SS600", "")
-
+        # Check of the sampel is hc or tumor
         if category == 'hc':
-            # single mutect2. filename and list with parameters for running mutect2 variant calling.
+            # Single mutect2. Filename and list with parameters for running mutect2 variant calling.
             self.write_file(f'{head_path}{self.sample_name}/{chrom}/mutect_{type_aln}/{type_aln}_{hc_or_tum.name}.txt',
                             [f'{head_path}{self.sample_name}/{number_hc_or_tum}_vcf/{chrom}/{type_aln}\n',
                              f'-I {head_path}{self.sample_name}/{number_hc_or_tum}/{chrom}/{type_aln}/SN_{hc_or_tum.name}.bam '
@@ -62,7 +66,7 @@ class Sample:
             arg_mutect2_hc_or_tumor += f'-I {head_path}{self.sample_name}/{number_hc_or_tum}/{chrom}/{type_aln}/SN_{hc_or_tum.name}.bam ' \
                                        f'-normal {type_aln2}_{hc_or_tum.name}.DR '
         else:
-            # single mutect2
+            # Single mutect2
             self.write_file(f'{head_path}{self.sample_name}/{chrom}/mutect_{type_aln}/{type_aln}_{hc_or_tum.name}.txt',
                             [f'{head_path}{self.sample_name}/{number_hc_or_tum}_vcf/{chrom}/{type_aln}\n',
                              f'-I {head_path}{self.sample_name}/{number_hc_or_tum}/{chrom}/{type_aln}/SN_{hc_or_tum.name}.bam ',
@@ -80,14 +84,14 @@ class Sample:
         Ensures that all arguments for Mutect2/FilterMutectCalls are made with all possible combinations
         tumor vs hc of a sample (i.e. per two).
         :param head_path:           Main path to where the file will be saved
-        :param compare_hc_tum:
-        :param manual_comparison:
-        :param mutect2_comparison:
+        :param compare_hc_tum:      File for performing Mutect2 with a tumor and a healthy sample.
+        :param manual_comparison:   File for running Mutect2 with a sample (tumor or germline)
+        :param mutect2_comparison:  The file in which the command for running Mutect2 is written
         :param number_of_tumors:    Number of hc you want to combine while running Mutect2
         :param number_of_hc:        Number of hc you want to combine while running Mutect2
         :param type_sample:         What type of tumor you want to have ("both", "tFL" or "FL")
-        :param type_aln:
-        :param type_aln2:
+        :param type_aln:            Type of alignment
+        :param type_aln2:           Type of alignment (for file name)
         :return:
         """
         # If it is None, the number of tumors or hc is adjusted to the length of the list tumors/hc
@@ -117,6 +121,7 @@ class Sample:
                 arg_tumor = ''
                 arg_mutect2_tumor = ''
                 for tum in edited_number_tumors:
+                    # Call self_info
                     arg_tumor, arg_mutect2_tumor, number_tum = self.set_info(tum, arg_tumor, head_path, chrom,
                                                                              type_aln, type_aln2, arg_mutect2_tumor,
                                                                              'tum')
@@ -143,7 +148,6 @@ class Sample:
                 file_output = f'\n{head_path}{self.sample_name}/{arg[:-1]}/{chrom}/{type_aln}/{arg}'
                 # File name (and path) after which these arguments are written
                 name_file = f'{head_path}{self.sample_name}/{chrom}/mutect_{type_aln}/{type_aln}_{arg[:-1]}.txt'
-
                 # Calls the function that actually writes the arguments
                 self.write_file(name_file, [mkdir_path, arg_mutect2, file_output])
 

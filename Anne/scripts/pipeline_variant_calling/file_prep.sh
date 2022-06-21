@@ -1,5 +1,10 @@
 #!/usr/bin/bash
 
+# Prepare the file to be worked with
+# File will be sorted if it hasn't already been sorted. 
+# The selected chromosome is retrieved from the file and then sorted by read ID. 
+# FastQC is also performed.
+
 #SBATCH --job-name=file_prep
 #SBATCH --output=file_prep.out
 #SBATCH --error=file_prep.err
@@ -26,20 +31,20 @@ do
     # -s: True if file exists and is not empty.
     if [ ! -s ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R1.fastq  ] &&  [ ! -s ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_name_R2.fastq ]; then
 
-        echo "BEGIN ${NUMBER}"
+        echo "START ${NUMBER}"
         # Creates a specific folder
         mkdir -p ${PATH_DIR}${NUMBER}/${CHROM}/QC
     
         cd ${PATH_DIR}${NUMBER}
         ml SAMtools/1.9-foss-2018b
-        # Filters a certain chromosome from the bam file
-        # When file doesn't exist.
+        # If no sorted bam file is present, the bam file will still be sorted
         if [ ! -f ${PATH_DIR}${FILE_NUM}.sorted.bam ]; then
             # Sort bam file
             samtools sort ${PATH_DIR}${FILE_NUM}.bam -o ${PATH_DIR}${FILE_NUM}.sorted.bam
             # Index bam file
             samtools index ${PATH_DIR}${FILE_NUM}.sorted.bam
         fi
+        # Filters a certain chromosome from the bam file
         samtools view -h ${PATH_DIR}${FILE_NUM}.sorted.bam ${CHROM} > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_${CHROM}.sam
         samtools view -bS ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_${CHROM}.sam > ${PATH_DIR}${NUMBER}/${CHROM}/${FILE_NUM}_${CHROM}.bam
         # Remove file
