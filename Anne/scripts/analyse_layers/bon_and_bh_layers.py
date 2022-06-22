@@ -10,6 +10,13 @@ from config import get_config
 
 
 def get_significant_snps(df, list_significant_elements, snps_search, path_analyse, type_test, type_file, non_coding, fc):  
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     path_new_file = f"{path_analyse}correction/{type_file}_{non_coding}_{fc}_{type_test}_sig_snps.tsv"
     snp_DF = pd.DataFrame(columns=[f'snp_IDs_{type_test}'])    
     if len(list_significant_elements) > 0:
@@ -33,6 +40,13 @@ def get_significant_snps(df, list_significant_elements, snps_search, path_analys
     
 
 def run_different_fc(df_select, type_file, non_coding, path_analyse, fc, path_search_snp, with_gene):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse, False, fc)
     # path_search_snp = "D:/Hanze_Groningen/STAGE/analyse/stat/ALL_gene_before_2000_250.tsv"
     snps_search = pd.read_csv(path_search_snp, sep='\t', compression='gzip')
@@ -62,6 +76,13 @@ def run_different_fc(df_select, type_file, non_coding, path_analyse, fc, path_se
 def calculate_fc(df):
     """
 
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
+    """
+
     example:
     np.array([10, 20, 0, 0, 3, 4]) / np.array([0, 20, 0, 30, 2, 33])   = array([inf, 1. , nan, 0. , 1.5, 0.12121212])
 
@@ -85,6 +106,13 @@ def calculate_fc(df):
 
 
 def run_all_corrections(path_analyse, type_file, non_coding, with_gene, path_search_snp):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     path_file = f"{path_analyse}{type_file}_{non_coding}_both_0_TESTS_chr0_0.tsv.gz"
     df = pd.read_csv(path_file, sep='\t', compression='gzip')
     

@@ -2,6 +2,13 @@ import sys
 import gzip
 
 def overlap(c1,b1,e1,c2,b2,e2):
+	"""
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
 	if c1 != c2:
 		return 0
 	if e2 < b1 or b2 > e1:

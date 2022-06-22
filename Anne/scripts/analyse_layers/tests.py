@@ -18,7 +18,11 @@ from scipy.stats.contingency import relative_risk
 
 def chi_square_self(df, colname_b, colname_nb, num_donor_b, num_donor_nb):
     """
-    
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
     """
     df['counts_breast_plus'] = df[colname_b] + (1/num_donor_b)
     print(set(df['counts_breast_plus']))
@@ -51,7 +55,11 @@ def chi_square_self(df, colname_b, colname_nb, num_donor_b, num_donor_nb):
 
 def chi_square(S_C, df):
     """
-    
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
     """
     start_time = time.perf_counter()
 
@@ -71,7 +79,11 @@ def chi_square(S_C, df):
 
 def log2_fc(df, n, S):
     """
-    
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
     """
     constant = np.log(n[0]) - np.log(n[1])
     log2_fc = (np.log(S[:, 0]) - np.log(S[:, 1]) - constant) / np.log(2)
@@ -82,7 +94,11 @@ def log2_fc(df, n, S):
 
 def fisher_test(S_C, df):
     """
-    
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
     """
     start_time = time.perf_counter()
 
@@ -102,6 +118,13 @@ def fisher_test(S_C, df):
 
 def shapiro_test(df, column_name, column_name_filter, path_file, type_analyse, type_df):
     """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
+    """
     As the p value obtained from the Shapiro-Wilk test is significant (p < 0.05), 
     we conclude that the data is not normally distributed. Further, in histogram data 
     distribution shape does not look normal. Therefore, Mann-Whitney U test is more appropriate for analyzing two samples.
@@ -120,6 +143,13 @@ def shapiro_test(df, column_name, column_name_filter, path_file, type_analyse, t
 
 def mannwhitney(df, column_breast, column_nonbreast):
     """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
+    """
     Mann-Whitney U test interpretation: As the p value obtained from the Mann-Whitney U test 
     is significant (U = 489.5, p < 0.05), we conclude that the yield of the two genotypes 
     significantly different from each other .
@@ -131,7 +161,11 @@ def mannwhitney(df, column_breast, column_nonbreast):
 
 def volcano_plot(df, p_value_column, path_file, type_analyse, type_df):
     """
-    
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
     """
     visuz.GeneExpression.volcano(df=df,lfc='log2_fc',pv=p_value_column, plotlegend=True, legendpos='upper right')
     plt.title(f"{type_analyse} - {type_df} nonbreast")
@@ -139,6 +173,13 @@ def volcano_plot(df, p_value_column, path_file, type_analyse, type_df):
     plt.clf()
 
 def calculate_relative_risk(S_C, df):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     relative_risk_values = list()
     confidence_interval = list()
     confidence_interval_bon = list()
@@ -176,7 +217,11 @@ def calculate_relative_risk(S_C, df):
 
 def all_test(df, num_donor_b, num_donor_nb, type_df, type_analyse, path_file, select_chrom, i):
     """
-    
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
     """
     print('\nboxplot')
     df.boxplot(column=['counts_breast'], grid=False)

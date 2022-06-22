@@ -6,11 +6,40 @@ sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non
 from Database import Database
 
 
+def run_multiple_testing_correction(df, alpha, method, type_test):
+    """
+
+    :param :  
+    :param :  
+    :param :  
+    :param :       
+    :return:    
+    """
+    list_p_values = list(df[f'p_value_{type_test}'])
+    rej, p_adjusted = multipletests(list_p_values, alpha=alpha, method=method)[:2]
+    df[f'{method}_{type_test}'] = p_adjusted
+    return df
+
 def bonferroni_correction(df, alpha, method, type_test):
+    """
+
+    :param : 
+    :param :  
+    :param :  
+    :param :        
+    :return:    
+    """
     df[f'{method}_{type_test}'] = df[f'p_value_{type_test}'] < (alpha/len(set(df)))
     return df
 
 def benjamini_hochberg_correction(df, alpha, type_test):
+    """
+
+    :param :  
+    :param :  
+    :param :       
+    :return:    
+    """
     # sort p-values
     df = df.sort_values(f'p_value_{type_test}').reset_index(drop=True)
     # assign a rank
@@ -38,6 +67,14 @@ def benjamini_hochberg_correction(df, alpha, type_test):
 
 
 def get_significant(df, type_test, alpha, RR):
+    """
+
+    :param : 
+    :param :  
+    :param :  
+    :param :        
+    :return:    
+    """
     if RR:
         print(f'---------RR--------')
         df_select = df[['info', f'{type_test}']]
@@ -63,6 +100,13 @@ def get_significant(df, type_test, alpha, RR):
 
 
 def get_overlap(self_X2_df, X2_df, F_df):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     print('---ALL')
     all_values = set(self_X2_df) | set(X2_df) |  set(F_df)
     # print(f'All genes ({len(all_values)}): {all_values}')
@@ -116,6 +160,17 @@ def get_overlap(self_X2_df, X2_df, F_df):
     return elements_in_all
 
 def search(df_select, type_file, non_coding, path_analyse, GT, fc):
+    """
+
+    :param :  
+    :param :  
+    :param :  
+    :param :  
+    :param :  
+    :param :  
+    :param :       
+    :return:    
+    """
     alpha=0.05
     if GT:
         method = 'bonferroni'

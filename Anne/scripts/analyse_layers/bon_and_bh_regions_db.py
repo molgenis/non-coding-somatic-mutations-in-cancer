@@ -12,6 +12,13 @@ from config import get_config
 
 
 def get_significant_snps_db(list_significant_elements, db, f, type_test):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     print(len(list_significant_elements))
     snp_id_list = list()
     dict_snp = dict()
@@ -37,6 +44,13 @@ def get_significant_snps_db(list_significant_elements, db, f, type_test):
 
 
 def run_different_fc(df_select, type_file, non_coding, path_analyse, db, fc):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     elements_in_all_normal, elements_in_all_bon, elements_in_all_bh, elements_snps_all_MTC = bon_and_bh_calculate.search(df_select, type_file, non_coding, path_analyse, False, fc)
     
 
@@ -56,6 +70,13 @@ def run_different_fc(df_select, type_file, non_coding, path_analyse, db, fc):
 
 
 def calculate_fc(df):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     """
 
     example:
@@ -79,6 +100,13 @@ def calculate_fc(df):
 
 
 def run_all_corrections(path_analyse, type_file, non_coding, db, col1, col2):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     print(type_file)
     print(non_coding)
     path_file = f"{path_analyse}{type_file}_{non_coding}_both_0_TESTS_chr0_0.tsv.gz"

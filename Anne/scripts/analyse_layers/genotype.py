@@ -20,6 +20,13 @@ from config import get_config
 import get_data as get_data
 
 def make_GT_df(df, type_c, num_donors):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     select_df = df[['GT2', 'snp_ID', 'chr', 'pos_start', 'pos_end']]
     select_1_df = select_df[select_df['GT2'] == 1]
     select_2_df = select_df[select_df['GT2'] == 2]
@@ -33,6 +40,13 @@ def make_GT_df(df, type_c, num_donors):
     return GT_df_0
 
 def cochran_armitage(both_GT, path_file, type_df):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     both_GT.reset_index(inplace=True)
     p_value_cochran_armitage = list()
     for index, row in both_GT.iterrows():
@@ -50,6 +64,13 @@ def cochran_armitage(both_GT, path_file, type_df):
 
 
 def all_data(filter_par, path_file, path_db):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
     breast_GT = make_GT_df(all_breast, 'b', all_num_donor_b)
     nonbreast_GT = make_GT_df(all_nonbreast, 'nb', all_num_donor_nb)
@@ -65,6 +86,13 @@ def all_data(filter_par, path_file, path_db):
 
 
 def noncoding_data(filter_par, path_file, path_db):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
     breast_GT = make_GT_df(noncoding_breast, 'b', noncoding_num_donor_b)
     nonbreast_GT = make_GT_df(noncoding_nonbreast, 'nb', noncoding_num_donor_nb)
@@ -81,6 +109,13 @@ def noncoding_data(filter_par, path_file, path_db):
 
 
 def coding_data(filter_par, path_file, path_db):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     coding_breast, coding_nonbreast, coding_num_donor_b, coding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
     breast_GT = make_GT_df(coding_breast, 'b', coding_num_donor_b)
     nonbreast_GT = make_GT_df(coding_nonbreast, 'nb', coding_num_donor_nb)

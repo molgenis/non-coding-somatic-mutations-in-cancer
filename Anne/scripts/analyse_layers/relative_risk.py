@@ -3,6 +3,13 @@ from scipy.stats.contingency import relative_risk
 
 
 def calculate_relative_risk(counts_breast, counts_nonbreast, donors_breast, donors_nonbreast):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     RR = (counts_breast / donors_breast) / (counts_nonbreast / donors_nonbreast)
     print(RR)
     log_RR = math.log(counts_breast) - math.log(donors_breast) - math.log(counts_nonbreast) + math.log(donors_nonbreast)

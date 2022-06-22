@@ -7,6 +7,13 @@ from config import get_config
 
 
 def search_gene(list_chr, path_analyse, type_file, non_coding, type_MTC, fc):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     if len(list_chr) > 0:
         config = get_config('gearshift')
         path_gene_file = config['all_genes'] #"D:/Hanze_Groningen/STAGE/db/all_genes_new - kopie.tsv"

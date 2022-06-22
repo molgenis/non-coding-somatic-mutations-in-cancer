@@ -20,6 +20,13 @@ import get_data as get_data
 import tests as tests
 
 def make_merge_df(path_breast, path_nonbreast):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     colnames=['index', 'counts_breast', 'chr', 'start_region', 'stop_region']
     breast = pd.read_csv(path_breast, sep='\t', header=None, names=colnames)
     breast.sort_values(['chr', 'start_region'], inplace=True)
@@ -34,6 +41,13 @@ def make_merge_df(path_breast, path_nonbreast):
 
 
 def make_df_2000(merge_df):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     df = pd.DataFrame(columns=['counts_breast', 'chr', 'start_region', 'stop_region', 'counts_nonbreast', 'snps_b_double', 'snps_nb_double'])
 
     # chrom = ['chr4']
@@ -59,6 +73,13 @@ def make_df_2000(merge_df):
 
 
 def all_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom, i):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     all_breast, all_nonbreast, all_num_donor_b, all_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
     merge_df = make_merge_df(path_R_b, path_R_nb)
     df_1000_tests = tests.all_test(merge_df, all_snps_b, all_snps_nb, 'ALL', 'Region_1000', path_file, select_chrom, i)
@@ -67,6 +88,13 @@ def all_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom, 
 
 
 def noncoding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom, i):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     noncoding_breast, noncoding_nonbreast, noncoding_num_donor_b, noncoding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
     nc_merge_df = make_merge_df(path_R_b, path_R_nb)
     nc_df_1000_tests = tests.all_test(nc_merge_df, all_snps_b, all_snps_nb, 'NonCoding', 'Region_1000', path_file, select_chrom, i)
@@ -74,6 +102,13 @@ def noncoding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_c
     nc_df_2000_tests = tests.all_test(nc_df_2000, all_snps_b, all_snps_nb, 'NonCoding', 'Region_2000', path_file, select_chrom, i)
 
 def coding_data(filter_par, path_file, path_db, path_R_b, path_R_nb, select_chrom, i):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     coding_breast, coding_nonbreast, coding_num_donor_b, coding_num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
     c_merge_df = make_merge_df(path_R_b, path_R_nb)
     c_df_1000_tests = tests.all_test(c_merge_df, all_snps_b, all_snps_nb, 'Coding', 'Region_1000', path_file, select_chrom, i)

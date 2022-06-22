@@ -14,6 +14,13 @@ import get_data as get_data
 import tests as tests
 
 def make_snp_df(df, type_df, type_c, path_file, select_chrom):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     print('----------')
     df = df[df['chr'] == select_chrom]
     df['snp'] = df['chr'].map(str) + '_' + df['pos_start'].map(str) + '_' + df['pos_end'].map(str)
@@ -42,6 +49,13 @@ def make_snp_df(df, type_df, type_c, path_file, select_chrom):
 
 
 def run_snp_tests(df_breast, df_nonbreast, type_df, type_analyse, path_file, select_chrom):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     print('\nset snps')
     num_donor_b, sort_snp_count_breast = make_snp_df(df_breast, type_df, 'breast', path_file, select_chrom)
     num_donor_nb, sort_snp_count_nonbreast = make_snp_df(df_nonbreast, type_df, 'nonbreast', path_file, select_chrom)
@@ -70,7 +84,14 @@ def run_snp_tests(df_breast, df_nonbreast, type_df, type_analyse, path_file, sel
 
 
 
-def all_data(filter_par, path_file, path_db, select_chrom):    
+def all_data(filter_par, path_file, path_db, select_chrom):  
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """  
     all_breast, all_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_all_data(filter_par, path_file, path_db)
 
     run_snp_tests(all_breast, all_nonbreast, 'ALL', 'per_snp', path_file, select_chrom)
@@ -79,6 +100,13 @@ def all_data(filter_par, path_file, path_db, select_chrom):
 
 
 def noncoding_data(filter_par, path_file, path_db, select_chrom):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     noncoding_breast, noncoding_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_noncoding_data(filter_par, path_file, path_db)
 
     run_snp_tests(noncoding_breast, noncoding_nonbreast, 'NonCoding', 'per_snp', path_file, select_chrom)
@@ -86,6 +114,13 @@ def noncoding_data(filter_par, path_file, path_db, select_chrom):
 
 
 def coding_data(filter_par, path_file, path_db, select_chrom):
+    """
+
+    :param : 
+    :param :  
+    :param :        
+    :return:    
+    """
     coding_breast, coding_nonbreast, num_donor_b, num_donor_nb, all_snps_b, all_snps_nb = get_data.get_coding_data(filter_par, path_file, path_db)
 
     run_snp_tests(coding_breast, coding_nonbreast, 'Coding', 'per_snp', path_file, select_chrom)
