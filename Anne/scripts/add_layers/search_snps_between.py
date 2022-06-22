@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 # Imports
 import pandas as pd
@@ -20,18 +21,29 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
     :param donor_dict:        A dictionary with as key the automatically generated donor ID and as value the donor
                               IDs that are used in the research.
     :param donor_list:        List of donor names (to be used later as rows in the sparse matrix)
-    :param gene_name_list --> gene_region_list:    List of gene names (to be used later as columns in the sparse matrix)
+    :param gene_name_list:    List of gene names (to be used later as columns in the sparse matrix)
+    :param sparse_matrix_overall: A matrix which contains very few non-zero elements. It contains the counts of a
+                                specific region-donor combination.
     :param donor_cancer_list: List of cancers. This list has the same order as donor_list.
-    :return: gene_name_list:  List of gene names (to be used later as columns in the sparse matrix)
+    :param total_read:          Lift of total read counts
+    :param filter_num:          The number for filtering the total read count. (the number must be equal to or greater than)
+    :param with_type:           Check if it is gene or not
+    :return: sparse_matrix_overall: A matrix which contains very few non-zero elements. It contains the counts of a
+                                   specific region-donor combination.
+             gene_name_list:  List of gene names (to be used later as columns in the sparse matrix)
+             total_read:          Lift of total read counts             
     """
     # Get index of the gene name in the list
     gene_index = gene_name_list.index(gene)
     if with_type == 'genes':
         # Replace the name with gene_name:chromosoom:start_pos-end_pos
         gene_name_list[gene_index] = f'{gene}:chr{chr}:{int(start_pos)}-{int(end_pos)}'
+    # Dictionary with the key donor_id and as value a list with the total number of read counts, 
+    # total dosage and how often this donor occurs
     donor_read_count = dict()
     # Make donor_list_snp. List because double donors count
     donor_list_snp = list()
+    # List of SNPs
     snp_ID_list = list()
         
     db.cursor.execute("""
@@ -49,7 +61,9 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
     if len(results) > 0:
         # Loop over results
         for res in results:
+            # Append donor_ID to donor_list_snp
             donor_list_snp.append(donor_dict[res['donor_ID']])
+            # Append snp_ID to snp_ID_list
             snp_ID_list.append(res['snp_ID'])
             # Check if donor_ID already exists
             if donor_dict[res['donor_ID']] in donor_read_count:
@@ -82,7 +96,7 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
             len(snp_ID_list)) + '\t' + ','.join(map(str, snp_ID_list)) + '\t' + str(len(donor_list_snp)) + '\t' + str(
             donor_count) + '\t' + str(cancer_count) + '\n')
     else:
-        # Write to file
+        # If no results (SNPs) are found in a certain region, a line will be written
         if with_type == 'genes':
             gene_file.write(str(filter_num) + '\t'+gene + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
                 len(snp_ID_list)) + '\t-\t-\t-\t-\n')
@@ -102,6 +116,8 @@ def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, po
     :param save_path:         Path to save files
     :param pos:               A string indicating whether it is before or after a gene (bef/aft)
     :param donor_cancer_list: List of cancers. This list has the same order as donor_list.
+    :param total_read:          Lift of total read counts
+    :param part_num:            The number of the part for multiprocessing
     :return:
 
     """

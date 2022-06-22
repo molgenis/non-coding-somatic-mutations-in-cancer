@@ -15,6 +15,5 @@ ml Anaconda3/5.3.0
 source activate stage
 
 
-SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/add_layers/ #$(yaml $YAML_PATH "['add_layers']")
-
+SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/add_layers/ 
 python3 ${SCRIPT_PATH}position_before_multipro.py

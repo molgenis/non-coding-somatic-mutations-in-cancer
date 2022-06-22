@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Imports
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -21,17 +23,17 @@ def loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_
     :param db:                  The database object
     :param chr:                 Number or letter of the chromosome
     :param length_chrom:        Length of the chromosome
-    :param steps:               .......
+    :param steps:               The steps for the region
     :param donor_dict:          A dictionary with as key the automatically generated donor ID and as value the donor
                                 IDs that are used in the research.
     :param donor_list:          List of donor names (to be used later as rows in the sparse matrix)
     :param donor_cancer_list:   List of cancers. This list has the same order as donor_list.
     :param save_path:           Path to save files
-    :param region_list:         ........
+    :param region_list:         List of the regions
     :param sparse_matrix_overall:A matrix which contains very few non-zero elements. It contains the counts of a
                                 specific region-donor combination.
-    :param filter_num:         ........
-    :param with_type:         ........
+    :param filter_num:          The number for filtering the total read count. (the number must be equal to or greater than)
+    :param with_type:           Check if it is gene or not
     :return:
 
     """
@@ -49,33 +51,32 @@ def loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_
         if i != 0:
             # Call close_to
             sparse_matrix_overall, region_list, total_read = close_to(db,
-                                                                                            f'{chr}:{i_start}-{i}',
-                                                                                            chr,
-                                                                                            i_start,
-                                                                                            i,
-                                                                                            split_chr_file,
-                                                                                            donor_dict,
-                                                                                            donor_list,
-                                                                                            region_list,                                                                                    
-                                                                                            sparse_matrix_overall,
-                                                                                            donor_cancer_list,
-                                                                                            total_read, filter_num, with_type)
+                                                                        f'{chr}:{i_start}-{i}',
+                                                                        chr,
+                                                                        i_start,
+                                                                        i,
+                                                                        split_chr_file,
+                                                                        donor_dict,
+                                                                        donor_list,
+                                                                        region_list,                                                                                    
+                                                                        sparse_matrix_overall,
+                                                                        donor_cancer_list,
+                                                                        total_read, filter_num, with_type)
         if length_chrom == (i + (length_chrom % steps)):
             last_i = (i + (length_chrom % steps))
             if i != last_i:
-                print(i+1, '-', last_i)
                 sparse_matrix_overall, region_list, total_read = close_to(db,
-                                                                                                f'{chr}:{i_start}-{i}',
-                                                                                                chr,
-                                                                                                (i + 1),
-                                                                                                last_i,
-                                                                                                split_chr_file,
-                                                                                                donor_dict,
-                                                                                                donor_list,
-                                                                                                region_list,
-                                                                                                sparse_matrix_overall,
-                                                                                                donor_cancer_list,
-                                                                                                total_read, filter_num, with_type)
+                                                                            f'{chr}:{i_start}-{i}',
+                                                                            chr,
+                                                                            (i + 1),
+                                                                            last_i,
+                                                                            split_chr_file,
+                                                                            donor_dict,
+                                                                            donor_list,
+                                                                            region_list,
+                                                                            sparse_matrix_overall,
+                                                                            donor_cancer_list,
+                                                                            total_read, filter_num, with_type)
         i_start = (i + 1)
     # Close file
     split_chr_file.close()
@@ -85,8 +86,8 @@ def loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_
 
 def set_region_list(steps, chr, length_chrom):
     """
-    
-    :param steps:        ...........
+    Creates a list with all regions (chr:begin_pos-end_pos)
+    :param steps:        The steps for the region
     :param chr:          Number or letter of the chromosome
     :param length_chrom: Length of the chromosome
     :return:
@@ -108,15 +109,15 @@ def multiprocess(chr_length, steps, donor_list, donor_dict, donor_cancer_list, s
     """
     
     :param chr_length:  Length of the chromosome
-    :param steps:
+    :param steps: The steps for the region
     :param donor_dict:          A dictionary with as key the automatically generated donor ID and as value the donor
                                 IDs that are used in the research.
     :param donor_list:          List of donor names (to be used later as rows in the sparse matrix)
     :param donor_cancer_list:   List of cancers. This list has the same order as donor_list.
     :param save_path:           Path to save files
-    :param filter_num:
-    :param with_type:
-    :param config:
+    :param filter_num:          The number for filtering the total read count. (the number must be equal to or greater than)
+    :param with_type:           Check if it is gene or not
+    :param config:              Dictionary with as keys the name of the paths and as value the paths   
     :return:
     """
     # Path of the database
@@ -128,19 +129,15 @@ def multiprocess(chr_length, steps, donor_list, donor_dict, donor_cancer_list, s
         # Creating a len(donor_list) * len(gene_name_list) sparse matrix
         sparse_matrix = csr_matrix((len(donor_list), len(region_list)),
                                                 dtype=np.int8).toarray()
-        print('loop over genes')
         # Call loop_over_genes
         loop_over_genes(db, chr, length_chrom, steps, donor_dict, donor_list, donor_cancer_list,
                         save_path, region_list, sparse_matrix, sparse_matrix.copy(), filter_num, with_type)
-        print('CLOSE')
 
 def split_dict(d, n, chr_length):
     """
-    # https://stackoverflow.com/questions/22878743/how-to-split-dictionary-into-multiple-dictionaries-fast
-
-    
-    :param d:  
-    :param n: 
+    Split dictionary into multiple dictionarys    
+    :param d:  The chromosome
+    :param n: number of chromosomes / cpus
     :param chr_length:  Length of the chromosome
     :return:
     """
@@ -160,10 +157,6 @@ def main():
     save_path = config['umap_path'] 
     # The steps for the region
     steps= 2000
-
-    #https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-247
-    #https://www.nature.com/articles/nature07517#Sec6
-    # SNP discovery increases with increasing depth: essentially all homozygous positions are detected at 15×, whereas heterozygous positions accumulate more gradually to 33× (Fig. 5a). 
     filter_num = 33
     with_type = 'chrom'
     #https://en.wikipedia.org/wiki/Human_genome

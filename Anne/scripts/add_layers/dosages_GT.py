@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 # Imports
 import sys
@@ -34,7 +35,8 @@ def set_GT(db, table):
     """
     Add and set GT (genotype) to homozygous alt (2), heterozygous (1) or homozygous ref (0).
     GT remains Nan (or none) when there are no dosages.
-    :param db:  The database object
+    :param db:    The database object
+    :param table: Name of the table
     :return:
     """
     # add dosages
@@ -90,7 +92,6 @@ def set_GT2(db, table):
 def sum_dosage_GT(db):
     """
     Add new table based on 'donor_had_snp'.
-    .....
     :param db:  The database object
     :return:
     """
@@ -155,10 +156,10 @@ def main():
     path_db = config['database']
     # Database connection
     db = Database(path_db)
-    # set_dosages(db)
+    set_dosages(db)
     set_GT(db, 'donor_has_snp')
     set_GT2(db, 'donor_has_snp')
-    # sum_dosage_GT(db)
+    sum_dosage_GT(db)
     set_GT(db, 'sum_dosage_GT')
     set_GT2(db, 'sum_dosage_GT')
 

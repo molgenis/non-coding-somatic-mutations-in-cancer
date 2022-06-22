@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 #Import
 import pandas as pd
@@ -12,6 +13,7 @@ def add_value(db, name_variant):
     """
     Adds value to the database (table snp).
     :param db:  The database object
+    :param name_variant: The name of the layer
     :return:
     """
     # Add in_transcript
@@ -25,11 +27,11 @@ def add_value(db, name_variant):
 
 def set_value(db, row, name_variant):
     """
-    
-    :param db: The database object      
-            row: The row out of the layer file
-            name_variant: The name of the layer
-    :return: length of the results
+    Update values in the database
+    :param db:  The database object
+    :param row: The row of a file
+    :param name_variant: The name of the layer
+    :return: length of the resulst
     """
     # Update in_transcript
     db.cursor.execute(

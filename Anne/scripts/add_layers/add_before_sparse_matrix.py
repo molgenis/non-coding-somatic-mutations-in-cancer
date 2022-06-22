@@ -15,7 +15,7 @@ from config import get_config
 def merge_sparce_matrix(save_path, whole_numpy_array):
     """
     Adds the sparce matrices together
-    :param save_path: string with path of where the file should be saved.
+    :param save_path:         string with path of where the file should be saved.
     :param whole_numpy_array: empty sparce array of len(donor_list) at len(gene_name_list)+1
     :return:
     """

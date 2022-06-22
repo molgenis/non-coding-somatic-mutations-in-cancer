@@ -15,4 +15,4 @@ ml Anaconda3/5.3.0
 source activate stage
 
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/add_layers/ 
-python3 ${SCRIPT_PATH}extra_layers_UCNE_multi.py
+python3 ${SCRIPT_PATH}extra_layers_multi_file.py 'UCNE'

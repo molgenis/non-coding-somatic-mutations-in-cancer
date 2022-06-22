@@ -1,3 +1,7 @@
 distance_eqtl_ALL: 'D:/Hanze_Groningen/STAGE/eQTL/distance_eqtl_ALL.tsv'
 eQTL_zero_distance: 'D:/Hanze_Groningen/STAGE/R/eQTL_zero_distance.tsv'
 database: 'D:/Hanze_Groningen/STAGE/db_laatste_copy.db'
+GT_file: 'D:/Hanze_Groningen/STAGE/R/GT.tsv'
+GT_file_breast: 'D:/Hanze_Groningen/STAGE/R/GT_breast.tsv'
+GT_file_nonbreast: 'D:/Hanze_Groningen/STAGE/R/GT_nonbreast.tsv'
+GT_file_both: 'D:/Hanze_Groningen/STAGE/R/GT_count_ALL.tsv'

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 # Imports
 import pandas as pd
@@ -15,9 +16,9 @@ def multiprocess_search_close_snp(df_strong_eQTL, region, path_save_file, config
     """
     Sees which SNPs are within a specific region of an eQTL
     :param df_strong_eQTL: Df with strongest eQTLs
-            region: Region from which it looks at a distance from an eQTL if there are SNPs within that region
-            path_save_file: Path where the file is saved
-            config: Dictionary with as keys the name of the paths and as value the paths           
+    :param region:         Region from which it looks at a distance from an eQTL if there are SNPs within that region
+    :param path_save_file: Path where the file is saved
+    :param config:         Dictionary with as keys the name of the paths and as value the paths           
     :return: 
     """
     path_db = config['database']
@@ -64,7 +65,7 @@ def main():
     df_strong_eQTL = pd.read_csv(path_strong_eQTL, sep='\t')
     # Region from which it looks at a distance from an eQTL if there are SNPs within that region
     region = 10000
-    # Multiprocess
+    
     cpus = mp.cpu_count()
     list_paths_save = list()
     arg_multi_list = []
@@ -74,7 +75,7 @@ def main():
         list_paths_save.append(path_save_file)
         # add parameters needed to run multiprocess_search_close_snp function
         arg_multi_list.append((df, region, path_save_file, config))
-
+    # Multiprocess
     pool = Pool(processes=cpus)
     pool.starmap(func=multiprocess_search_close_snp, iterable=arg_multi_list)
     pool.close()

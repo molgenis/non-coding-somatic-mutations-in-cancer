@@ -52,6 +52,8 @@ def set_gene(db, row, chr, position_out_gene, position_in_gene):
     :param row: One row out of the gene file (columns: #name, chrom, strand, txStart, txEnd, cdsStart, cdsEnd,
                 exonCount, exonStarts, exonEnds, proteinID, alignID)
     :param chr: Chromosome number or letter (without chr)
+    :param position_out_gene: Region before the start position of a gene or after the stop position of a gene
+    :param position_in_gene: Region after the start position of a gene or before the stop position of a gene
     :return:
     """
     # Update in_transcript
@@ -115,6 +117,7 @@ def loop_over_genes(db, gene_df, position_out_gene, position_in_gene):
 
 
 def main():
+    # Call get_config
     config = get_config('gearshift')
     # Path of the database
     path_db = config['database'] 

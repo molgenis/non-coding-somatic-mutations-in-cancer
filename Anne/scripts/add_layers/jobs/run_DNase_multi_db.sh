@@ -1,10 +1,10 @@
 #!/usr/bin/bash
 
-#SBATCH --job-name=UCNE
-#SBATCH --output=UCNE.out
-#SBATCH --error=UCNE.err
+#SBATCH --job-name=DNase2
+#SBATCH --output=DNase2.out
+#SBATCH --error=DNase2.err
 #SBATCH --time=160:59:59
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=16
 #SBATCH --mem=96gb
 #SBATCH --nodes=1
 #SBATCH --open-mode=append
@@ -16,4 +16,4 @@ source activate stage
 
 SCRIPT_PATH=/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/add_layers/
 
-python3 ${SCRIPT_PATH}extra_layers_UCNE.py
+python3 ${SCRIPT_PATH}extra_layers_multi_db.py 'DNase'

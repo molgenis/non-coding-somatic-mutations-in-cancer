@@ -11,7 +11,7 @@ def compare_eQTL_files(df_eQTL, df_strong_eQTL, config):
     Appends the extra information from the file with all eQTLs to the file with only the strictest eQTLs per gene.
     :param df_eQTL: all significant eQTLs
     :param df_strong_eQTL: all strongest eQTLs per gene (no information further)
-    :param config: dictionary of all paths
+    :param config: Dictionary with as keys the name of the paths and as value the paths   
     :return:
     """
     # Make empty dataframe with the same column names as df_eQTL
@@ -27,6 +27,7 @@ def compare_eQTL_files(df_eQTL, df_strong_eQTL, config):
 
 
 def main():
+    # Call get_config
     config = get_config('gearshift')
     # Path to all significant eQTLs
     path_eQTL = config['all_sig_eqtl']
