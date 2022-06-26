@@ -20,7 +20,9 @@ Jupyter Notebook, Python and R should be installed and working before the script
 1.	Clone the repo
 
 ``` git clone https://github.com/molgenis/non-coding-somatic-mutations-in-cancer.git ```
+
 2.	Install all the required python packages
+
 ```conda install –-file requirements.txt ```
  
 ## Usage
