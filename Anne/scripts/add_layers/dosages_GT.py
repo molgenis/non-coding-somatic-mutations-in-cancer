@@ -2,11 +2,13 @@
 
 # Imports
 import sys
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-import matplotlib.pyplot as plt
-import seaborn as sns
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
@@ -24,12 +26,12 @@ def set_dosages(db):
                     """)
     # set dosages to the correct value
     db.cursor.execute(
-            """UPDATE donor_has_snp 
+        """UPDATE donor_has_snp 
                 SET dosages = (CAST(mutant_allele_read_count AS REAL) / CAST(total_read_count AS REAL))
                 WHERE total_read_count > 0;""")
     # Add to database
     db.mydb_connection.commit()
-    
+
 
 def set_GT(db, table):
     """
@@ -43,32 +45,32 @@ def set_GT(db, table):
     db.cursor.execute("""
                     ALTER TABLE %s
                     ADD `GT` INT NULL DEFAULT NULL
-                    """% table)
+                    """ % table)
     # set GT to the correct value
     # Homozygoot alt
     db.cursor.execute(
-            """UPDATE %s 
+        """UPDATE %s 
                 SET GT = 2
-                WHERE dosages >= 0.8;"""% table)
+                WHERE dosages >= 0.8;""" % table)
     # Heterozygoot 
     db.cursor.execute(
-            """UPDATE %s 
+        """UPDATE %s 
                 SET GT = 1
-                WHERE dosages < 0.8 AND dosages > 0.2;"""% table)
+                WHERE dosages < 0.8 AND dosages > 0.2;""" % table)
     # Homozygoot ref
     db.cursor.execute(
-            """UPDATE %s 
+        """UPDATE %s 
                 SET GT = 0
-                WHERE dosages <= 0.2;"""% table)
+                WHERE dosages <= 0.2;""" % table)
     # Add to database
     db.mydb_connection.commit()
-    
+
 
 def set_GT2(db, table):
     """
     Add and set GT2 (genotype).
     The Nan (or none) values are all set to 0 (homozygous ref).
-    :param db:  The database object
+    :param db:    The database object
     :param table: Name of the table
     :return:
     """
@@ -76,18 +78,19 @@ def set_GT2(db, table):
     db.cursor.execute("""
                     ALTER TABLE %s
                     ADD `GT2` INT NULL DEFAULT NULL
-                    """% table)
+                    """ % table)
     # set GT2 to the correct value
     # Make all values of GT2 equal to GT
     db.cursor.execute(
-            """UPDATE %s 
-                SET GT2 = GT;"""% table)
+        """UPDATE %s 
+                SET GT2 = GT;""" % table)
     # Set all Nan (or none) values to 0 (homozygous ref)
     db.cursor.execute(
-            """UPDATE %s 
+        """UPDATE %s 
                 SET GT2 = 0
-                WHERE GT IS NULL;"""% table)
+                WHERE GT IS NULL;""" % table)
     db.mydb_connection.commit()
+
 
 def sum_dosage_GT(db):
     """
@@ -99,7 +102,8 @@ def sum_dosage_GT(db):
     db.cursor.execute("""
         CREATE TABLE sum_dosage_GT AS
             SELECT donor_has_snp.snp_ID, donor_has_snp.donor_ID, donor_has_snp.donor_project_ID,
-                    (CAST(SUM(donor_has_snp.mutant_allele_read_count) AS REAL) / CAST(SUM(donor_has_snp.total_read_count) AS REAL)) AS "dosages",
+                    (CAST(SUM(donor_has_snp.mutant_allele_read_count) AS REAL) / 
+                    CAST(SUM(donor_has_snp.total_read_count) AS REAL)) AS "dosages",
                     SUM(donor_has_snp.total_read_count) AS "total_read_count_sum", 
                     SUM(donor_has_snp.mutant_allele_read_count) AS "mutant_allele_read_count_sum",
                     COUNT(donor_has_snp.total_read_count) AS "number_snps"
@@ -162,7 +166,6 @@ def main():
     sum_dosage_GT(db)
     set_GT(db, 'sum_dosage_GT')
     set_GT2(db, 'sum_dosage_GT')
-
 
 
 if __name__ == '__main__':

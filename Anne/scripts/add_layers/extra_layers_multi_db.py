@@ -5,17 +5,21 @@ import pandas as pd
 from multiprocessing import Pool
 import multiprocessing as mp
 import sys
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 from collections import Counter
 
 
-
-def close_to(db, chr, start_pos, end_pos, variant_file, donor_dict, donor_list, donor_cancer_list, filter_num, name_variant):
+def close_to(db, chr, start_pos, end_pos, variant_file, donor_dict, donor_list, donor_cancer_list, filter_num,
+             name_variant):
     """
-    Selects all snps that occur in a specific region on a specific chromosome.
+    Selects all SNPs that occur in a specific region on a specific chromosome.
     And writes a line with certain information in the file (variant_file).
     :param db:                The database object
     :param chr:               Chromosome number or letter (without chr)
@@ -26,10 +30,11 @@ def close_to(db, chr, start_pos, end_pos, variant_file, donor_dict, donor_list, 
                               IDs that are used in the research.
     :param donor_list:        List of donor names (to be used later as rows in the sparse matrix)
     :param donor_cancer_list: List of cancers. This list has the same order as donor_list.
-    :param filter_num:        The number for filtering the total read count. (the number must be equal to or greater than)
+    :param filter_num:        The number for filtering the total read count. (the number must be equal to or
+                              greater than)
     :param name_variant:      The name of the layer
     :return:
-    """ 
+    """
     # Dictionary with the key donor_id and as value a list with the total number of read counts, 
     # total dosage and how often this donor occurs
     donor_read_count = dict()
@@ -37,17 +42,19 @@ def close_to(db, chr, start_pos, end_pos, variant_file, donor_dict, donor_list, 
     donor_list_snp = list()
     # List of SNPs
     snp_ID_list = list()
-        
+
     db.cursor.execute("""
                     SELECT sum_dosage_GT.snp_ID , sum_dosage_GT.donor_ID, 
                            sum_dosage_GT.total_read_count_sum , sum_dosage_GT.mutant_allele_read_count_sum,
                            sum_dosage_GT.dosages
                     FROM snp, sum_dosage_GT
-                    WHERE snp.chr = '%s' AND snp.pos_start >= %s AND snp.pos_end <= %s AND sum_dosage_GT.total_read_count_sum > %s 
-                            AND sum_dosage_GT.mutant_allele_read_count_sum > 0 AND snp.ID = sum_dosage_GT.snp_ID AND snp.%s = 1
+                    WHERE snp.chr = '%s' AND snp.pos_start >= %s AND snp.pos_end <= %s AND 
+                            sum_dosage_GT.total_read_count_sum > %s 
+                            AND sum_dosage_GT.mutant_allele_read_count_sum > 0 AND snp.ID = sum_dosage_GT.snp_ID 
+                            AND snp.%s = 1
                     GROUP BY sum_dosage_GT.snp_ID, sum_dosage_GT.donor_ID;
                     """ %
-                    (str(chr), int(start_pos), int(end_pos), int(filter_num), str(name_variant)))
+                      (str(chr), int(start_pos), int(end_pos), int(filter_num), str(name_variant)))
 
     results = db.cursor.fetchall()
     if len(results) > 0:
@@ -78,13 +85,12 @@ def close_to(db, chr, start_pos, end_pos, variant_file, donor_dict, donor_list, 
         donor_count = dict(Counter(donor_list_snp))
         # Write to file
         variant_file.write(str(filter_num) + '\t' + str(chr) + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
-        len(snp_ID_list)) + '\t' + ','.join(map(str, snp_ID_list)) + '\t' + str(len(donor_list_snp)) + '\t' + str(
-        donor_count) + '\t' + str(cancer_count) + '\n')
-    else: 
+            len(snp_ID_list)) + '\t' + ','.join(map(str, snp_ID_list)) + '\t' + str(len(donor_list_snp)) + '\t' + str(
+            donor_count) + '\t' + str(cancer_count) + '\n')
+    else:
         # If no results (SNPs) are found in a certain region, a line will be written
         variant_file.write(str(filter_num) + '\t' + str(chr) + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
-        len(snp_ID_list)) + '\t-\t-\t-\t-\n')
-    
+            len(snp_ID_list)) + '\t-\t-\t-\t-\n')
 
 
 def make_file_extra_layers(df_variant, chr, name_variant, path_db, config, donor_dict, donor_list, donor_cancer_list):
@@ -101,7 +107,7 @@ def make_file_extra_layers(df_variant, chr, name_variant, path_db, config, donor
     :param donor_list:        List of donor names (to be used later as rows in the sparse matrix)
     :param donor_cancer_list: List of cancers. This list has the same order as donor_list.
     :return:
-    """ 
+    """
     # Database connection
     db = Database(path_db)
     # The header for the file
@@ -112,17 +118,18 @@ def make_file_extra_layers(df_variant, chr, name_variant, path_db, config, donor
     # Write file to file
     f.write(header_file)
     for index, row in df_variant.iterrows():
-        close_to(db, row['#Chromosome'].replace('chr', ''), row['Start'], row['End'], f, donor_dict, donor_list, donor_cancer_list, 33, name_variant)        
+        close_to(db, row['#Chromosome'].replace('chr', ''), row['Start'], row['End'], f, donor_dict, donor_list,
+                 donor_cancer_list, 33, name_variant)
     f.close()
     # Committing the current transactions
     db.mydb_connection.commit()
-    
+
 
 def main():
     # Call get_config
     config = get_config('gearshift')
     name_layer = sys.argv[1]
-    path_db = config['database'] 
+    path_db = config['database']
     # Database connection
     db = Database(path_db)
     # Call get_projects
@@ -137,7 +144,8 @@ def main():
     # Loop over chromosomes
     for item in list(set(df_variant['#Chromosome'])):
         select_variant_df = df_variant.loc[df_variant['#Chromosome'] == item]
-        arg_multi_list.append((select_variant_df, item, name_layer, path_db, config, donor_dict, donor_list, donor_cancer_list))
+        arg_multi_list.append(
+            (select_variant_df, item, name_layer, path_db, config, donor_dict, donor_list, donor_cancer_list))
 
     pool = Pool(processes=mp.cpu_count())
     pool.starmap(func=make_file_extra_layers, iterable=arg_multi_list)
@@ -145,6 +153,7 @@ def main():
     pool.join()
     # Close database connection
     db.close()
+
 
 if __name__ == '__main__':
     main()

@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
-#Import
+# Import
 import pandas as pd
 import sys
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
@@ -21,9 +25,10 @@ def add_value(db, name_variant):
                     ALTER TABLE snp
                     ADD {name_variant} BOOLEAN DEFAULT(FALSE)
                     """)
-    
+
     # Committing the current transactions
     db.mydb_connection.commit()
+
 
 def set_value(db, row, name_variant):
     """
@@ -45,16 +50,16 @@ def set_value(db, row, name_variant):
             FROM snp
             WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
         (str(row['#Chromosome'].replace('chr', '')), int(row['Start']), int(row['End'])))
-    
+
     results = db.cursor.fetchall()
     return len(results)
-    
+
 
 def main():
     # Call get_config
     config = get_config('gearshift')
     # Path to databas
-    path_db = config['database'] 
+    path_db = config['database']
     # Database connection
     db = Database(path_db)
     # DNase file
@@ -64,18 +69,20 @@ def main():
     # Call add_value
     add_value(db, name_variant)
 
-    f = open(f'{config["genes_eQTL_etc"]}{name_variant}_num_snps.tsv', 'w') 
+    f = open(f'{config["genes_eQTL_etc"]}{name_variant}_num_snps.tsv', 'w')
     f.write(f"#Chromosome\tStart\tEnd\tnum_snps_region\n")
     for index, row in df_variant.iterrows():
         # Call set_value
         num_snps_region = set_value(db, row, name_variant)
         print(index)
-        f.write(f"{str(row['#Chromosome'].replace('chr', ''))}\t{int(row['Start'])}\t{int(row['End'])}\t{num_snps_region}\n")
+        f.write(
+            f"{str(row['#Chromosome'].replace('chr', ''))}\t{int(row['Start'])}\t{int(row['End'])}\t{num_snps_region}\n")
     f.close()
     # Committing the current transactions
     db.mydb_connection.commit()
     # Close database connection
     db.close()
+
 
 if __name__ == '__main__':
     main()

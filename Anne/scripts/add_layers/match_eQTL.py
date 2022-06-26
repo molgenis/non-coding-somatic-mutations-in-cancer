@@ -3,14 +3,17 @@
 # Imports
 import pandas as pd
 import sys
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
+
 
 def compare_eQTL_files(df_eQTL, df_strong_eQTL, config):
     """
     Appends the extra information from the file with all eQTLs to the file with only the strictest eQTLs per gene.
-    :param df_eQTL: all significant eQTLs
-    :param df_strong_eQTL: all strongest eQTLs per gene (no information further)
+    :param df_eQTL: All significant eQTLs
+    :param df_strong_eQTL: All strongest eQTLs per gene (no information further)
     :param config: Dictionary with as keys the name of the paths and as value the paths   
     :return:
     """
@@ -19,7 +22,7 @@ def compare_eQTL_files(df_eQTL, df_strong_eQTL, config):
     # Loop over df_strong_eQTL
     for index, row in df_strong_eQTL.iterrows():
         # Get the info of the strong eQTL
-        select_eQTL = df_eQTL[(df_eQTL['SNP']==row[0]) & (df_eQTL['Gene']==row[1])]
+        select_eQTL = df_eQTL[(df_eQTL['SNP'] == row[0]) & (df_eQTL['Gene'] == row[1])]
         # Append to df
         df = df.append(select_eQTL, ignore_index=True)
     # Write df to file
@@ -39,7 +42,6 @@ def main():
     df_strong_eQTL = pd.read_csv(path_strong_eQTL, sep='\t', header=None)
     # Call compare_eQTL_files
     compare_eQTL_files(df_eQTL, df_strong_eQTL, config)
-
 
 
 if __name__ == '__main__':

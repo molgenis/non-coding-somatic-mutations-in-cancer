@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 
-#Imports
+# Imports
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
 import sys
 import glob
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
@@ -39,7 +43,8 @@ def merge_sparce_matrix(save_path, whole_numpy_array):
     # Makes the donor_ids column the index of the data frame
     df_whole.set_index('donor_id', inplace=True)
     df_whole.to_csv(f'{save_path}ALL_sparsematrix_bef_overall.tsv.gz', sep="\t", index=True, encoding='utf-8',
-              compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+                    compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+
 
 def main():
     # Call get_config
@@ -49,9 +54,9 @@ def main():
     # Database connection
     db = Database(path_db)
     # Gene file path
-    gene_path = config['all_genes'] 
+    gene_path = config['all_genes']
     # Path to save files
-    save_path = config['umap_path'] 
+    save_path = config['umap_path']
     # Read gene file
     gene_df = pd.read_csv(gene_path, sep='\t')
     # Gene name list
@@ -62,10 +67,11 @@ def main():
     donor_list, donor_dict, donor_cancer_list = db.get_donors(project_dict)
     # Creating a len(donor_list) * len(gene_name_list) sparse matrix
     # +1 for the column total_reads
-    whole_numpy_array = csr_matrix((len(donor_list), len(gene_name_list)+1),
-                                             dtype=np.int8).toarray() 
+    whole_numpy_array = csr_matrix((len(donor_list), len(gene_name_list) + 1),
+                                   dtype=np.int8).toarray()
     # Call merge_sparce_matrix
     merge_sparce_matrix(save_path, whole_numpy_array)
+
 
 if __name__ == '__main__':
     main()

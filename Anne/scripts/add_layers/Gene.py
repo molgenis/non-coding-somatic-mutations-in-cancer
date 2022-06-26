@@ -3,9 +3,13 @@
 # Imports
 import pandas as pd
 import sys
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
@@ -67,13 +71,15 @@ def set_gene(db, row, chr, position_out_gene, position_in_gene):
         """UPDATE snp
             SET before_gene = TRUE
             WHERE chr = '%s' AND pos_start BETWEEN %s and %s;""" %
-        (str(chr), int(row['hg19.knownGene.txStart']-position_out_gene), int(row['hg19.knownGene.txStart']+position_in_gene)))
+        (str(chr), int(row['hg19.knownGene.txStart'] - position_out_gene),
+         int(row['hg19.knownGene.txStart'] + position_in_gene)))
     # Update after_gene
     db.cursor.execute(
         """UPDATE snp
             SET after_gene = TRUE
             WHERE chr = '%s' AND pos_start BETWEEN %s and %s;""" %
-        (str(chr), int(row['hg19.knownGene.txEnd'])-position_in_gene, int(row['hg19.knownGene.txEnd'])+position_out_gene))
+        (str(chr), int(row['hg19.knownGene.txEnd']) - position_in_gene,
+         int(row['hg19.knownGene.txEnd']) + position_out_gene))
     # Update in_coding
     db.cursor.execute(
         """UPDATE snp
@@ -95,7 +101,6 @@ def set_gene(db, row, chr, position_out_gene, position_in_gene):
     db.mydb_connection.commit()
 
 
-
 def loop_over_genes(db, gene_df, position_out_gene, position_in_gene):
     """
     Loop over the gene data frame.
@@ -107,7 +112,7 @@ def loop_over_genes(db, gene_df, position_out_gene, position_in_gene):
     :return:
 
     """
-   
+
     for index, row in gene_df.iterrows():
         # Remove 'chr' from the chromosome (chr1 --> 1)
         chr = row['hg19.knownGene.chrom'].replace('chr', '')
@@ -120,7 +125,7 @@ def main():
     # Call get_config
     config = get_config('gearshift')
     # Path of the database
-    path_db = config['database'] 
+    path_db = config['database']
     # Database connection
     db = Database(path_db)
     # Path of the genes and there positions

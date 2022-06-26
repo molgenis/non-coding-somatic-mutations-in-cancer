@@ -2,25 +2,17 @@
 library(karyoploteR)
 library(GenomicRanges)
 library(RSQLite)
-#library(zeallot) #https://stackoverflow.com/questions/13538628/returning-different-data-frames-in-a-function-r
-
 
 
 create_data_karyoploteR <- function(path, df, i, last_par, chr, basename_file) {
   ##########################################
-  #
+  # Create karyoplote data for the plot
   ##########################################
   # Check if it's not the sum picture but just per sample
   if (last_par != 'sum'){
     # Read file
     snps<-read.table(path,sep="\t",header=F)
     colnames(snps)<-c("gene_id", "seqnames","Start","End")
-    snpsHOI <- snps[snps$seqnames == paste("chr", chr),]
-    if (dim(snpsHOI)[1] == 0) {
-      print('JAAAAA')
-    }else{
-      print('neee')
-    }
     # Join start and end separated by a '-'
     snps$range <- paste(snps$Start, "-", snps$End)
     # Make it into a GRanges, so you can make a plot with it
@@ -36,7 +28,6 @@ create_data_karyoploteR <- function(path, df, i, last_par, chr, basename_file) {
     # Return a list of all_snps and new_df
     return(list(all_snps,new_df))
   } else {
-    print(head(df))
     # Replace the gene_id column
     df$gene_id <- seq(1, nrow(df), by=1)
     # Make the columns numeric
@@ -52,7 +43,7 @@ create_data_karyoploteR <- function(path, df, i, last_par, chr, basename_file) {
 
 add_density <- function(kp, data, r0, r1, label) {
   ##########################################
-  #
+  # Add density, axis and labels to the plot
   ##########################################
   # Plot the SNP density over the genome
   kp <- kpPlotDensity(kp, data=data, r0=r0, r1=r1, window.size = 1000)
@@ -67,7 +58,7 @@ add_density <- function(kp, data, r0, r1, label) {
 
 peaks <- function(kp, peaks_file, chr){
   ##########################################
-  #
+  # Get the peaks
   ##########################################
   # Get information out of the plots
   density <- kp$latest.plot$computed.values$density
@@ -82,7 +73,6 @@ peaks <- function(kp, peaks_file, chr){
   for (index in indexes){
     count <- count + 1
     # Write info to file - 'hight of peak' - 'start of window' - 'end of window'
-    #write(c(density[index], start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 3);
     write(c(count, density[index], chr, start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 5);
   }
   close(printer)
@@ -91,7 +81,7 @@ peaks <- function(kp, peaks_file, chr){
 
 make_plots <- function(chr, filenames, df, i, basename_file, counter, r0, r1, last_par, new_add, kp, num_for_r, custom.cytobands) {
   ##########################################
-  #
+  # Create the plots
   ##########################################
   # With a completely new plot, an object has to be created first. 
   # For a plot that has already been created, only a plot needs to be added.
@@ -131,19 +121,16 @@ make_plots <- function(chr, filenames, df, i, basename_file, counter, r0, r1, la
 
 read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, num_for_r, custom.cytobands) {
   ##########################################
-  #
+  # Read the files
   ##########################################
-  print(filenames)
   # Paste 'chr' for each chromosome
   chr <- paste('chr', chr, sep="")
   # Make empty dataframe
   df <- read.table(text = "", col.names = c("gene_id", "seqnames","Start","End"))
   # Loop over all files that end with .bed
   for (i in 1:length(filenames)){  
-    print(i)
     # With one file I have to split on something else than with the other file
     basename_file <- tools::file_path_sans_ext(strsplit(basename(filenames[i]), ".", fixed = TRUE)[[1]][1])
-    print(basename_file)
     # Checked that a maximum of 12 participants are clearly visible in a plot. 
     # So now he makes multiple plots with 12 (or fewer) participants per plot.
     if ( (i%%(num_of_pictures+1)) == 0 || i == 1){
@@ -166,7 +153,6 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, 
       df <- info[[2]]
       # counter: Keeps track of plot number
       counter <- info[[3]]  
-      
       peaks_file <- paste(path_info_save, basename_file, '_LONG_', chr, '.tsv', sep="")
       peaks(kp, peaks_file, chr)
     } else{
@@ -178,7 +164,6 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, 
       df <- info[[2]]
       # counter: Keeps track of plot number
       counter <- info[[3]]  
-      
       peaks_file <- paste(path_info_save, basename_file, '_LONG_', chr, '.tsv', sep="")
       peaks(kp, peaks_file, chr)
       # When you arrive at the last *.bed file, a plot is made in which all patients are added up. 
@@ -204,22 +189,10 @@ read_files <- function(filenames, chr, r0, r1, path_info_save, num_of_pictures, 
 main <- function() {
   # List of chromosomes
   numbers <-  seq(1, 22, by=1)
-  #numbers <-  seq(1, 5, by=1)
-  chrom <- append(numbers, c('X', 'Y'))
-  #chrom <- c(22)
-  
-  
-  # Cancer
-  #path_file = "D:/Hanze_Groningen/STAGE/R/select_inf/cancer/"
-  #path_save = "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/cancer/"
-  # Project
-  #path_file = "D:/Hanze_Groningen/STAGE/R/select_inf/project/"
-  #path_save = "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/project/"
-  # VS
-  path_file = "D:/Hanze_Groningen/STAGE/R/select_inf/vs/filter/nu/" #vs\filter
+  chrom <- append(numbers, c('X', 'Y'))  
+  # breast cancer VS nonbreast cancer
+  path_file = "D:/Hanze_Groningen/STAGE/R/select_inf/vs/filter/nu/" 
   path_save = "D:/Hanze_Groningen/STAGE/R/PLOTS/kary/vs/before/1000_filter_all/"
-  
-  
   # Color chromosome on genes
   custom.cytobands <- toGRanges('D:/Hanze_Groningen/STAGE/db/mycytobands_R.txt')
   # How many layers do you want on one plot
@@ -239,9 +212,7 @@ main <- function() {
   
   # Loop over chromosomes
   for (chr in chrom){
-    print(chr)
     path_info_save = paste(path_save, '/chr', chr, '/', sep='')
-    print(path_info_save)
     # Makes folder if it doesn't exists
     if (!dir.exists(path_info_save)){
       dir.create(path_info_save, recursive = T)

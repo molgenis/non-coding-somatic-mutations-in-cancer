@@ -30,7 +30,7 @@ class Database:
             print("Error while connecting to sqlite", er)
             pass
 
-    def close(self):  
+    def close(self):
         """
         Close the connections of the cursor and mydb_connection
         :return: 
@@ -54,7 +54,6 @@ class Database:
             # Add to project_dict as key the auto-generated ID and as value the type of cancer that belongs to that project
             project_dict[proj['ID']] = proj['cancer']
         return project_dict
-
 
     def get_donors(self, project_dict):
         """
@@ -83,7 +82,7 @@ class Database:
 
     def get_snps(self, chr, start_pos, end_pos):
         """
-        Finds the snps between certain positions and puts the snp IDs in a list.
+        Finds the SNPs between certain positions and puts the snp IDs in a list.
         :param chr:         Chromosoom number or letter
         :param start_pos:   The start position
         :param end_pos:     The end position
@@ -95,7 +94,7 @@ class Database:
                         FROM 'snp'
                         WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s
                         """ %
-                        (str(chr), int(start_pos), int(end_pos)))
+                            (str(chr), int(start_pos), int(end_pos)))
         results_before = self.cursor.fetchall()
         # Make snp_id_list
         snp_id_list = list()
@@ -103,4 +102,3 @@ class Database:
             # Add ID to snp_id_list
             snp_id_list.append(res_bef['ID'])
         return snp_id_list
-

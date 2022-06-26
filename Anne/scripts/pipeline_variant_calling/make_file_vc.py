@@ -2,10 +2,11 @@
 
 # Imports
 import pandas as pd
-from itertools import combinations
 import sys
 from Sample import Sample
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
@@ -57,6 +58,7 @@ def arguments_to_file(dict_samples, head_path, chrom, number_of_tumors=None, num
     Ensures that all arguments are created and written.
     :param dict_samples:     a dictionary containing the sample_num as key and as value Sample objects
     :param head_path:        Main path to where the file will be saved
+    :param chrom:            The chosen chromosome
     :param number_of_tumors: Number of hc you want to combine while running Mutect2
     :param number_of_hc:     Number of hc you want to combine while running Mutect2
     :param type_sample:      What type of tumor you want to have ("both", "tFL" or "FL")

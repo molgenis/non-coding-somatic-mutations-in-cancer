@@ -2,9 +2,12 @@
 
 # Imports
 import sys
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
@@ -58,6 +61,7 @@ def add_value(db):
     # Committing the current transactions
     db.mydb_connection.commit()
 
+
 def cal_AF(db):
     """
     Calculate AF
@@ -65,11 +69,13 @@ def cal_AF(db):
     :return:
     """
     db.cursor.execute(
-            """UPDATE snp
+        """UPDATE snp
             SET AF = cal_AF.AF
-            FROM (SELECT (CAST(SUM(sum_dosage_GT.GT2) AS REAL) / (CAST(COUNT(sum_dosage_GT.donor_ID) AS REAL) * 2)) AS AF, 
+            FROM (SELECT (CAST(SUM(sum_dosage_GT.GT2) AS REAL) / (CAST(COUNT(sum_dosage_GT.donor_ID) AS REAL) * 2)) 
+                    AS AF, 
                     FROM sum_dosage_GT, snp
-                    WHERE sum_dosage_GT.snp_ID = snp.ID AND (sum_dosage_GT.GT2 = 0 OR sum_dosage_GT.GT2 = 1 OR sum_dosage_GT.GT2 = 2)
+                    WHERE sum_dosage_GT.snp_ID = snp.ID AND (sum_dosage_GT.GT2 = 0 OR sum_dosage_GT.GT2 = 1 
+                    OR sum_dosage_GT.GT2 = 2)
                     GROUP BY sum_dosage_GT.snp_ID
                     ORDER BY sum_dosage_GT.snp_ID) AS cal_AF;""")
     # Add to database

@@ -5,7 +5,6 @@ import pandas as pd
 from collections import Counter
 
 
-
 def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_list, gene_name_list,
              sparse_matrix_overall, donor_cancer_list, total_read, filter_num, with_type):
     """
@@ -26,7 +25,8 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
                                 specific region-donor combination.
     :param donor_cancer_list: List of cancers. This list has the same order as donor_list.
     :param total_read:          Lift of total read counts
-    :param filter_num:          The number for filtering the total read count. (the number must be equal to or greater than)
+    :param filter_num:          The number for filtering the total read count. (the number must be equal to or
+                                greater than)
     :param with_type:           Check if it is gene or not
     :return: sparse_matrix_overall: A matrix which contains very few non-zero elements. It contains the counts of a
                                    specific region-donor combination.
@@ -45,17 +45,18 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
     donor_list_snp = list()
     # List of SNPs
     snp_ID_list = list()
-        
+
     db.cursor.execute("""
                     SELECT sum_dosage_GT.snp_ID , sum_dosage_GT.donor_ID, 
                            sum_dosage_GT.total_read_count_sum , sum_dosage_GT.mutant_allele_read_count_sum,
                            sum_dosage_GT.dosages
                     FROM snp, sum_dosage_GT
-                    WHERE snp.chr = '%s' AND snp.pos_start >= %s AND snp.pos_end <= %s AND sum_dosage_GT.total_read_count_sum > %s 
-                            AND sum_dosage_GT.mutant_allele_read_count_sum > 0 AND (sum_dosage_GT.GT2 = 1 OR sum_dosage_GT.GT2 = 2) AND snp.ID = sum_dosage_GT.snp_ID
+                    WHERE snp.chr = '%s' AND snp.pos_start >= %s AND snp.pos_end <= %s 
+                    AND sum_dosage_GT.total_read_count_sum > %s AND sum_dosage_GT.mutant_allele_read_count_sum > 0 
+                    AND (sum_dosage_GT.GT2 = 1 OR sum_dosage_GT.GT2 = 2) AND snp.ID = sum_dosage_GT.snp_ID
                     GROUP BY sum_dosage_GT.snp_ID, sum_dosage_GT.donor_ID;
                     """ %
-                    (str(chr), int(start_pos), int(end_pos), int(filter_num)))
+                      (str(chr), int(start_pos), int(end_pos), int(filter_num)))
 
     results = db.cursor.fetchall()
     if len(results) > 0:
@@ -86,27 +87,32 @@ def close_to(db, gene, chr, start_pos, end_pos, gene_file, donor_dict, donor_lis
         # as value how often that name occurs in the list.
         cancer_count = dict(Counter(cancer_list))
         donor_count = dict(Counter(donor_list_snp))
-         # Write to file
+        # Write to file
         if with_type == 'genes':
-            gene_file.write(str(filter_num) + '\t'+gene + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
-                len(snp_ID_list)) + '\t' + ','.join(map(str, snp_ID_list)) + '\t' + str(len(donor_list_snp)) + '\t' + str(
-                donor_count) + '\t' + str(cancer_count) + '\n')
+            gene_file.write(
+                str(filter_num) + '\t' + gene + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
+                    len(snp_ID_list)) + '\t' + ','.join(map(str, snp_ID_list)) + '\t' + str(
+                    len(donor_list_snp)) + '\t' + str(
+                    donor_count) + '\t' + str(cancer_count) + '\n')
         else:
             gene_file.write(filter_num + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
-            len(snp_ID_list)) + '\t' + ','.join(map(str, snp_ID_list)) + '\t' + str(len(donor_list_snp)) + '\t' + str(
-            donor_count) + '\t' + str(cancer_count) + '\n')
+                len(snp_ID_list)) + '\t' + ','.join(map(str, snp_ID_list)) + '\t' + str(
+                len(donor_list_snp)) + '\t' + str(
+                donor_count) + '\t' + str(cancer_count) + '\n')
     else:
         # If no results (SNPs) are found in a certain region, a line will be written
         if with_type == 'genes':
-            gene_file.write(str(filter_num) + '\t'+gene + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
-                len(snp_ID_list)) + '\t-\t-\t-\t-\n')
+            gene_file.write(
+                str(filter_num) + '\t' + gene + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
+                    len(snp_ID_list)) + '\t-\t-\t-\t-\n')
         else:
             gene_file.write(filter_num + '\t' + chr + '\t' + str(start_pos) + '\t' + str(end_pos) + '\t' + str(
-            len(snp_ID_list)) + '\t-\t-\t-\t-\n')
+                len(snp_ID_list)) + '\t-\t-\t-\t-\n')
     return sparse_matrix_overall, gene_name_list, total_read
 
 
-def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, pos, donor_cancer_list, total_read, part_num):
+def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, pos, donor_cancer_list, total_read,
+                        part_num):
     """
     Writes the sparse_matrix to a compressed (.gz) .tsv file
     :param sparse_matrix:     A matrix which contains very few non-zero elements. It contains the counts of a specific
@@ -134,6 +140,3 @@ def write_sparse_matrix(sparse_matrix, gene_name_list, donor_list, save_path, po
     # Write the dataframe to a compressed .tsv file
     df.to_csv(f'{save_path}{part_num}_sparsematrix_{pos}_NEW.tsv.gz', sep="\t", index=True, encoding='utf-8',
               compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
-
-
-

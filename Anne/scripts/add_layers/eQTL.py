@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 
-#Imports
+# Imports
 import pandas as pd
 import sys
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
 def add_value(db, ID_eQT, eQT, close_eQT):
     """
     Adds values (ID_eQT, eQT, close_eQT) to the database (table snp).
-    :param db:  The database object
+    :param db:      The database object
     :param ID_eQT:  String. This is the name of the parameter from the database that is set to an ID 
                     when that snp exactly matches an eQT.
-    :param eQT:  String. This is the name of the parameter in the database that will 
-                 be set to true when a snp matches an eQT exactly
+    :param eQT:     String. This is the name of the parameter in the database that will
+                    be set to true when a snp matches an eQT exactly
     :param close_eQT:  String. This is the name of the parameter in the database that is set 
                        to true when a snp falls within a certain region (before or after) a known eQT
     :return:
@@ -25,36 +29,38 @@ def add_value(db, ID_eQT, eQT, close_eQT):
                     ALTER TABLE snp
                     ADD `%s` VARCHAR(45) NULL DEFAULT NULL
                     """ %
-                    (ID_eQT))
+                      (ID_eQT))
     db.cursor.execute("""
                     ALTER TABLE snp
                     ADD `%s` BOOLEAN DEFAULT(FALSE)
                     """ %
-                    (eQT))
+                      (eQT))
     db.cursor.execute("""
                     ALTER TABLE snp
                     ADD `%s` BOOLEAN DEFAULT(FALSE)
                     """ %
-                    (close_eQT))
+                      (close_eQT))
+
 
 def set_value(db, ID_eQT, eQT, row):
     """
-    The parameters ID_eQT and eQT are set to either an ID or true when a snp exactly matches an eQT in position, ref and alt
-    :param db:  The database object
+    The parameters ID_eQT and eQT are set to either an ID or true when a snp exactly matches an eQT in position,
+    ref and alt
+    :param db:      The database object
     :param ID_eQT:  String. This is the name of the parameter from the database that is set to an ID 
                     when that snp exactly matches an eQT.
-    :param eQT:  String. This is the name of the parameter in the database that will 
-                 be set to true when a snp matches an eQT exactly
-    :param row:  Line from the eQT file with information about 1 eQT
-    :return: the length of the results
+    :param eQT:     String. This is the name of the parameter in the database that will
+                    be set to true when a snp matches an eQT exactly
+    :param row:     Line from the eQT file with information about 1 eQT
+    :return: The length of the results
     """
     # Add ID_eQTL and eQTL to snp that matches the matches in chr, pos_start, pos_end, ref and alt.
     db.cursor.execute(
-            """UPDATE snp
+        """UPDATE snp
                 SET %s = '%s', %s = TRUE
                 WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-            (ID_eQT, str(row['SNP']), eQT, str(row['SNPChr']), int(row['SNPPos']), 
-            int(row['SNPPos'])))
+        (ID_eQT, str(row['SNP']), eQT, str(row['SNPChr']), int(row['SNPPos']),
+         int(row['SNPPos'])))
 
     # Count snps in region
     db.cursor.execute(
@@ -62,7 +68,7 @@ def set_value(db, ID_eQT, eQT, row):
             FROM snp
             WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
         (str(row['SNPChr']), int(row['SNPPos']), int(row['SNPPos'])))
-    
+
     results = db.cursor.fetchall()
     return len(results)
 
@@ -70,26 +76,26 @@ def set_value(db, ID_eQT, eQT, row):
 def set_value_close_to(db, row, close_eQT, region):
     """
     The parameter close_eQT is set to true when a snp falls within the region (before or after) of an eQT
-    :param db:  The database object
-    :param row:  Line from the eQT file with information about 1 eQT
+    :param db:         The database object
+    :param row:        Line from the eQT file with information about 1 eQT
     :param close_eQT:  String. This is the name of the parameter in the database that is set 
                        to true when a snp falls within a certain region (before or after) a known eQT
-    :param region:  Region (front or back) an eQT, within which snps are searched.
-    :return:   the length of the results
+    :param region:     Region (front or back) an eQT, within which snps are searched.
+    :return:   The length of the results
     """
     db.cursor.execute(
-            """UPDATE snp
+        """UPDATE snp
                 SET %s = TRUE
                 WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-            (close_eQT, str(row['SNPChr']), int(row['SNPPos'])-region, int(row['SNPPos'])+region))
+        (close_eQT, str(row['SNPChr']), int(row['SNPPos']) - region, int(row['SNPPos']) + region))
 
     # Count snps in region
     db.cursor.execute(
         """SELECT ID
             FROM snp
             WHERE chr = '%s' AND pos_start >= %s AND pos_end <= %s;""" %
-        (str(row['SNPChr']), int(row['SNPPos'])-region, int(row['SNPPos'])+region))
-    
+        (str(row['SNPChr']), int(row['SNPPos']) - region, int(row['SNPPos']) + region))
+
     results = db.cursor.fetchall()
     return len(results)
 
@@ -97,23 +103,28 @@ def set_value_close_to(db, row, close_eQT, region):
 def loop_eQTL(db, eQTL_df, ID_eQT, eQT, close_eQT, region, config):
     """
     Loop over the eQT dataframe
-    :param db:  The database object
+    :param db:       The database object
     :param eQTL_df:  The eQT file as data frame
-    :param ID_eQT:  String. This is the name of the parameter from the database that is set to an ID 
-                    when that snp exactly matches an eQT.
-    :param eQT:  String. This is the name of the parameter in the database that will 
-                 be set to true when a snp matches an eQT exactly
+    :param ID_eQT:   String. This is the name of the parameter from the database that is set to an ID
+                     when that snp exactly matches an eQT.
+    :param eQT:      String. This is the name of the parameter in the database that will
+                     be set to true when a snp matches an eQT exactly
     :param close_eQT: String. This is the name of the parameter in the database that is set 
                       to true when a snp falls within a certain region (before or after) a known eQT
-    :param region: Region (front or back) an eQT, within which snps are searched.
+    :param region:    Region (front or back) an eQT, within which snps are searched.
+    :param config:    Dictionary with as keys the name of the paths and as value the paths
     :return:
     """
-    f = open(f'{config["genes_eQTL_etc"]}eQTL_num_snps_{region}.tsv', 'w') 
+    f = open(f'{config["genes_eQTL_etc"]}eQTL_num_snps_{region}.tsv', 'w')
     f.write(f"eQTL\tchr\tStart\tEnd\texact\tclose\n")
     for index, row in eQTL_df.iterrows():
+        # Call set_value
         exact_results = set_value(db, ID_eQT, eQT, row)
+        # Call set_value_close_to
         close_results = set_value_close_to(db, row, close_eQT, region)
-        f.write(f"{str(row['SNP'])}\t{str(row['SNPChr'])}\t{int(row['SNPPos'])}\t{int(row['SNPPos'])}\t{exact_results}\t{close_results}\n")
+        f.write(
+            f"{str(row['SNP'])}\t{str(row['SNPChr'])}\t{int(row['SNPPos'])}\t{int(row['SNPPos'])}\t{exact_results}"
+            f"\t{close_results}\n")
     f.close()
     # Add to database
     db.mydb_connection.commit()
@@ -123,9 +134,9 @@ def main():
     # Call get_config
     config = get_config('gearshift')
     # Database file
-    db_path= config['database'] 
+    db_path = config['database']
     # File with eQTLs
-    eQTL_path = config['strong_eqtl_path'] 
+    eQTL_path = config['strong_eqtl_path']
     # Database class
     db = Database(db_path)
     # Read file
@@ -145,4 +156,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

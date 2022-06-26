@@ -6,17 +6,14 @@ library(GenomicRanges)
 
 create_data_karyoploteR <- function(snps, df, i, last_par, chr, basename_file) {
     ##########################################
-    #
+    # Create karyoplote data for the plot
     ##########################################
     # Check if it's not the sum picture but just per sample
     if (last_par != 'sum'){
-        # Read file
-        #snps<-read.table(path,sep="\t",header=F)
-        #colnames(snps)<-c("gene_id", "seqnames","Start","End")
         # Join start and end separated by a '-'
         snps$range <- paste(snps$Start, "-", snps$End)
         # Make it into a GRanges, so you can make a plot with it
-        all_snps <- GRanges(snps) #toGRanges
+        all_snps <- GRanges(snps) 
         # Add patient ID as a column
         snps$sampleName <- basename_file
         # Check whether it is the first sample or whether other samples have already been read
@@ -43,7 +40,7 @@ create_data_karyoploteR <- function(snps, df, i, last_par, chr, basename_file) {
 
 add_density <- function(kp, data, r0, r1, label) {
     ##########################################
-    #
+    # Add density, axis and labels to the plot
     ##########################################
     # Plot the SNP density over the genome
     kp <- kpPlotDensity(kp, data=data, r0=r0, r1=r1, window.size = 100)
@@ -52,15 +49,13 @@ add_density <- function(kp, data, r0, r1, label) {
     kpAxis(kp, ymax=kp$latest.plot$computed.values$max.density, r0=r0, r1=r1, cex=0.8)
     # Add labels. Labels will appear on the left side of the plot.
     kpAddLabels(kp, labels=label, label.margin=0.04, r0=r0, r1=r1, data.panel = 1, cex=1.2, col = "cornflowerblue")
-
-    #kpRect(kp, chr="chr1", x0=7500001, x1=7600000, y0=0, y1=200, col="#AAFFCBDD", data.panel="all", border=NA)
     # Return karyoplot object
     return(kp)
 }
 
 peaks <- function(kp, peaks_file, chr){
     ##########################################
-    #
+    # Get the peaks
     ##########################################
     # Get information out of the plots
     density <- kp$latest.plot$computed.values$density
@@ -75,7 +70,6 @@ peaks <- function(kp, peaks_file, chr){
     for (index in indexes){
         count <- count + 1
         # Write info to file - 'hight of peak' - 'start of window' - 'end of window'
-        #write(c(density[index], start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 3);
         write(c(count, density[index], chr, start(windows[index]), end(windows[index])), textfile,sep = "\t",append = TRUE, ncolumns = 5);
     }
     close(printer)
@@ -84,13 +78,11 @@ peaks <- function(kp, peaks_file, chr){
 
 make_plots <- function(chr, filenames, df, i, basename_file, counter, r0, r1, last_par, new_add, kp, num_for_r, custom.cytobands, zoom.region) {
     ##########################################
-    #
+    # Create the plots
     ##########################################
     # With a completely new plot, an object has to be created first. 
     # For a plot that has already been created, only a plot needs to be added.
     if (new_add == 'new') {
-        # Create karyoplot object
-        #kp <- plotKaryotype()
         # Select chromosome
         kp <- plotKaryotype(genome="hg19", plot.type=1, chromosomes=c(chr), cytobands = custom.cytobands, zoom=zoom.region) 
         # Add base numbers: add the base numbering below each chromosome
@@ -123,56 +115,30 @@ make_plots <- function(chr, filenames, df, i, basename_file, counter, r0, r1, la
 
 
 set_plot_info <- function(select_breast, select_nonbreast, chr, start, end, r0, r1, path_info_save, num_of_pictures, num_for_r, custom.cytobands, zoom.region) {
-    # for (i in 1:2){
-        i <- 1
-        print(i)
-        # Checked that a maximum of 12 participants are clearly visible in a plot. 
-        # So now he makes multiple plots with 12 (or fewer) participants per plot.
-        # if ( (i%%(num_of_pictures+1)) == 0 || i == 1){
-        basename_file <- 'breast'
-        # If i is not 1, he has to close the previous plot, with 1 that is not yet possible,
-        # because then no plot has been made yet.
-        # if (i != 1 || num_of_pictures == 1){
-        #     dev.off()
-        # }
-        # Set counter to 0: Keeps track of plot number
-        counter <- 0 
-        # Create name for the figure that saves ~12 plots      
-        name <- paste(path_info_save, 'plot', chr,'_start_', start,'_end_', end, '.png', sep="")
-        # Make figure
-        png(name, width = 2000, height = 1000) 
-        # Call make_plots
-        info <- make_plots(chr, select_breast, df, i, basename_file, counter, r0, r1, '', 'new', '', num_for_r, custom.cytobands, zoom.region) #kp, df, counter
-        # The kp plot (karyoplot object)
-        kp <- info[[1]]
-        # The data frame that is continuously expanded with new data for the SUM plot
-        df <- info[[2]]
-        # counter: Keeps track of plot number
-        counter <- info[[3]]  
+    ##########################################
+    # 
+    ##########################################
+    i <- 1
+    print(i)
+    # Checked that a maximum of 12 participants are clearly visible in a plot. 
+    # So now he makes multiple plots with 12 (or fewer) participants per plot.
+    basename_file <- 'breast'
+    # Set counter to 0: Keeps track of plot number
+    counter <- 0 
+    # Create name for the figure that saves ~12 plots      
+    name <- paste(path_info_save, 'plot', chr,'_start_', start,'_end_', end, '.png', sep="")
+    # Make figure
+    png(name, width = 2000, height = 1000) 
+    # Call make_plots
+    info <- make_plots(chr, select_breast, df, i, basename_file, counter, r0, r1, '', 'new', '', num_for_r, custom.cytobands, zoom.region) #kp, df, counter
+    # The kp plot (karyoplot object)
+    kp <- info[[1]]
+    # The data frame that is continuously expanded with new data for the SUM plot
+    df <- info[[2]]
+    # counter: Keeps track of plot number
+    counter <- info[[3]]  
+    dev.off()
         
-        # peaks_file <- paste(path_info_save, basename_file, '_LONG_', chr, '.tsv', sep="")
-        # peaks(kp, peaks_file, chr)
-        dev.off()
-        # } 
-        # else{
-        #     basename_file <- 'nonbreast'
-        #     # Call make_plots
-        #     info <- make_plots(chr, select_nonbreast, df, i, basename_file, counter, r0, r1, '', 'add', kp, num_for_r, custom.cytobands, zoom.region) #kp, df, counter
-        #     # The kp plot (karyoplot object)
-        #     kp <- info[[1]]
-        #     # The data frame that is continuously expanded with new data for the SUM plot
-        #     df <- info[[2]]
-        #     # counter: Keeps track of plot number
-        #     counter <- info[[3]]  
-            
-        #     peaks_file <- paste(path_info_save, basename_file, '_LONG_', chr, '.tsv', sep="")
-        #     peaks(kp, peaks_file, chr)
-        #     # When you arrive at the last *.bed file, a plot is made in which all patients are added up. 
-        #     # So that you have everything in 1 enumerating picture.
-            
-        #     dev.off()                
-        # } 
-    # }
 }
 
 

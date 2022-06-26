@@ -4,9 +4,13 @@
 import pandas as pd
 import sys
 import numpy as np
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
@@ -60,7 +64,8 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
             last_id_snp = db.cursor.lastrowid
             # Fill donor_has_snp table
             db.cursor.execute("""
-                INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id, total_read_count, mutant_allele_read_count)
+                INSERT INTO donor_has_snp (donor_project_ID, donor_ID, snp_ID, tissue_id, specimen_id, 
+                                          total_read_count, mutant_allele_read_count)
                 VALUES (%s, %s, %s, %s, '%s', %s, %s)""" %
                               (int(last_id_project), int(last_id_donor), int(last_id_snp), int(tissue_id),
                                str(specimen_id), row['total_read_count'], row['mutant_allele_read_count']))
@@ -77,8 +82,8 @@ def fill_snp_tissue_donorsnp(db, select_donor, specimen_df, last_id_project, las
                     FROM donor_has_snp
                     WHERE donor_project_ID = %s AND donor_ID = %s AND snp_ID = %s AND tissue_id = %s AND 
                     specimen_id = '%s' AND total_read_count = %s AND mutant_allele_read_count = %s;""" %
-                    (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id), str(specimen_id), 
-                    row['total_read_count'], row['mutant_allele_read_count'])
+                    (int(last_id_project), int(last_id_donor), int(id_snp), int(tissue_id), str(specimen_id),
+                     row['total_read_count'], row['mutant_allele_read_count'])
                 )
                 check_donor_snp = db.cursor.fetchall()
                 # If the combination donor and snp does not yet exist, fill in the table donor_has_snp
@@ -118,12 +123,12 @@ def fill_donor(db, select_project, donor_info, last_id_project, specimen_df):
             db.cursor.execute("""INSERT INTO donor (donor_ID, project_ID, sex, vital_status, age_at_diagnosis, 
                                                     age_at_last_followup, disease_status_last_followup)
                                 VALUES ('%s', %s, '%s', '%s', %s, %s, '%s')""" %
-                            (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
-                            donor_info['donor_vital_status'][donor_id],
-                            donor_info['donor_age_at_diagnosis'][donor_id],
-                            donor_info['donor_age_at_last_followup'][donor_id],
-                            donor_info['disease_status_last_followup'][donor_id]))
-                
+                              (str(donor_id), int(last_id_project), donor_info['donor_sex'][donor_id],
+                               donor_info['donor_vital_status'][donor_id],
+                               donor_info['donor_age_at_diagnosis'][donor_id],
+                               donor_info['donor_age_at_last_followup'][donor_id],
+                               donor_info['disease_status_last_followup'][donor_id]))
+
             # Get the last ID (private key of the donor table) used
             last_id_donor = db.cursor.lastrowid
         else:
@@ -194,7 +199,8 @@ def read_file(path, db, project_cancer, donor_info, specimen_df):
     df = df.drop_duplicates()
     # Selects only the SNPs found with WGS
     df = df.loc[df['seq_strategy'] == 'WGS']
-    df[['total_read_count', 'mutant_allele_read_count']] = df[['total_read_count', 'mutant_allele_read_count']].fillna('NULL')
+    df[['total_read_count', 'mutant_allele_read_count']] = df[['total_read_count', 'mutant_allele_read_count']].fillna(
+        'NULL')
     # Checked if df is not empty (Some projects do not contain WGS SNPs)
     if len(df) != 0:
         # Calls fill_database
@@ -246,8 +252,8 @@ def main():
     donor_info_df['donor_vital_status'] = donor_info_df['donor_vital_status'].map(
         {'deceased': 'FALSE', 'alive': 'TRUE'})
     # Replace nan and empty values with NULL
-    donor_info_df = donor_info_df.replace(np.nan,'NULL')
-    donor_info_df = donor_info_df.replace('','NULL')
+    donor_info_df = donor_info_df.replace(np.nan, 'NULL')
+    donor_info_df = donor_info_df.replace('', 'NULL')
     # Make dictionary of donor_info_df
     donor_info = donor_info_df.set_index('icgc_donor_id').to_dict('dict')
     # Path to file with specimen_type (Normal or tumor tissue)

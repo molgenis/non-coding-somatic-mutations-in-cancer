@@ -4,20 +4,23 @@
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
-# from matplotlib import pyplot as plt
 from search_snps_between import close_to, write_sparse_matrix
 from multiprocessing import Pool
 import multiprocessing as mp
 import sys
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from Database import Database
-sys.path.append('/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
+
+sys.path.append(
+    '/groups/umcg-wijmenga/tmp01/projects/lude_vici_2021/rawdata/non-coding-somatic-mutations-in-cancer/Anne/scripts/')
 from config import get_config
 
 
-
 def loop_over_genes(config, gene_df, position_out_gene, position_in_gene, donor_dict, donor_list, donor_cancer_list,
-                    save_path, gene_name_bef, gene_name_aft, sparse_matrix_before_overall, sparse_matrix_after_overall, filter_num, with_type, part_num):
+                    save_path, gene_name_bef, gene_name_aft, sparse_matrix_before_overall, sparse_matrix_after_overall,
+                    filter_num, with_type, part_num):
     """
     Loop over the gene data frame.
     :param config:              Dictionary with as keys the name of the paths and as value the paths    
@@ -36,7 +39,8 @@ def loop_over_genes(config, gene_df, position_out_gene, position_in_gene, donor_
                                 specific region (before gene)-donor combination.
     :param sparse_matrix_after_overall: A matrix which contains very few non-zero elements. It contains the counts of a
                                 specific region (after gene)-donor combination.
-    :param filter_num:          The number for filtering the total read count. (the number must be equal to or greater than)
+    :param filter_num:          The number for filtering the total read count. (the number must be equal to or
+                                greater than)
     :param with_type:           Check if it is gene or not
     :param part_num:            The number of the part for multiprocessing
     :return:
@@ -46,7 +50,7 @@ def loop_over_genes(config, gene_df, position_out_gene, position_in_gene, donor_
     path_db = config['database']
     # Database connection
     db = Database(path_db)
-     # The header for the files before_gene_file and after_gene_file
+    # The header for the files before_gene_file and after_gene_file
     header_file = 'filter\tgene\tchr\tstart_position_regio\tend_position_regio\t#snp_unique\tsnp_list\t#donors_all' \
                   '\tdonor_count\tcancer_count\n'
     # Make file
@@ -55,7 +59,7 @@ def loop_over_genes(config, gene_df, position_out_gene, position_in_gene, donor_
     # Write header
     before_gene_file.write(header_file)
     after_gene_file.write(header_file)
-    
+
     total_read_before = [0] * len(donor_list)
     total_read_after = [0] * len(donor_list)
     # Loop over genes in file
@@ -65,27 +69,24 @@ def loop_over_genes(config, gene_df, position_out_gene, position_in_gene, donor_
         # Call close_to
         # BEF
         sparse_matrix_before_overall, gene_name_bef, total_read_before = close_to(db,
-                                                                                row['hg19.kgXref.geneSymbol'],
-                                                                                chr,
-                                                                                row[
-                                                                                    'hg19.knownGene.txStart'] - position_out_gene,
-                                                                                row[
-                                                                                    'hg19.knownGene.txStart'] + position_in_gene,
-                                                                                before_gene_file,
-                                                                                donor_dict,
-                                                                                donor_list,
-                                                                                gene_name_bef,
-                                                                                sparse_matrix_before_overall,
-                                                                                donor_cancer_list,
-                                                                                total_read_before, filter_num, with_type)
+                                                                                  row['hg19.kgXref.geneSymbol'],
+                                                                                  chr,
+                                                                                  row['hg19.knownGene.txStart'] - position_out_gene,
+                                                                                  row['hg19.knownGene.txStart'] + position_in_gene,
+                                                                                  before_gene_file,
+                                                                                  donor_dict,
+                                                                                  donor_list,
+                                                                                  gene_name_bef,
+                                                                                  sparse_matrix_before_overall,
+                                                                                  donor_cancer_list,
+                                                                                  total_read_before, filter_num,
+                                                                                  with_type)
         # AFT
-        sparse_matrix_after_overall, gene_name_aft, total_read_after = close_to(db, 
+        sparse_matrix_after_overall, gene_name_aft, total_read_after = close_to(db,
                                                                                 row['hg19.kgXref.geneSymbol'],
                                                                                 chr,
-                                                                                row[
-                                                                                    'hg19.knownGene.txEnd'] - position_in_gene,
-                                                                                row[
-                                                                                    'hg19.knownGene.txEnd'] + position_out_gene,
+                                                                                row['hg19.knownGene.txEnd'] - position_in_gene,
+                                                                                row['hg19.knownGene.txEnd'] + position_out_gene,
                                                                                 after_gene_file,
                                                                                 donor_dict,
                                                                                 donor_list,
@@ -108,13 +109,13 @@ def main():
     # Call get_config
     config = get_config('gearshift')
     # Path of the database
-    path_db = config['database'] 
+    path_db = config['database']
     # Database connection
     db = Database(path_db)
-    
-    gene_path = config['all_genes'] 
+
+    gene_path = config['all_genes']
     # Path to save files
-    save_path = config['umap_path'] 
+    save_path = config['umap_path']
     # Read gene file
     gene_df = pd.read_csv(gene_path, sep='\t')
     gene_name_list = gene_df['hg19.kgXref.geneSymbol'].tolist()
@@ -142,12 +143,14 @@ def main():
     cpus = mp.cpu_count()
     arg_multi_list = []
     # Divide df into parts of
-    for i in range(0, len(gene_df)+101, 100):
-        df = gene_df.iloc[i:i+100]
+    for i in range(0, len(gene_df) + 101, 100):
+        df = gene_df.iloc[i:i + 100]
         # Save arguments
-        arg_multi_list.append((config, df, position_out_gene, position_in_gene, donor_dict, donor_list, donor_cancer_list,
-                    save_path, gene_name_list, gene_name_list.copy(), sparse_matrix_before_region,
-                    sparse_matrix_after_region, sparse_matrix_before_region.copy(), sparse_matrix_after_region.copy(), filter_num, with_type, i))
+        arg_multi_list.append(
+            (config, df, position_out_gene, position_in_gene, donor_dict, donor_list, donor_cancer_list,
+             save_path, gene_name_list, gene_name_list.copy(), sparse_matrix_before_region,
+             sparse_matrix_after_region, sparse_matrix_before_region.copy(), sparse_matrix_after_region.copy(),
+             filter_num, with_type, i))
     # Multiprocess
     pool = Pool(processes=cpus)
     pool.starmap(func=loop_over_genes, iterable=arg_multi_list)
@@ -157,4 +160,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
