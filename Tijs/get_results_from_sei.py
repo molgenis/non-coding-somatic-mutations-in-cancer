@@ -56,7 +56,9 @@ def main(args):
   seq_class_df = open_seq_class_df(args.inputPath)
 
   df = get_top3_sei(args.inputPath, seq_class_df)
-  df = df.sort_values(by=["score1"], ascending=False)
+  df["score1_abs"] = df["score1"].abs()
+  df = df.sort_values(by=["score1_abs"], ascending=False)
+  df = df.drop(columns=["score1_abs"])
   df.to_csv(args.outputPath, sep="\t", index=False)
 
 
@@ -80,9 +82,10 @@ def get_top3_sei(input_path, seq_class_df):
         break
 
     scores = chunk[8:].astype(np.float32)
-    top3 = scores.nlargest(3)
+    top3 = scores.abs().nlargest(3)
     entry = pd.DataFrame.from_dict({"chr":[chunk["chrom"]], "position":[chunk["position"]], "top1":[top3.index[0]], "top2":[top3.index[1]], "top3":[top3.index[2]], 
-                                    "score1":[top3[0]], "score2":[top3[1]], "score3":[top3[2]], "top_sequence_class":[seq_class], "top_sequence_class_score":[seq_class_entry["seqclass_max_absdiff"].values[0]]})
+                                    "score1":[chunk[top3.index[0]]], "score2":[chunk[top3.index[1]]], "score3":[chunk[top3.index[2]]], 
+                                    "top_sequence_class":[seq_class], "top_sequence_class_score":[seq_class_entry["seqclass_max_absdiff"].values[0]]})
     df = pd.concat([df, entry])
 
   return df
