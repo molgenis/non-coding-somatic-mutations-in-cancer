@@ -32,10 +32,10 @@ Uses:
 __title__ = "get top 3 diffs from DeepSEA-sei run" 
 __author__ = "Tijs van Lieshout"
 __created__ = "2022-07-18"
-__updated__ = "2022-07-18"
+__updated__ = "2022-07-20"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
-__version__ = 1.0
+__version__ = 1.1
 __license__ = "GPLv3"
 __description__ = f"""{__title__} is a python script created on {__created__} by {__author__}.
                       Last update (version {__version__}) was on {__updated__} by {__maintainer__}.
@@ -52,14 +52,22 @@ from tqdm import tqdm
 
 def main(args):
   df = pd.DataFrame()
-  # TODO: include top_sequence_class
   seq_class_df = open_seq_class_df(args.inputPath)
+  summary_file = pd.read_csv(args.summaryPath, sep="\t")
+  UT =summary_file[summary_file["condition"] == "UT"]
 
   df = get_top3_sei(args.inputPath, seq_class_df)
   df["score1_abs"] = df["score1"].abs()
   df = df.sort_values(by=["score1_abs"], ascending=False)
   df = df.drop(columns=["score1_abs"])
-  df.to_csv(args.outputPath, sep="\t", index=False)
+  merged_df = merge_dataframes(df, UT)
+
+  merged_df['OverallZScore'] = merged_df['OverallZScore'].str.replace(",",".")
+  merged_df[['top_sequence_class_score', 'OverallZScore']] = merged_df[['top_sequence_class_score', 'OverallZScore']].astype(float)
+  contingency_table = pd.crosstab(index=merged_df['top_sequence_class_score'] >= 0, columns=merged_df['OverallZScore'] > =0,
+                                  rownames=["positive sequence class score"],colnames=["positive Z-score"])
+  print(contingency_table)
+  merged_df.to_csv(args.outputPath, sep="\t", index=False)
 
 
 def open_seq_class_df(path):
@@ -85,15 +93,25 @@ def get_top3_sei(input_path, seq_class_df):
     top3 = scores.abs().nlargest(3)
     entry = pd.DataFrame.from_dict({"chr":[chunk["chrom"]], "position":[chunk["position"]], "top1":[top3.index[0]], "top2":[top3.index[1]], "top3":[top3.index[2]], 
                                     "score1":[chunk[top3.index[0]]], "score2":[chunk[top3.index[1]]], "score3":[chunk[top3.index[2]]], 
-                                    "top_sequence_class":[seq_class], "top_sequence_class_score":[seq_class_entry["seqclass_max_absdiff"].values[0]]})
+                                    "top_sequence_class":[seq_class], "top_sequence_class_score":[seq_class_entry[seq_class].values[0]]})
     df = pd.concat([df, entry])
 
   return df
 
 
+def merge_dataframes(df, UT): 
+  df['chr'] = df['chr'].str.strip("chr")
+  df[['chr', 'position']] = df[['chr', 'position']].astype(int)
+  UT[['SNPChr', 'SNPChrPos']] = UT[['SNPChr', 'SNPChrPos']].astype(int)
+  merged_df = pd.merge(df, UT, left_on=['chr','position'], right_on=['SNPChr','SNPChrPos'])
+  return merged_df
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument("-i", "--inputPath", type=str, required=True, help="Help goes here") 
+  parser.add_argument("-s", "--summaryPath", type=str, required=False, help="Help goes here") 
+  parser.add_argument("-p", "--predictedSurePath", type=str, required=False, help="Help goes here") 
   parser.add_argument("-o", "--outputPath", type=str, required=True, help="Help goes here")
   args = parser.parse_args()
   
