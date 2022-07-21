@@ -32,10 +32,10 @@ Uses:
 __title__ = "Creating a set of all given ICGC mutations 1200 bases upstream of the canonical transcription start sites"
 __author__ = "Tijs van Lieshout"
 __created__ = "2022-07-01"
-__updated__ = "2022-07-13"
+__updated__ = "2022-07-21"
 __maintainer__ = "Tijs van Lieshout"
 __email__ = "t.van.lieshout@umcg.nl"
-__version__ = 1.0
+__version__ = 1.1
 __license__ = "GPLv3"
 __description__ = f"""{__title__} is a python script created on {__created__} by {__author__}.
                       Last update (version {__version__}) was on {__updated__} by {__maintainer__}.
@@ -72,7 +72,7 @@ def main(args):
   
   # prepare output, change column order
   output_df = upstream_df[['chromosome','chromosome_start', 'chromosome_end', 'icgc_donor_id', 
-                           'icgc_mutation_id', 'mutated_from_allele', 'mutated_to_allele']]
+                           'icgc_mutation_id', 'mutated_from_allele', 'mutated_to_allele', 'name']]
   output_df = output_df.sort_values(by=['chromosome', 'chromosome_start'])
 
   output_bt = bt.from_dataframe(output_df.rename(columns={'chromosome': '#chromosome'}), header=True)
@@ -118,6 +118,8 @@ def get_upstream_mutations(chunk, tss_df, upstream):
       # skip concat attempt for increased speed
       if len(tmp_chr_chunk) == 0:
         continue
+      name = chr_tss_df[chr_tss_df['chromStart'] == tss_start]['name'].values[0]
+      tmp_chr_chunk = tmp_chr_chunk.assign(name=name)
       upstream_chr_chunk = pd.concat([upstream_chr_chunk, tmp_chr_chunk])
 
     upstream_chunk = pd.concat([upstream_chunk, upstream_chr_chunk])
