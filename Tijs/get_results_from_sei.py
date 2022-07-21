@@ -64,7 +64,8 @@ def main(args):
 
   merged_df['OverallZScore'] = merged_df['OverallZScore'].str.replace(",",".")
   merged_df[['top_sequence_class_score', 'OverallZScore']] = merged_df[['top_sequence_class_score', 'OverallZScore']].astype(float)
-  contingency_table = pd.crosstab(index=merged_df['top_sequence_class_score'] >= 0, columns=merged_df['OverallZScore'] > =0,
+  merged_df = merged_df[merged_df['top_sequence_class'].str.contains("E")]
+  contingency_table = pd.crosstab(index=merged_df['top_sequence_class_score'] >= 0, columns=merged_df['OverallZScore'] >=0,
                                   rownames=["positive sequence class score"],colnames=["positive Z-score"])
   print(contingency_table)
   merged_df.to_csv(args.outputPath, sep="\t", index=False)
