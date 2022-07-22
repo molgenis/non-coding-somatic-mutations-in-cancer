@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Uses:
-<The terminal interactions with this script go here>
+./calculate_mutational_score_per_gene.py -i ../../ICGC_blood_data/2022-07-21_1200_upstream_of_TSS_blood_cancer_noncosomu_with_gene_symbols.bed -o ../../ICGC_blood_data/2022-07-22_stouffers_lymphoma_promoters.tsv
 """
 
 # Metadata
@@ -46,6 +46,7 @@ import argparse
 
 import pandas as pd
 import numpy as np
+import scipy.stats as st
 
 
 def main(args):
@@ -53,15 +54,30 @@ def main(args):
   print(df)
   print("\n\n")
 
+
   # most naive way
   calculate_naive_count(df, 'icgc_mutation_id')
+  print('positive strand SuRE scores')
+  calculate_naive_score(df, 'SuRE_diff_positive')
+
+  print('negative strand SuRE scores')
+  calculate_naive_score(df, 'SuRE_diff_negative')
 
   # normalize mutational burden per donor
-  normalized_count_matrix = create_normalized_count_matrix(df, 'icgc_mutation_id')
+  normalized_count_matrix = create_normalized_matrix(df.groupby(['icgc_donor_id', 'name'])['icgc_mutation_id'].count())
+
+  print('most naive way to sum Z-scores of positive strand SuRE p-values')
+  normalized_pos_score_matrix = create_normalized_matrix(df.groupby(['icgc_donor_id', 'name'])['SuRE_diff_positive'].mean())
+  print('most naive way to sum Z-scores of negative strand SuRE p-values')
+  normalized_neg_score_matrix = create_normalized_matrix(df.groupby(['icgc_donor_id', 'name'])['SuRE_diff_negative'].mean())
 
   # calculate the stouffers methodology for combining z-scores
-  calculate_stouffers_count(normalized_count_matrix)
-  #stouffers_count.sort_values(ascending=False).to_csv(args.outputPath, sep="\t")
+  calculate_stouffers(normalized_count_matrix)
+  print('Stouffers Z-scores of positive strand SuRE p-values')
+  calculate_stouffers(normalized_pos_score_matrix)
+  print('Stouffers Z-scores of negative strand SuRE p-values')
+  calculate_stouffers(normalized_neg_score_matrix)
+#  stouffers_count.sort_values(ascending=False).to_csv(args.outputPath, sep="\t")
 
 
 def calculate_naive_count(df, column_name):
@@ -71,8 +87,14 @@ def calculate_naive_count(df, column_name):
   print("\n\n")
 
 
-def create_normalized_count_matrix(df, column_name):
-  per_donor = df.groupby(['icgc_donor_id', 'name'])[column_name].count()
+def calculate_naive_score(df, column_name):
+  naive_score = df.groupby(['name'])[column_name].sum()
+  print("Most naive way to sum pred. scores")
+  print(naive_score.sort_values(ascending=False))
+  print("\n\n")
+
+
+def create_normalized_matrix(per_donor):
   normalized_count_matrix = pd.DataFrame() 
   for donor in set(per_donor.index.get_level_values('icgc_donor_id')): 
     donor_data = per_donor[donor]
@@ -94,11 +116,10 @@ def calculate_normalized_count(normalized_count_matrix):
   print("\n\n")
 
 
-
-def calculate_stouffers_count(normalized_count_matrix):
+def calculate_stouffers(normalized_matrix):
   # https://en.wikipedia.org/wiki/Fisher%27s_method#Relation_to_Stouffer.27s_Z-score_method
-  k = len(normalized_count_matrix.columns) - normalized_count_matrix.isnull().sum(axis=1)
-  stouffers_count = normalized_count_matrix.sum(axis=1) / np.sqrt(k) 
+  k = len(normalized_matrix.columns) - normalized_matrix.isnull().sum(axis=1)
+  stouffers_count = normalized_matrix.sum(axis=1) / np.sqrt(k) 
   print("Stouffer's Z-score method of combining mutational counts normalized per patient (Stouffer's method of Z-scores)")
   print(stouffers_count.sort_values(ascending=False))
   print("\n\n")
